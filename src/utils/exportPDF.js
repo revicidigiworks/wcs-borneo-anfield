@@ -96,7 +96,7 @@ const drawInfoBar = (doc, team, startY) => {
 const drawTeamBox = (doc, team, startY) => {
   const x = LAYOUT.MARGIN;
   const y = startY;
-  const h = 35;
+  const h = 30;
 
   doc.setDrawColor(...COLOR.BORDER);
   doc.rect(x, y, LAYOUT.CONTENT_W, h);
@@ -167,8 +167,8 @@ const drawPlayers = (doc, team, startY) => {
     theme: "grid",
 
     styles: {
-      fontSize: 8,
-      cellPadding: 3,
+      fontSize: 7,
+      cellPadding: 2,
     },
 
     headStyles: {
@@ -213,7 +213,7 @@ const drawSignature = (doc, yStart) => {
   doc.setTextColor(...COLOR.TEXT_MAIN);
 
   doc.text("MANAGER TIM", LAYOUT.MARGIN + 15, signY);
-  doc.text("PANITIA", LAYOUT.PAGE_W - LAYOUT.MARGIN - 45, signY);
+  doc.text("PANITIA", LAYOUT.PAGE_W - LAYOUT.MARGIN - 35, signY);
 
   doc.setDrawColor(...COLOR.BORDER);
   doc.line(LAYOUT.MARGIN + 5, signY + 15, LAYOUT.MARGIN + 55, signY + 15);
