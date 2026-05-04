@@ -6,7 +6,7 @@ import autoTable from "jspdf-autotable";
  ====================== */
 const COLOR = {
   PRIMARY: [200, 16, 46],
-  SECONDARY: [20, 20, 20],
+  SECONDARY: [15, 15, 15],
   TEXT_MAIN: [45, 45, 45],
   TEXT_MUTE: [100, 100, 100],
   BG_LIGHT: [248, 248, 248],
@@ -96,7 +96,7 @@ const drawInfoBar = (doc, team, startY) => {
 const drawTeamBox = (doc, team, startY) => {
   const x = LAYOUT.MARGIN;
   const y = startY;
-  const h = 30;
+  const h = 35;
 
   doc.setDrawColor(...COLOR.BORDER);
   doc.rect(x, y, LAYOUT.CONTENT_W, h);
