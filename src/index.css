@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* RESET + THEME */
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #C8102E;
+}
+
+
+
+/* utility tambahan */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
