@@ -10,7 +10,7 @@ export default function Login() {
     e.preventDefault();
 
     // 🔐 simple auth (nanti bisa upgrade Firebase Auth)
-    if (email === "admin@borneo.com" && password === "admin123") {
+    if (email === "admineo@bas.com" && password === "picklebas*") {
       localStorage.setItem("admin", "true");
       navigate("/admin/dashboard");
     } else {
