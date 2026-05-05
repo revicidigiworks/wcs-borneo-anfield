@@ -329,14 +329,40 @@ export default function Register() {
               <h2 className="font-bold text-lg flex items-center gap-2">
                 <Users size={18} /> Daftar Pemain
               </h2>
-              
+
             </div>
 
             <div className="space-y-4">
               {players.map((p, i) => (
                 <div key={p.id} className="border rounded-lg p-3 bg-[#fafafa] space-y-3">
-                  <div className="font-semibold text-sm text-gray-500">
-                    Pemain #{i + 1}
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-sm text-gray-500">
+                      Pemain #{i + 1}
+                    </span>
+
+                    <div className="flex items-center gap-2">
+
+                      {/* ➕ TAMBAH (CUMA DI PALING BAWAH) */}
+                      {i === players.length - 1 && (
+                        <button
+                          type="button"
+                          onClick={addPlayer}
+                          className="text-green-600 bg-green-50 hover:bg-green-100 p-1.5 rounded"
+                        >
+                          <Plus size={16} />
+                        </button>
+                      )}
+
+                      {/* 🗑 HAPUS */}
+                      <button
+                        type="button"
+                        onClick={() => removePlayer(i)}
+                        className="text-red-600 bg-red-50 hover:bg-red-100 p-1.5 rounded"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+
+                    </div>
                   </div>
 
                   <input value={p.name} onChange={(e) => handlePlayerChange(i, "name", e.target.value)} placeholder="Contoh: Risal Gerrad (sesuai KTP)" className="border rounded-md px-4 h-11 text-sm w-full" />
@@ -401,13 +427,9 @@ export default function Register() {
                     </div>
 
                   </div>
-                  <button type="button" onClick={addPlayer} className="text-[#0aef43] text-sm font-semibold flex items-center gap-1">
-                <Plus size={15} /> Tambah Pemain
-              </button>
 
-                  <button type="button" onClick={() => removePlayer(i)} className="text-red-600 flex items-center gap-1 text-sm">
-                    <Trash2 size={15} /> Hapus Pemain
-                  </button>
+
+                 
                 </div>
               ))}
             </div>
