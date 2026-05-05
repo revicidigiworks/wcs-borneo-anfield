@@ -158,7 +158,9 @@ const drawPlayers = async (doc, players, yStart) => {
   };
 
   const sortedPlayers = [...players].sort(
-    (a, b) => (positionOrder[a.position] || 99) - (positionOrder[b.position] || 99)
+    (a, b) =>
+      (positionOrder[a.position] || 99) -
+      (positionOrder[b.position] || 99)
   );
 
   doc.setFont("helvetica", "bold");
@@ -167,6 +169,58 @@ const drawPlayers = async (doc, players, yStart) => {
 
   y += 8;
 
+  // 🔥 CARD RAPI
+  const drawCard = async (p, x, y, index) => {
+    if (!p) return;
+
+    // BOX
+    doc.setDrawColor(...COLOR.BORDER);
+    doc.rect(x, y, boxW, boxH);
+
+    // FOTO
+    if (p.photo) {
+      const img = await toBase64(p.photo);
+      if (img) {
+        doc.addImage(img, "JPEG", x + 3, y + 4, 20, 24);
+      }
+    }
+
+    const textX = x + 26;
+    const lineW = boxW - 35; // 🔥 FIX AUTO WIDTH
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text(`No. ${index}`, textX, y + 7);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setDrawColor(180); // garis lebih soft
+
+    // NAMA
+    doc.text("Nama:", textX, y + 13);
+    doc.line(textX + 18, y + 13, textX + 18 + lineW, y + 13);
+    doc.text(
+      (p.name || "-").toUpperCase().slice(0, 28),
+      textX + 18,
+      y + 12
+    );
+
+    // POSISI
+    doc.text("Posisi:", textX, y + 19);
+    doc.line(textX + 18, y + 19, textX + 18 + lineW, y + 19);
+    doc.text(p.position || "-", textX + 18, y + 18);
+
+    // TTL
+    doc.text("TTL:", textX, y + 25);
+    doc.line(textX + 18, y + 25, textX + 18 + lineW, y + 25);
+    doc.text(
+      `${p.pob || "-"}, ${p.dob || "-"}`.slice(0, 30),
+      textX + 18,
+      y + 24
+    );
+  };
+
+  // LOOP 2 KOLOM
   for (let i = 0; i < sortedPlayers.length; i += 2) {
     if (y + boxH > 270) {
       doc.addPage();
@@ -176,59 +230,7 @@ const drawPlayers = async (doc, players, yStart) => {
     const left = sortedPlayers[i];
     const right = sortedPlayers[i + 1];
 
-    // 🔹 DRAW BOX FUNCTION
-   const drawCard = async (p, x, y, index) => {
-  if (!p) return;
-
-  // BOX
-  doc.setDrawColor(...COLOR.BORDER);
-  doc.rect(x, y, boxW, boxH);
-
-  // FOTO (lebih proporsional)
-  if (p.photo) {
-    const img = await toBase64(p.photo);
-    if (img) {
-      doc.addImage(img, "JPEG", x + 3, y + 4, 20, 24);
-    }
-  }
-
-  const textX = x + 26;
-  const lineW = 50;
-
-  // NO
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(9);
-  doc.text(`No. ${index}`, textX, y + 7);
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-
-  // NAMA
-  doc.text("Nama:", textX, y + 13);
-  doc.line(textX + 18, y + 13, textX + 18 + lineW, y + 13);
-  doc.text(
-    (p.name || "-").toUpperCase().slice(0, 28),
-    textX + 18,
-    y + 12
-  );
-
-  // POSISI
-  doc.text("Posisi:", textX, y + 19);
-  doc.line(textX + 18, y + 19, textX + 18 + lineW, y + 19);
-  doc.text(p.position || "-", textX + 18, y + 18);
-
-  // TTL
-  doc.text("TTL:", textX, y + 25);
-  doc.line(textX + 18, y + 25, textX + 18 + lineW, y + 25);
-
-  const ttl = `${p.pob || "-"}, ${p.dob || "-"}`;
-  doc.text(ttl.slice(0, 30), textX + 18, y + 24);
-};
-
-    // kiri
     await drawCard(left, startXLeft, y, i + 1);
-
-    // kanan
     await drawCard(right, startXRight, y, i + 2);
 
     y += boxH + 6;
