@@ -141,15 +141,13 @@ const drawTeamInfo = (doc, team, y) => {
 /* ===================== PLAYER LIST ===================== */
 const drawPlayers = async (doc, players, yStart) => {
   let y = yStart;
-  const rowH = 17;
 
-  const col = {
-    no: PAGE.M,
-    foto: PAGE.M + 10,
-    nama: PAGE.M + 30,
-    ttl: PAGE.M + 95,
-    usia: PAGE.W - PAGE.M - 5,
-  };
+  const boxW = 85;
+  const boxH = 32;
+  const gapX = 10;
+
+  const startXLeft = PAGE.M;
+  const startXRight = PAGE.M + boxW + gapX;
 
   // 🔥 URUT POSISI
   const positionOrder = {
@@ -163,109 +161,70 @@ const drawPlayers = async (doc, players, yStart) => {
     (a, b) => (positionOrder[a.position] || 99) - (positionOrder[b.position] || 99)
   );
 
-  // 🔥 GROUP POSISI
-  const grouped = {
-    Kiper: [],
-    Belakang: [],
-    Tengah: [],
-    Depan: [],
-  };
-
-  sortedPlayers.forEach((p) => {
-    grouped[p.position]?.push(p);
-  });
-
-  // TITLE
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
   doc.text("DAFTAR PEMAIN TERDAFTAR", PAGE.M, y);
-  y += 5;
 
-  // LOOP PER POSISI
-  for (const pos of ["Kiper", "Belakang", "Tengah", "Depan"]) {
-    const group = grouped[pos];
-    if (!group || group.length === 0) continue;
+  y += 8;
 
-    // PAGE BREAK
-    if (y > 260) {
+  for (let i = 0; i < sortedPlayers.length; i += 2) {
+    if (y + boxH > 270) {
       doc.addPage();
       y = 20;
     }
 
-    // 🔥 HEADER POSISI
-    doc.setFillColor(...COLOR.SECONDARY);
-    doc.rect(PAGE.M, y, 180, 6, "F");
+    const left = sortedPlayers[i];
+    const right = sortedPlayers[i + 1];
 
-    doc.setTextColor(255);
-    doc.setFontSize(8);
-    doc.text(pos.toUpperCase(), PAGE.M + 3, y + 4);
+    // 🔹 DRAW BOX FUNCTION
+    const drawCard = async (p, x, y, index) => {
+      if (!p) return;
 
-    y += 7;
-    doc.setTextColor(...COLOR.TEXT_MAIN);
+      // border
+      doc.setDrawColor(...COLOR.BORDER);
+      doc.rect(x, y, boxW, boxH);
 
-    // HEADER TABLE
-    doc.setFillColor(...COLOR.PRIMARY);
-    doc.rect(PAGE.M, y, 180, 7, "F");
-
-    doc.setTextColor(255);
-    doc.setFontSize(8);
-
-    doc.text("NO", col.no + 2, y + 5);
-    doc.text("FOTO", col.foto, y + 5);
-    doc.text("NAMA LENGKAP", col.nama, y + 5);
-    doc.text("TTL", col.ttl, y + 5);
-    doc.text("USIA", col.usia, y + 5, { align: "right" });
-
-    y += 7;
-    doc.setTextColor(...COLOR.TEXT_MAIN);
-
-    // DATA PLAYER
-    for (let i = 0; i < group.length; i++) {
-      const p = group[i];
-
-      if (y + rowH > 270) {
-        doc.addPage();
-        y = 20;
-      }
-
-      doc.text(String(i + 1), col.no + 2, y + 10);
-
+      // FOTO
       if (p.photo) {
         const img = await toBase64(p.photo);
         if (img) {
-          doc.addImage(img, "JPEG", col.foto, y + 1, 14, 15);
+          doc.addImage(img, "JPEG", x + 2, y + 2, 18, 22);
         }
       }
 
-      doc.text((p.name || "-").toUpperCase(), col.nama, y + 10);
+      const textX = x + 22;
 
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.text(`No. ${index}`, textX, y + 6);
+
+      doc.setFont("helvetica", "normal");
+
+      doc.text("Nama Lengkap:", textX, y + 11);
+      doc.text((p.name || "-").toUpperCase(), textX + 30, y + 11);
+
+      doc.text("Posisi:", textX, y + 16);
+      doc.text(p.position || "-", textX + 30, y + 16);
+
+      doc.text("TTL:", textX, y + 21);
       doc.text(
         `${p.pob || "-"}, ${p.dob || "-"}`,
-        col.ttl,
-        y + 10
+        textX + 30,
+        y + 21
       );
+    };
 
-      doc.text(
-        `${p.age || "-"} THN`,
-        col.usia,
-        y + 10,
-        { align: "right" }
-      );
+    // kiri
+    await drawCard(left, startXLeft, y, i + 1);
 
-      // garis
-      doc.setDrawColor(...COLOR.LINE);
-      doc.setLineWidth(0.2);
-      doc.line(PAGE.M, y + rowH, PAGE.W - PAGE.M, y + rowH);
+    // kanan
+    await drawCard(right, startXRight, y, i + 2);
 
-      y += rowH;
-    }
-
-    y += 5;
+    y += boxH + 6;
   }
 
   return y + 10;
 };
-
 /* ===================== SIGNATURE ===================== */
 const drawSignature = (doc) => {
   const y = PAGE.H - 40;
