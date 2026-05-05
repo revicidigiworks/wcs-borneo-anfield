@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import { db } from "../../services/firebase";
 import { collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { exportTeamsPDF } from "../../utils/exportPDF";
-import { 
-  Search, 
-  Users, 
-  Lock, 
-  Unlock, 
-  Trash2, 
-  Save, 
-  Plus, 
-  ChevronLeft, 
-  Download, 
+import {
+  Search,
+  Users,
+  Lock,
+  Unlock,
+  Trash2,
+  Save,
+  Plus,
+  ChevronLeft,
+  Download,
   LogOut,
   FileText // Ikon baru untuk export individu
 } from "lucide-react";
@@ -51,7 +51,14 @@ export default function Dashboard() {
   };
 
   const addPlayer = () => {
-    const newPlayer = { id: Date.now(), name: "", pob: "", dob: "" };
+    const newPlayer = {
+      id: Date.now(),
+      name: "",
+      pob: "",
+      dob: "",
+      photo: "",   // 🔥 WAJIB
+      ktp: ""      // optional
+    };
     setActive({ ...active, players: [...(active.players || []), newPlayer] });
   };
 
@@ -93,7 +100,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-slate-900 flex flex-col md:flex-row">
-      
+
       {/* SIDEBAR */}
       <div className={`${view === 'detail' ? 'hidden' : 'flex'} md:flex md:w-80 lg:w-96 flex-col bg-white border-r border-gray-200 h-screen sticky top-0`}>
         <div className="p-5 border-b border-gray-100">
@@ -103,9 +110,14 @@ export default function Dashboard() {
               <LogOut size={20} />
             </button>
           </div>
-          
-          <button 
-            onClick={() => exportTeamsPDF(teams)}
+
+          <button
+            onClick={() => exportTeamsPDF(
+              teams.map(t => ({
+                ...t,
+                players: (t.players || []).filter(p => p.photo) // 🔥 hanya yg ada foto
+              }))
+            )}
             className="w-full bg-slate-900 text-white py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 mb-4 hover:bg-slate-800 transition-all"
           >
             <Download size={14} /> Export Semua Tim (.PDF)
@@ -127,11 +139,10 @@ export default function Dashboard() {
             <div
               key={t.id}
               onClick={() => handleSelectTeam(t)}
-              className={`p-4 rounded-xl border transition-all cursor-pointer ${
-                active?.id === t.id
+              className={`p-4 rounded-xl border transition-all cursor-pointer ${active?.id === t.id
                   ? "bg-red-50 border-red-200 ring-1 ring-red-200"
                   : "bg-white border-transparent hover:border-gray-200 shadow-sm"
-              }`}
+                }`}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -151,7 +162,7 @@ export default function Dashboard() {
       <div className={`${view === 'list' ? 'hidden' : 'flex'} md:flex flex-1 flex-col h-screen overflow-y-auto bg-white md:bg-gray-50`}>
         {active ? (
           <div className="max-w-4xl w-full mx-auto pb-24 md:p-8">
-            
+
             {/* MOBILE HEADER */}
             <div className="md:hidden flex items-center p-4 bg-white sticky top-0 z-10 border-b">
               <button onClick={() => setView("list")} className="p-2 -ml-2">
@@ -159,8 +170,11 @@ export default function Dashboard() {
               </button>
               <h2 className="flex-1 font-bold text-center truncate px-2">{active.name}</h2>
               {/* Tombol Export Per Tim Mobile */}
-              <button 
-                onClick={() => exportTeamsPDF([active])}
+              <button
+                onClick={() => exportTeamsPDF({
+                  ...active,
+                  players: (active.players || []).filter(p => p.photo)
+                })}
                 className="p-2 text-blue-600 active:bg-blue-50 rounded-full"
               >
                 <FileText size={20} />
@@ -176,13 +190,13 @@ export default function Dashboard() {
                 </div>
                 <div className="flex gap-2">
                   {/* Tombol Export Per Tim Desktop */}
-                  <button 
-                    onClick={() => exportTeamsPDF([active])}
+                  <button
+                    onClick={() => exportTeamsPDF(active)}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-100 transition-colors border border-blue-100"
                   >
                     <Download size={14} /> EXPORT TIM INI
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleDelete(active.id)}
                     className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
                   >
@@ -217,7 +231,7 @@ export default function Dashboard() {
                   <h3 className="font-bold text-lg flex items-center gap-2">
                     <div className="w-1 h-6 bg-red-600 rounded-full"></div> Daftar Pemain
                   </h3>
-                  <button 
+                  <button
                     onClick={addPlayer}
                     className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-100 flex items-center gap-1"
                   >
@@ -241,20 +255,33 @@ export default function Dashboard() {
                           onChange={(e) => updatePlayer(i, "name", e.target.value)}
                           className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-sm font-medium"
                         />
+
                         <div className="grid grid-cols-2 gap-2">
-                           <input
+                          <input
                             placeholder="Tempat Lahir"
                             value={p.pob}
                             onChange={(e) => updatePlayer(i, "pob", e.target.value)}
                             className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-xs"
                           />
-                           <input
+                          <input
                             type="date"
                             value={p.dob}
                             onChange={(e) => updatePlayer(i, "dob", e.target.value)}
                             className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-xs"
                           />
                         </div>
+
+                        {/* 🔥 TAMBAH DI SINI */}
+                        {p.photo && (
+                          <div className="pt-2">
+                            <p className="text-[10px] text-gray-400 mb-1">Preview Foto</p>
+                            <img
+                              src={p.photo}
+                              alt="preview"
+                              className="w-20 h-24 object-cover rounded border"
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -265,11 +292,11 @@ export default function Dashboard() {
             {/* FLOATING ACTION BAR */}
             <div className="fixed bottom-0 left-0 right-0 md:left-auto md:right-8 md:bottom-8 p-4 bg-white/80 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-t md:border-none z-20">
               <div className="max-w-4xl mx-auto flex gap-3">
-                <button 
+                <button
                   onClick={() => {
                     const newStatus = !active.isLocked;
                     updateDoc(doc(db, "teams", active.id), { isLocked: newStatus });
-                    setActive({...active, isLocked: newStatus});
+                    setActive({ ...active, isLocked: newStatus });
                     fetchTeams();
                   }}
                   className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 ${active.isLocked ? 'bg-amber-100 text-amber-700 shadow-amber-100' : 'bg-slate-800 text-white shadow-slate-200'}`}
@@ -277,8 +304,8 @@ export default function Dashboard() {
                   {active.isLocked ? <Lock size={18} /> : <Unlock size={18} />}
                   {active.isLocked ? "Unlock Team" : "Lock Team"}
                 </button>
-                
-                <button 
+
+                <button
                   onClick={handleSave}
                   className="flex-[2] md:flex-none px-10 py-3 bg-red-600 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-red-200 shadow-xl transition-transform active:scale-95 hover:bg-red-700"
                 >

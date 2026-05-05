@@ -1,16 +1,35 @@
 import jsPDF from "jspdf";
 
 /* =====================
-   HELPER LOAD IMAGE
+   CONVERT IMAGE → BASE64 (WAJIB BIAR FOTO MUNCUL)
 ===================== */
-const loadImage = (url) =>
-  new Promise((resolve) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = url;
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
+const getBase64Image = (url) => {
+  return new Promise((resolve) => {
+    try {
+      const img = new Image();
+      img.setAttribute("crossOrigin", "anonymous");
+
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = this.width;
+        canvas.height = this.height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(this, 0, 0);
+
+        const dataURL = canvas.toDataURL("image/jpeg", 0.7);
+        resolve(dataURL);
+      };
+
+      img.onerror = () => resolve(null);
+
+      // 🔥 Cloudinary optimization
+      img.src = url.replace("/upload/", "/upload/f_auto,q_auto/");
+    } catch {
+      resolve(null);
+    }
   });
+};
 
 /* =====================
    HEADER
@@ -20,8 +39,8 @@ const drawHeader = (doc, team) => {
   doc.setFontSize(16);
   doc.text("FORMULIR RESMI PANITIA", 14, 15);
 
-  doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
   doc.text("World Cup Series Borneo Anfield 2026", 14, 22);
 
   doc.setFont("helvetica", "bold");
@@ -47,7 +66,7 @@ const drawTeamInfo = (doc, team, y) => {
 };
 
 /* =====================
-   PLAYER GRID + FOTO
+   PLAYERS GRID (FOTO ONLY)
 ===================== */
 const drawPlayers = async (doc, players, startY) => {
   let x = 14;
@@ -59,7 +78,7 @@ const drawPlayers = async (doc, players, startY) => {
   for (let i = 0; i < players.length; i++) {
     const p = players[i];
 
-    // pindah baris
+    // pindah baris tiap 3 kolom
     if (i !== 0 && i % 3 === 0) {
       x = 14;
       y += cardH + 5;
@@ -77,9 +96,10 @@ const drawPlayers = async (doc, players, startY) => {
 
     // FOTO
     if (p.photo) {
-      const img = await loadImage(p.photo);
-      if (img) {
-        doc.addImage(img, "JPEG", x + 2, y + 2, 16, 20);
+      const base64 = await getBase64Image(p.photo);
+
+      if (base64) {
+        doc.addImage(base64, "JPEG", x + 2, y + 2, 16, 20);
       }
     }
 
@@ -88,6 +108,7 @@ const drawPlayers = async (doc, players, startY) => {
     doc.text(`Nama: ${p.name || "-"}`, x + 20, y + 8);
     doc.text(`TTL: ${p.pob || "-"}, ${p.dob || "-"}`, x + 20, y + 13);
     doc.text(`Umur: ${p.age || "-"}`, x + 20, y + 18);
+    doc.text(`#${i + 1}`, x + 2, y + 42);
 
     x += cardW + 4;
   }
@@ -110,12 +131,12 @@ const drawSignature = (doc) => {
 };
 
 /* =====================
-   MAIN EXPORT
+   MAIN EXPORT FUNCTION
 ===================== */
 export const exportTeamsPDF = async (teams) => {
   const doc = new jsPDF();
 
-  // 🔥 SUPPORT 1 ATAU BANYAK
+  // support array / single
   const list = Array.isArray(teams) ? teams : [teams];
 
   for (let i = 0; i < list.length; i++) {
@@ -132,7 +153,7 @@ export const exportTeamsPDF = async (teams) => {
 
   const fileName =
     list.length === 1
-      ? (list[0].name || "TEAM").replace(/\s+/g, "_")
+      ? (list[0].name || "TEAM").replace(/\s+/g, "_").toUpperCase()
       : "ALL_TEAMS";
 
   doc.save(`${fileName}.pdf`);
