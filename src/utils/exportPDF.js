@@ -170,7 +170,7 @@ const drawPlayers = async (doc, players, yStart) => {
   y += 8;
 
   // 🔥 CARD RAPI
-  const drawCard = async (p, x, y, index) => {
+const drawCard = async (p, x, y, index) => {
   if (!p) return;
 
   // BOX
@@ -185,8 +185,10 @@ const drawPlayers = async (doc, players, yStart) => {
     }
   }
 
+  // 🔥 COLUMN SYSTEM
   const labelX = x + 26;
-  const valueX = x + 48; // 🔥 FIX ALIGN SEMUA VALUE
+  const colonX = x + 44;
+  const valueX = x + 48; // agak ke kiri → lebih enak dibaca
   const maxWidth = boxW - 52;
 
   doc.setFont("helvetica", "bold");
@@ -196,27 +198,24 @@ const drawPlayers = async (doc, players, yStart) => {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
 
-  // 🔥 NAMA (AUTO WRAP + LIMIT)
-  doc.text("Nama:", labelX, y + 13);
-  doc.text(p.name || "-", valueX, y + 13, {
-    maxWidth,
-  });
+  // 🔥 NAMA
+  doc.text("Nama", labelX, y + 13);
+  doc.text(":", colonX, y + 13);
+  doc.text(p.name || "-", valueX, y + 13, { maxWidth });
 
   // 🔥 POSISI
-  doc.text("Posisi:", labelX, y + 19);
-  doc.text(p.position || "-", valueX, y + 19, {
-    maxWidth,
-  });
+  doc.text("Posisi", labelX, y + 19);
+  doc.text(":", colonX, y + 19);
+  doc.text(p.position || "-", valueX, y + 19, { maxWidth });
 
   // 🔥 TTL
-  doc.text("TTL:", labelX, y + 25);
+  doc.text("TTL", labelX, y + 25);
+  doc.text(":", colonX, y + 25);
   doc.text(
     `${p.pob || "-"}, ${p.dob || "-"}`,
     valueX,
     y + 25,
-    {
-      maxWidth,
-    }
+    { maxWidth }
   );
 };
 
@@ -245,8 +244,8 @@ const drawSignature = (doc) => {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
 
-  doc.text("MANAJER TIM", PAGE.M + 20, y);
-  doc.text("PANITIA", PAGE.W - PAGE.M - 30, y);
+  doc.text("MANAJER TIM", PAGE.M + 23, y);
+  doc.text("PANITIA", PAGE.W - PAGE.M - 40, y);
 
   doc.setDrawColor(...COLOR.BORDER);
   doc.line(PAGE.M + 5, y + 15, PAGE.M + 60, y + 15);
