@@ -140,8 +140,8 @@ export default function Dashboard() {
               key={t.id}
               onClick={() => handleSelectTeam(t)}
               className={`p-4 rounded-xl border transition-all cursor-pointer ${active?.id === t.id
-                  ? "bg-red-50 border-red-200 ring-1 ring-red-200"
-                  : "bg-white border-transparent hover:border-gray-200 shadow-sm"
+                ? "bg-red-50 border-red-200 ring-1 ring-red-200"
+                : "bg-white border-transparent hover:border-gray-200 shadow-sm"
                 }`}
             >
               <div className="flex items-center justify-between">
@@ -182,6 +182,30 @@ export default function Dashboard() {
             </div>
 
             <div className="p-6 space-y-8">
+              {/* 🔥 LINK EDIT TIM */}
+  <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs">
+    <p className="font-bold mb-1">Link Edit Tim</p>
+
+    <div className="flex gap-2">
+      <input
+        value={`${window.location.origin}/edit/${active.editToken}`}
+        readOnly
+        className="flex-1 border rounded px-2 py-1 text-xs"
+      />
+
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(
+            `${window.location.origin}/edit/${active.editToken}`
+          );
+          alert("Link disalin");
+        }}
+        className="bg-green-600 text-white px-3 rounded text-xs"
+      >
+        Copy
+      </button>
+    </div>
+  </div>
               {/* DESKTOP HEADER */}
               <div className="hidden md:flex justify-between items-end border-b pb-6">
                 <div>
@@ -204,6 +228,7 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
+              
 
               {/* FORM SECTION */}
               <section className="space-y-4">
@@ -271,17 +296,32 @@ export default function Dashboard() {
                           />
                         </div>
 
-                        {/* 🔥 TAMBAH DI SINI */}
+                        {/* FOTO */}
                         {p.photo && (
-                          <div className="pt-2">
-                            <p className="text-[10px] text-gray-400 mb-1">Preview Foto</p>
-                            <img
-                              src={p.photo}
-                              alt="preview"
-                              className="w-20 h-24 object-cover rounded border"
-                            />
-                          </div>
+                          <img
+                            src={p.photo}
+                            alt="Foto"
+                            onClick={() => window.open(p.photo)}
+                            className="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-80"
+                          />
                         )}
+
+                        {/* KTP (opsional tampil) */}
+                        {p.ktp && (
+                          <img
+                            src={p.ktp}
+                            alt="KTP"
+                            onClick={() => window.open(p.ktp)}
+                            className="w-full h-28 object-cover rounded-lg cursor-pointer hover:opacity-80"
+                          />
+                        )}
+
+                        <input
+                          placeholder="Nama Lengkap"
+                          value={p.name}
+                          onChange={(e) => updatePlayer(i, "name", e.target.value)}
+                          className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-sm font-medium"
+                        />
                       </div>
                     </div>
                   ))}
