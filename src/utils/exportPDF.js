@@ -234,6 +234,26 @@ const drawSignature = (doc) => {
   doc.line(PAGE.W - PAGE.M - 60, y + 15, PAGE.W - PAGE.M - 5, y + 15);
 };
 
+/* ===================== FOOTER ===================== */
+const drawFooter = (doc) => {
+  const pages = doc.internal.getNumberOfPages();
+
+  for (let i = 1; i <= pages; i++) {
+    doc.setPage(i);
+
+    const h = doc.internal.pageSize.height;
+
+    doc.setFontSize(7);
+    doc.setTextColor(150); // abu soft
+
+    doc.text(
+      `Halaman ${i}/${pages}`,
+      PAGE.W - PAGE.M,
+      h - 8,
+      { align: "right" }
+    );
+  }
+};
 
 /* ===================== EXPORT ===================== */
 export const exportTeamsPDF = async (teams) => {
