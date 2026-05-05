@@ -72,7 +72,7 @@ const drawHeader = (doc, team, metaData) => {
   doc.setTextColor(...COLOR.SECONDARY);
   doc.text("FORMULIR RESMI PENDAFTARAN & VERIFIKASI TIM", PAGE.M, 32);
 
-  return 38;
+  return 42;
 };
 
 /* ===================== INFO BAR ===================== */
@@ -91,10 +91,10 @@ const drawInfoBar = (doc, team, y) => {
   doc.text(`STATUS: VALID`, PAGE.M + 65, y + 7);
   doc.text(`DOKUMEN: TERKONFIRMASI`, PAGE.M + 120, y + 7);
 
-  return y + 18;
+  return y + 22;
 };
 
-/* ===================== TEAM INFO (2 KOLOM) ===================== */
+/* ===================== TEAM INFO ===================== */
 const drawTeamInfo = (doc, team, y) => {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
@@ -103,7 +103,7 @@ const drawTeamInfo = (doc, team, y) => {
 
   drawLine(doc, y + 2, COLOR.BORDER, 0.3);
 
-  y += 10;
+  y += 12;
 
   const left = [
     ["Nama Tim", team.name],
@@ -117,6 +117,8 @@ const drawTeamInfo = (doc, team, y) => {
     ["Official 3", team.official3],
   ];
 
+  const rightStart = PAGE.M + 95;
+
   doc.setFontSize(9);
 
   left.forEach((d, i) => {
@@ -124,18 +126,18 @@ const drawTeamInfo = (doc, team, y) => {
     doc.text(d[0], PAGE.M, y + i * 7);
 
     doc.setFont("helvetica", "normal");
-    doc.text(`: ${d[1] || "-"}`, PAGE.M + 28, y + i * 7);
+    doc.text(`: ${d[1] || "-"}`, PAGE.M + 30, y + i * 7);
   });
 
   right.forEach((d, i) => {
     doc.setFont("helvetica", "bold");
-    doc.text(d[0], PAGE.W / 2 + 5, y + i * 7);
+    doc.text(d[0], rightStart, y + i * 7);
 
     doc.setFont("helvetica", "normal");
-    doc.text(`: ${d[1] || "-"}`, PAGE.W / 2 + 30, y + i * 7);
+    doc.text(`: ${d[1] || "-"}`, rightStart + 28, y + i * 7);
   });
 
-  return y + 25;
+  return y + 30;
 };
 
 /* ===================== PLAYER LIST ===================== */
@@ -143,13 +145,12 @@ const drawPlayers = async (doc, players, yStart) => {
   let y = yStart;
 
   const boxW = 85;
-  const boxH = 32;
+  const boxH = 36;
   const gapX = 10;
 
   const startXLeft = PAGE.M;
   const startXRight = PAGE.M + boxW + gapX;
 
-  // 🔥 URUT POSISI
   const positionOrder = {
     Kiper: 1,
     Belakang: 2,
@@ -158,14 +159,16 @@ const drawPlayers = async (doc, players, yStart) => {
   };
 
   const sortedPlayers = [...players].sort(
-    (a, b) => (positionOrder[a.position] || 99) - (positionOrder[b.position] || 99)
+    (a, b) =>
+      (positionOrder[a.position] || 99) -
+      (positionOrder[b.position] || 99)
   );
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
   doc.text("DAFTAR PEMAIN TERDAFTAR", PAGE.M, y);
 
-  y += 8;
+  y += 12;
 
   for (let i = 0; i < sortedPlayers.length; i += 2) {
     if (y + boxH > 270) {
@@ -176,55 +179,51 @@ const drawPlayers = async (doc, players, yStart) => {
     const left = sortedPlayers[i];
     const right = sortedPlayers[i + 1];
 
-    // 🔹 DRAW BOX FUNCTION
     const drawCard = async (p, x, y, index) => {
       if (!p) return;
 
-      // border
+      doc.setFillColor(250, 250, 250);
       doc.setDrawColor(...COLOR.BORDER);
-      doc.rect(x, y, boxW, boxH);
+      doc.rect(x, y, boxW, boxH, "FD");
 
-      // FOTO
       if (p.photo) {
         const img = await toBase64(p.photo);
         if (img) {
-          doc.addImage(img, "JPEG", x + 2, y + 2, 18, 22);
+          doc.addImage(img, "JPEG", x + 3, y + 3, 18, 22);
         }
       }
 
-      const textX = x + 22;
+      const textX = x + 24;
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(8);
-      doc.text(`No. ${index}`, textX, y + 6);
+      doc.text(`No. ${index}`, textX, y + 7);
 
       doc.setFont("helvetica", "normal");
 
-      doc.text("Nama Lengkap:", textX, y + 11);
-      doc.text((p.name || "-").toUpperCase(), textX + 30, y + 11);
+      doc.text("Nama:", textX, y + 13);
+      doc.text((p.name || "-").toUpperCase(), textX, y + 18);
 
-      doc.text("Posisi:", textX, y + 16);
-      doc.text(p.position || "-", textX + 30, y + 16);
+      doc.text("Posisi:", textX, y + 23);
+      doc.text(p.position || "-", textX + 25, y + 23);
 
-      doc.text("TTL:", textX, y + 21);
+      doc.text("TTL:", textX, y + 28);
       doc.text(
         `${p.pob || "-"}, ${p.dob || "-"}`,
-        textX + 30,
-        y + 21
+        textX + 25,
+        y + 28
       );
     };
 
-    // kiri
     await drawCard(left, startXLeft, y, i + 1);
-
-    // kanan
     await drawCard(right, startXRight, y, i + 2);
 
-    y += boxH + 6;
+    y += boxH + 8;
   }
 
-  return y + 10;
+  return y + 15;
 };
+
 /* ===================== SIGNATURE ===================== */
 const drawSignature = (doc) => {
   const y = PAGE.H - 40;
@@ -250,14 +249,11 @@ const drawFooter = (doc) => {
     const h = doc.internal.pageSize.height;
 
     doc.setFontSize(7);
-    doc.setTextColor(150); // abu soft
+    doc.setTextColor(150);
 
-    doc.text(
-      `Halaman ${i}/${pages}`,
-      PAGE.W - PAGE.M,
-      h - 8,
-      { align: "right" }
-    );
+    doc.text(`Halaman ${i}/${pages}`, PAGE.W - PAGE.M, h - 10, {
+      align: "right",
+    });
   }
 };
 
