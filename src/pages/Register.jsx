@@ -329,9 +329,7 @@ export default function Register() {
               <h2 className="font-bold text-lg flex items-center gap-2">
                 <Users size={18} /> Daftar Pemain
               </h2>
-              <button type="button" onClick={addPlayer} className="text-[#c8102e] text-sm font-semibold flex items-center gap-1">
-                <Plus size={15} /> Tambah Pemain
-              </button>
+              
             </div>
 
             <div className="space-y-4">
@@ -403,6 +401,9 @@ export default function Register() {
                     </div>
 
                   </div>
+                  <button type="button" onClick={addPlayer} className="text-[#0aef43] text-sm font-semibold flex items-center gap-1">
+                <Plus size={15} /> Tambah Pemain
+              </button>
 
                   <button type="button" onClick={() => removePlayer(i)} className="text-red-600 flex items-center gap-1 text-sm">
                     <Trash2 size={15} /> Hapus Pemain
