@@ -328,12 +328,27 @@ export default function Dashboard() {
             <div className="fixed bottom-0 left-0 right-0 md:left-auto md:right-8 md:bottom-8 p-4 bg-white/80 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-t md:border-none z-20">
               <div className="max-w-4xl mx-auto flex gap-3">
                 <button
-                  onClick={() => {
-                    const newStatus = !active.isLocked;
-                    updateDoc(doc(db, "teams", active.id), { isLocked: newStatus });
-                    setActive({ ...active, isLocked: newStatus });
-                    fetchTeams();
-                  }}
+                  onClick={async () => {
+  try {
+    const newStatus = !active.isLocked;
+
+    console.log("UPDATE isLocked:", newStatus);
+
+    await updateDoc(doc(db, "teams", active.id), {
+      isLocked: newStatus
+    });
+
+    setActive({ ...active, isLocked: newStatus });
+
+    await fetchTeams();
+
+    alert("Status berhasil diubah ✅");
+
+  } catch (err) {
+    console.error("UPDATE ERROR:", err);
+    alert("Gagal update (cek console) ❌");
+  }
+}}
                   className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 ${active.isLocked ? 'bg-amber-100 text-amber-700 shadow-amber-100' : 'bg-slate-800 text-white shadow-slate-200'}`}
                 >
                   {active.isLocked ? <Lock size={18} /> : <Unlock size={18} />}
