@@ -56,6 +56,7 @@ export default function Dashboard() {
       name: "",
       pob: "",
       dob: "",
+      position: "",
       photo: "",   // 🔥 WAJIB
       ktp: ""      // optional
     };
@@ -274,6 +275,17 @@ export default function Dashboard() {
                         </button>
                       </div>
                       <div className="space-y-3">
+                        {p.position && (
+  <span className={`
+    inline-block text-[10px] font-bold px-2 py-1 rounded
+    ${p.position === "Kiper" && "bg-blue-100 text-blue-700"}
+    ${p.position === "Belakang" && "bg-red-100 text-red-700"}
+    ${p.position === "Tengah" && "bg-yellow-100 text-yellow-800"}
+    ${p.position === "Depan" && "bg-green-100 text-green-700"}
+  `}>
+    {p.position}
+  </span>
+)}
                         <input
                           placeholder="Nama Lengkap"
                           value={p.name}
@@ -296,27 +308,40 @@ export default function Dashboard() {
                           />
                         </div>
 
-<div className="flex gap-3">
+                        {/* 🔥 POSISI */}
+                        <select
+                          value={p.position || ""}
+                          onChange={(e) => updatePlayer(i, "position", e.target.value)}
+                          className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-xs"
+                        >
+                          <option value="">Pilih Posisi</option>
+                          <option value="Kiper">Kiper</option>
+                          <option value="Belakang">Belakang</option>
+                          <option value="Tengah">Tengah</option>
+                          <option value="Depan">Depan</option>
+                        </select>
 
-  {p.photo && (
-    <img
-      src={p.photo}
-      alt="Foto"
-      onClick={() => window.open(p.photo)}
-      className="w-24 h-32 object-cover rounded-md border cursor-pointer"
-    />
-  )}
+                        <div className="flex gap-3">
 
-  {p.ktp && (
-    <img
-      src={p.ktp}
-      alt="KTP"
-      onClick={() => window.open(p.ktp)}
-      className="w-32 h-20 object-cover rounded-md border cursor-pointer"
-    />
-  )}
+                          {p.photo && (
+                            <img
+                              src={p.photo}
+                              alt="Foto"
+                              onClick={() => window.open(p.photo)}
+                              className="w-24 h-32 object-cover rounded-md border cursor-pointer"
+                            />
+                          )}
 
-</div>
+                          {p.ktp && (
+                            <img
+                              src={p.ktp}
+                              alt="KTP"
+                              onClick={() => window.open(p.ktp)}
+                              className="w-32 h-20 object-cover rounded-md border cursor-pointer"
+                            />
+                          )}
+
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -329,26 +354,26 @@ export default function Dashboard() {
               <div className="max-w-4xl mx-auto flex gap-3">
                 <button
                   onClick={async () => {
-  try {
-    const newStatus = !active.isLocked;
+                    try {
+                      const newStatus = !active.isLocked;
 
-    console.log("UPDATE isLocked:", newStatus);
+                      console.log("UPDATE isLocked:", newStatus);
 
-    await updateDoc(doc(db, "teams", active.id), {
-      isLocked: newStatus
-    });
+                      await updateDoc(doc(db, "teams", active.id), {
+                        isLocked: newStatus
+                      });
 
-    setActive({ ...active, isLocked: newStatus });
+                      setActive({ ...active, isLocked: newStatus });
 
-    await fetchTeams();
+                      await fetchTeams();
 
-    alert("Status berhasil diubah ✅");
+                      alert("Status berhasil diubah ✅");
 
-  } catch (err) {
-    console.error("UPDATE ERROR:", err);
-    alert("Gagal update (cek console) ❌");
-  }
-}}
+                    } catch (err) {
+                      console.error("UPDATE ERROR:", err);
+                      alert("Gagal update (cek console) ❌");
+                    }
+                  }}
                   className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 ${active.isLocked ? 'bg-amber-100 text-amber-700 shadow-amber-100' : 'bg-slate-800 text-white shadow-slate-200'}`}
                 >
                   {active.isLocked ? <Lock size={18} /> : <Unlock size={18} />}

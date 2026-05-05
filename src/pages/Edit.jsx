@@ -233,7 +233,7 @@
           pob: sanitizeText(p.pob),
           dob: p.dob,
           age: calcAge(p.dob),
-
+position: p.position || "",
           ktp: p.ktp || "",
           photo: p.photo || "",
         }));
@@ -397,6 +397,21 @@
                               className="border rounded-md px-3 h-10 text-xs bg-gray-100 w-full"
                             />
                           </div>
+                          <div>
+  <p className="text-[10px] text-gray-500 mb-1">Posisi</p>
+  <select
+    value={p.position || ""}
+    disabled={locked}
+    onChange={(e) => handlePlayerChange(i, "position", e.target.value)}
+    className="border rounded-md px-3 h-10 text-xs w-full"
+  >
+    <option value="">Pilih Posisi</option>
+    <option value="Kiper">Kiper</option>
+    <option value="Belakang">Belakang</option>
+    <option value="Tengah">Tengah</option>
+    <option value="Depan">Depan</option>
+  </select>
+</div>
                           <div className="flex gap-3 flex-wrap">
 
                             {p.ktp && (

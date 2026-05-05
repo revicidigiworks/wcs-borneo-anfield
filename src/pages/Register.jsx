@@ -34,16 +34,17 @@ export default function Register() {
   });
 
   const [players, setPlayers] = useState([
-    {
-      id: Date.now(),
-      name: "",
-      pob: "",
-      dob: "",
-      age: "",
-      ktp: null,
-      photo: null,
-    },
-  ]);
+  {
+    id: Date.now(),
+    name: "",
+    pob: "",
+    dob: "",
+    age: "",
+    position: "", // 🔥 TAMBAH INI
+    ktp: null,
+    photo: null,
+  },
+]);
 
   const [loading, setLoading] = useState(false);
 
@@ -89,21 +90,22 @@ export default function Register() {
     setPlayers(updated);
   };
 
-  const addPlayer = () => {
-    if (players.length >= 16) return alert("Maksimal hanya 16 pemain");
-    setPlayers([
-      ...players,
-      {
-        id: Date.now() + Math.random(),
-        name: "",
-        pob: "",
-        dob: "",
-        age: "",
-        ktp: null,
-        photo: null,
-      },
-    ]);
-  };
+ const addPlayer = () => {
+  if (players.length >= 16) return alert("Maksimal hanya 16 pemain");
+  setPlayers([
+    ...players,
+    {
+      id: Date.now() + Math.random(),
+      name: "",
+      pob: "",
+      dob: "",
+      age: "",
+      position: "", // 🔥 WAJIB
+      ktp: null,
+      photo: null,
+    },
+  ]);
+};
 
   const removePlayer = (index) => {
     if (players.length === 1) return alert("Minimal harus ada 1 pemain");
@@ -153,6 +155,8 @@ export default function Register() {
       const age = calcAge(p.dob);
       if (age < 17 || age > 50)
         return alert(`Usia pemain ke-${i + 1} harus 17 - 50 tahun`), false;
+      if (!p.position)
+  return alert(`Posisi pemain ke-${i + 1} wajib diisi`), false;
 
       if (!p.ktp) return alert(`KTP pemain ke-${i + 1} wajib upload`), false;
       if (!p.photo) return alert(`Foto pemain ke-${i + 1} wajib upload`), false;
@@ -254,6 +258,7 @@ export default function Register() {
           pob: sanitizeText(p.pob),
           dob: p.dob,
           age: calcAge(p.dob),
+          position: p.position,
           ktp: ktpUrl,
           photo: photoUrl,
         });
@@ -378,6 +383,20 @@ export default function Register() {
                       className="border rounded-md px-3 h-11 text-sm bg-gray-100 w-full"
                     />
                   </div>
+                  <div>
+  <p className="text-[10px] text-gray-500 mb-1">Posisi</p>
+  <select
+    value={p.position}
+    onChange={(e) => handlePlayerChange(i, "position", e.target.value)}
+    className="border rounded-md px-3 h-11 text-sm w-full"
+  >
+    <option value="">Pilih Posisi</option>
+    <option value="Kiper">Kiper</option>
+    <option value="Belakang">Belakang</option>
+    <option value="Tengah">Tengah</option>
+    <option value="Depan">Depan</option>
+  </select>
+</div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
                     <div>
