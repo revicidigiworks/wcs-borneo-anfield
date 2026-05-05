@@ -1,14 +1,19 @@
 import jsPDF from "jspdf";
 
-/* =====================
-   CONFIG
-===================== */
-const M = 15;
-const PAGE_W = 210;
+/* ===================== */
+const COLOR = {
+  PRIMARY: [200, 16, 46],
+  DARK: [20, 20, 20],
+  BORDER: [180, 180, 180],
+};
 
-/* =====================
-   IMAGE HELPER
-===================== */
+const PAGE = {
+  W: 210,
+  H: 297,
+  M: 15,
+};
+
+/* ===================== */
 const toBase64 = async (url) => {
   try {
     const res = await fetch(url);
@@ -24,35 +29,40 @@ const toBase64 = async (url) => {
   }
 };
 
-/* =====================
-   HEADER
-===================== */
+/* ===================== HEADER */
 const drawHeader = (doc, team) => {
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text("WORLD CUP SERIES 2026", M, 15);
+  doc.setFontSize(20);
+  doc.text("WORLD CUP SERIES 2026", PAGE.M, 16);
+
+  doc.setTextColor(...COLOR.PRIMARY);
+  doc.setFontSize(11);
+  doc.text("OFFICIAL TEAM REGISTRATION FORM", PAGE.M, 22);
 
   doc.setFontSize(10);
-  doc.setTextColor(200, 16, 46);
-  doc.text("OFFICIAL TEAM SHEET", M, 21);
+  doc.setTextColor(80);
+  doc.text(`TEAM: ${team.name}`, PAGE.W - PAGE.M, 16, {
+    align: "right",
+  });
 
-  doc.setDrawColor(200, 16, 46);
-  doc.setLineWidth(0.8);
-  doc.line(M, 25, PAGE_W - M, 25);
-
-  doc.setTextColor(0);
-  doc.setFontSize(9);
-  doc.text(`TEAM: ${team.name}`, PAGE_W - M, 15, { align: "right" });
+  doc.setDrawColor(...COLOR.PRIMARY);
+  doc.setLineWidth(1.5);
+  doc.line(PAGE.M, 26, PAGE.W - PAGE.M, 26);
 
   return 32;
 };
 
-/* =====================
-   TEAM INFO
-===================== */
+/* ===================== TEAM INFO */
 const drawTeamInfo = (doc, team, y) => {
-  const left = M;
-  const right = PAGE_W / 2;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(0);
+  doc.text("TEAM INFORMATION", PAGE.M, y);
+
+  doc.setDrawColor(...COLOR.BORDER);
+  doc.line(PAGE.M, y + 2, PAGE.W - PAGE.M, y + 2);
+
+  y += 10;
 
   const data = [
     ["Manager", team.manager],
@@ -66,103 +76,119 @@ const drawTeamInfo = (doc, team, y) => {
   doc.setFontSize(9);
 
   data.forEach((d, i) => {
-    const x = i % 2 === 0 ? left : right;
-    const row = Math.floor(i / 2);
-
     doc.setFont("helvetica", "bold");
-    doc.text(`${d[0]}:`, x, y + row * 8);
+    doc.text(d[0], PAGE.M, y + i * 7);
 
     doc.setFont("helvetica", "normal");
-    doc.text(d[1] || "-", x + 30, y + row * 8);
+    doc.text(`: ${d[1] || "-"}`, PAGE.M + 30, y + i * 7);
   });
 
-  return y + 28;
+  return y + data.length * 7 + 8;
 };
 
-/* =====================
-   DRAW TABLE HEADER
-===================== */
-const drawTableHeader = (doc, y) => {
-  const cols = ["NO", "NAMA", "TTL", "USIA", "FOTO"];
-  const colX = [M, M + 12, M + 70, M + 140, M + 155];
+/* ===================== TABLE PLAYER */
+const drawPlayers = async (doc, players, yStart) => {
+  let y = yStart;
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(9);
+  const rowH = 22;
 
-  cols.forEach((c, i) => {
-    doc.text(c, colX[i], y);
-  });
-
-  doc.setDrawColor(0);
-  doc.line(M, y + 2, PAGE_W - M, y + 2);
-
-  return y + 6;
-};
-
-/* =====================
-   DRAW PLAYERS
-===================== */
-const drawPlayers = async (doc, players, startY) => {
-  let y = startY;
-
-  const colX = {
-    no: M,
-    name: M + 12,
-    ttl: M + 70,
-    age: M + 140,
-    photo: M + 155,
+  // COLUMN POSITION
+  const col = {
+    no: PAGE.M,
+    foto: PAGE.M + 10,
+    nama: PAGE.M + 32,
+    ttl: PAGE.M + 105,
+    usia: PAGE.W - PAGE.M - 5,
   };
+
+  /* HEADER BG */
+  doc.setFillColor(...COLOR.PRIMARY);
+  doc.rect(PAGE.M, y, PAGE.W - PAGE.M * 2, 8, "F");
+
+  doc.setTextColor(255);
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "bold");
+
+  doc.text("NO", col.no + 2, y + 5);
+  doc.text("FOTO", col.foto + 2, y + 5);
+  doc.text("NAMA", col.nama, y + 5);
+  doc.text("TTL", col.ttl, y + 5);
+  doc.text("USIA", col.usia, y + 5, { align: "right" });
+
+  y += 8;
+
+  doc.setTextColor(0);
 
   for (let i = 0; i < players.length; i++) {
     const p = players[i];
 
-    if (y > 260) {
+    // page break
+    if (y + rowH > 270) {
       doc.addPage();
       y = 20;
-      drawTableHeader(doc, y);
-      y += 6;
     }
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
+    // garis row
+    doc.setDrawColor(...COLOR.BORDER);
+    doc.rect(PAGE.M, y, PAGE.W - PAGE.M * 2, rowH);
 
-    doc.text(String(i + 1), colX.no, y);
-    doc.text((p.name || "-").substring(0, 25), colX.name, y);
-    doc.text(`${p.pob || "-"}, ${p.dob || "-"}`, colX.ttl, y);
-    doc.text(`${p.age || "-"} TH`, colX.age, y);
+    // nomor
+    doc.text(String(i + 1), col.no + 2, y + 12);
 
     // FOTO
     if (p.photo) {
       const img = await toBase64(p.photo);
       if (img) {
-        doc.addImage(img, "JPEG", colX.photo, y - 5, 16, 20);
+        doc.addImage(img, "JPEG", col.foto, y + 2, 16, 18);
       }
     }
 
-    y += 10;
+    // border foto
+    doc.rect(col.foto, y + 2, 16, 18);
+
+    // nama
+    doc.text(
+      (p.name || "-").toUpperCase(),
+      col.nama,
+      y + 12
+    );
+
+    // ttl
+    doc.text(
+      `${p.pob || "-"}, ${p.dob || "-"}`,
+      col.ttl,
+      y + 12
+    );
+
+    // usia
+    doc.text(
+      `${p.age || "-"} TH`,
+      col.usia,
+      y + 12,
+      { align: "right" }
+    );
+
+    y += rowH;
   }
 
-  return y;
+  return y + 10;
 };
 
-/* =====================
-   SIGNATURE
-===================== */
+/* ===================== SIGNATURE */
 const drawSignature = (doc) => {
-  const y = doc.internal.pageSize.height - 35;
+  const y = PAGE.H - 35;
 
-  doc.setFontSize(9);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
 
-  doc.text("MANAGER TIM", M + 20, y);
-  doc.text("PANITIA", PAGE_W - M - 30, y);
+  doc.text("MANAGER TIM", PAGE.M + 25, y);
+  doc.text("PANITIA", PAGE.W - PAGE.M - 30, y);
 
-  doc.line(M + 5, y + 15, M + 60, y + 15);
-  doc.line(PAGE_W - M - 60, y + 15, PAGE_W - M - 5, y + 15);
+  doc.line(PAGE.M + 5, y + 15, PAGE.M + 65, y + 15);
+  doc.line(PAGE.W - PAGE.M - 65, y + 15, PAGE.W - PAGE.M - 5, y + 15);
 };
 
-/* =====================
-   EXPORT
-===================== */
+/* ===================== EXPORT */
 export const exportTeamsPDF = async (teams) => {
   const doc = new jsPDF("p", "mm", "a4");
 
@@ -175,12 +201,10 @@ export const exportTeamsPDF = async (teams) => {
 
     let y = drawHeader(doc, team);
     y = drawTeamInfo(doc, team, y);
-
-    y = drawTableHeader(doc, y);
     y = await drawPlayers(doc, team.players || [], y);
 
     drawSignature(doc);
   }
 
-  doc.save("FINAL_FORM_RESMI.pdf");
+  doc.save("FORM_PENDAFTARAN_TIM.pdf");
 };
