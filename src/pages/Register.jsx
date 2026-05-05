@@ -28,13 +28,21 @@ export default function Register() {
     manager: "",
     official1: "",
     official2: "",
-    official3: "", // 🔥 tambahan
+    official3: "",
     phone: "",
     address: "",
   });
 
   const [players, setPlayers] = useState([
-    { id: Date.now(), name: "", pob: "", dob: "", age: "" },
+    {
+      id: Date.now(),
+      name: "",
+      pob: "",
+      dob: "",
+      age: "",
+      ktp: null,
+      photo: null,
+    },
   ]);
 
   const [loading, setLoading] = useState(false);
@@ -66,11 +74,34 @@ export default function Register() {
     setPlayers(updated);
   };
 
+  const MAX_FILE_SIZE = 200 * 1024;
+
+  const handleFileChange = (index, field, file) => {
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert("Ukuran file maksimal 200KB");
+      return;
+    }
+
+    const updated = [...players];
+    updated[index][field] = file;
+    setPlayers(updated);
+  };
+
   const addPlayer = () => {
     if (players.length >= 16) return alert("Maksimal hanya 16 pemain");
     setPlayers([
       ...players,
-      { id: Date.now() + Math.random(), name: "", pob: "", dob: "", age: "" },
+      {
+        id: Date.now() + Math.random(),
+        name: "",
+        pob: "",
+        dob: "",
+        age: "",
+        ktp: null,
+        photo: null,
+      },
     ]);
   };
 
@@ -107,9 +138,6 @@ export default function Register() {
     if (sanitizeText(team.address).length < 8)
       return alert("Alamat tim terlalu pendek"), false;
 
-    if (players.length !== 16)
-      return alert("Jumlah pemain harus tepat 16 orang"), false;
-
     for (let i = 0; i < players.length; i++) {
       const p = players[i];
 
@@ -125,9 +153,50 @@ export default function Register() {
       const age = calcAge(p.dob);
       if (age < 17 || age > 50)
         return alert(`Usia pemain ke-${i + 1} harus 17 - 50 tahun`), false;
+
+      if (!p.ktp) return alert(`KTP pemain ke-${i + 1} wajib upload`), false;
+      if (!p.photo) return alert(`Foto pemain ke-${i + 1} wajib upload`), false;
+    }
+
+    const uniqueCheck = new Set();
+
+    for (let i = 0; i < players.length; i++) {
+      const key =
+        sanitizeText(players[i].name).toLowerCase() +
+        players[i].pob.toLowerCase() +
+        players[i].dob;
+
+      if (uniqueCheck.has(key)) {
+        return alert(`Pemain duplikat di form (index ${i + 1})`), false;
+      }
+
+      uniqueCheck.add(key);
     }
 
     return true;
+  };
+
+  const uploadFile = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "unsigned_upload");
+
+    const res = await fetch(
+      "https://api.cloudinary.com/v1_1/da9y2lsrs/image/upload",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+
+    if (!data.secure_url) {
+      console.error(data);
+      throw new Error("Upload gagal");
+    }
+
+    return data.secure_url;
   };
 
   const handleSubmit = async (e) => {
@@ -137,22 +206,59 @@ export default function Register() {
     try {
       setLoading(true);
 
-      // 🔒 LIMIT 32 TIM
       const snapshot = await getDocs(collection(db, "teams"));
+
       if (snapshot.size >= 32) {
         alert("Slot sudah penuh (32 tim)");
         return;
       }
 
-      const cleanPlayers = players.map((p) => ({
-        id: p.id,
-        name: sanitizeText(p.name),
-        pob: sanitizeText(p.pob),
-        dob: p.dob,
-        age: calcAge(p.dob),
-      }));
+      // 🔥 CEK DUPLIKAT SEBELUM UPLOAD
+      const existingPlayers = [];
 
-      // 🔐 TOKEN EDIT
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.players) {
+          data.players.forEach((p) => {
+            existingPlayers.push(
+              p.name.toLowerCase() + p.pob.toLowerCase() + p.dob
+            );
+          });
+        }
+      });
+
+      for (let i = 0; i < players.length; i++) {
+        const key =
+          sanitizeText(players[i].name).toLowerCase() +
+          players[i].pob.toLowerCase() +
+          players[i].dob;
+
+        if (existingPlayers.includes(key)) {
+          alert(`Pemain ${players[i].name} sudah terdaftar di tim lain`);
+          return;
+        }
+      }
+
+
+      const cleanPlayers = [];
+
+      for (let i = 0; i < players.length; i++) {
+        const p = players[i];
+
+        const ktpUrl = await uploadFile(p.ktp);
+        const photoUrl = await uploadFile(p.photo);
+
+        cleanPlayers.push({
+          id: p.id,
+          name: sanitizeText(p.name),
+          pob: sanitizeText(p.pob),
+          dob: p.dob,
+          age: calcAge(p.dob),
+          ktp: ktpUrl,
+          photo: photoUrl,
+        });
+      }
+
       const editToken = uuidv4();
 
       await addDoc(collection(db, "teams"), {
@@ -176,8 +282,6 @@ export default function Register() {
       });
 
       alert("Tim berhasil didaftarkan ✅");
-
-      // 🔥 redirect aman
       navigate(`/edit/${editToken}`);
 
     } catch (error) {
@@ -237,12 +341,67 @@ export default function Register() {
                     Pemain #{i + 1}
                   </div>
 
-                  <input value={p.name} onChange={(e) => handlePlayerChange(i, "name", e.target.value)} placeholder="Nama Lengkap Pemain (sesuai KTP)" className="border rounded-md px-4 h-11 text-sm w-full" />
+                  <input value={p.name} onChange={(e) => handlePlayerChange(i, "name", e.target.value)} placeholder="Contoh: Risal Gerrad (sesuai KTP)" className="border rounded-md px-4 h-11 text-sm w-full" />
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <input value={p.pob} onChange={(e) => handlePlayerChange(i, "pob", e.target.value)} placeholder="Tempat Lahir" className="border rounded-md px-4 h-11 text-sm" />
-                    <input type="date" value={p.dob} onChange={(e) => handlePlayerChange(i, "dob", e.target.value)} className="border rounded-md px-4 h-11 text-sm" />
-                    <input value={p.age} readOnly placeholder="Usia Otomatis" className="border rounded-md px-4 h-11 text-sm bg-gray-100" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                    <div>
+                      <p className="text-[10px] text-gray-500 mb-1">Tempat Lahir</p>
+                      <input
+                        value={p.pob}
+                        onChange={(e) => handlePlayerChange(i, "pob", e.target.value)}
+                        placeholder="Contoh: Samarinda"
+                        className="border rounded-md px-3 h-11 text-sm w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] text-gray-500 mb-1">Tanggal Lahir</p>
+                      <div className="relative">
+                        <input
+                          type="date"
+                          value={p.dob}
+                          onChange={(e) => handlePlayerChange(i, "dob", e.target.value)}
+                          className="border rounded-md px-3 h-11 text-sm w-full appearance-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-500 mb-1">Umur</p>
+                    <input
+                      value={p.age}
+                      readOnly
+                      placeholder="Otomatis dari tanggal lahir"
+                      className="border rounded-md px-3 h-11 text-sm bg-gray-100 w-full"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                    <div>
+                      <p className="text-[10px] text-gray-500 mb-1">
+                        Upload KTP (JPG/PNG, max 200KB)
+                      </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileChange(i, "ktp", e.target.files[0])}
+                        className="border rounded-md px-2 h-11 text-sm w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] text-gray-500 mb-1">
+                        Upload Foto Pemain (JPG/PNG, max 200KB)
+                      </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileChange(i, "photo", e.target.files[0])}
+                        className="border rounded-md px-2 h-11 text-sm w-full"
+                      />
+                    </div>
+
                   </div>
 
                   <button type="button" onClick={() => removePlayer(i)} className="text-red-600 flex items-center gap-1 text-sm">
