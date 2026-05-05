@@ -141,7 +141,6 @@ const drawTeamInfo = (doc, team, y) => {
 /* ===================== PLAYER LIST ===================== */
 const drawPlayers = async (doc, players, yStart) => {
   let y = yStart;
-
   const rowH = 17;
 
   const col = {
@@ -152,68 +151,116 @@ const drawPlayers = async (doc, players, yStart) => {
     usia: PAGE.W - PAGE.M - 5,
   };
 
+  // 🔥 URUT POSISI
+  const positionOrder = {
+    Kiper: 1,
+    Belakang: 2,
+    Tengah: 3,
+    Depan: 4,
+  };
+
+  const sortedPlayers = [...players].sort(
+    (a, b) => (positionOrder[a.position] || 99) - (positionOrder[b.position] || 99)
+  );
+
+  // 🔥 GROUP POSISI
+  const grouped = {
+    Kiper: [],
+    Belakang: [],
+    Tengah: [],
+    Depan: [],
+  };
+
+  sortedPlayers.forEach((p) => {
+    grouped[p.position]?.push(p);
+  });
+
   // TITLE
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
   doc.text("DAFTAR PEMAIN TERDAFTAR", PAGE.M, y);
-
   y += 5;
 
-  // HEADER
-  doc.setFillColor(...COLOR.PRIMARY);
-  doc.rect(PAGE.M, y, 180, 7, "F");
+  // LOOP PER POSISI
+  for (const pos of ["Kiper", "Belakang", "Tengah", "Depan"]) {
+    const group = grouped[pos];
+    if (!group || group.length === 0) continue;
 
-  doc.setTextColor(255);
-  doc.setFontSize(8);
-
-  doc.text("NO", col.no + 2, y + 5);
-  doc.text("FOTO", col.foto, y + 5);
-  doc.text("NAMA LENGKAP", col.nama, y + 5);
-  doc.text("TTL", col.ttl, y + 5);
-  doc.text("USIA", col.usia, y + 5, { align: "right" });
-
-  y += 7;
-
-  doc.setTextColor(...COLOR.TEXT_MAIN);
-
-  for (let i = 0; i < players.length; i++) {
-    const p = players[i];
-
-    if (y + rowH > 270) {
+    // PAGE BREAK
+    if (y > 260) {
       doc.addPage();
       y = 20;
     }
 
-    doc.text(String(i + 1), col.no + 2, y + 10);
+    // 🔥 HEADER POSISI
+    doc.setFillColor(...COLOR.SECONDARY);
+    doc.rect(PAGE.M, y, 180, 6, "F");
 
-    if (p.photo) {
-      const img = await toBase64(p.photo);
-      if (img) {
-        doc.addImage(img, "JPEG", col.foto, y + 1, 14, 15);
+    doc.setTextColor(255);
+    doc.setFontSize(8);
+    doc.text(pos.toUpperCase(), PAGE.M + 3, y + 4);
+
+    y += 7;
+    doc.setTextColor(...COLOR.TEXT_MAIN);
+
+    // HEADER TABLE
+    doc.setFillColor(...COLOR.PRIMARY);
+    doc.rect(PAGE.M, y, 180, 7, "F");
+
+    doc.setTextColor(255);
+    doc.setFontSize(8);
+
+    doc.text("NO", col.no + 2, y + 5);
+    doc.text("FOTO", col.foto, y + 5);
+    doc.text("NAMA LENGKAP", col.nama, y + 5);
+    doc.text("TTL", col.ttl, y + 5);
+    doc.text("USIA", col.usia, y + 5, { align: "right" });
+
+    y += 7;
+    doc.setTextColor(...COLOR.TEXT_MAIN);
+
+    // DATA PLAYER
+    for (let i = 0; i < group.length; i++) {
+      const p = group[i];
+
+      if (y + rowH > 270) {
+        doc.addPage();
+        y = 20;
       }
+
+      doc.text(String(i + 1), col.no + 2, y + 10);
+
+      if (p.photo) {
+        const img = await toBase64(p.photo);
+        if (img) {
+          doc.addImage(img, "JPEG", col.foto, y + 1, 14, 15);
+        }
+      }
+
+      doc.text((p.name || "-").toUpperCase(), col.nama, y + 10);
+
+      doc.text(
+        `${p.pob || "-"}, ${p.dob || "-"}`,
+        col.ttl,
+        y + 10
+      );
+
+      doc.text(
+        `${p.age || "-"} THN`,
+        col.usia,
+        y + 10,
+        { align: "right" }
+      );
+
+      // garis
+      doc.setDrawColor(...COLOR.LINE);
+      doc.setLineWidth(0.2);
+      doc.line(PAGE.M, y + rowH, PAGE.W - PAGE.M, y + rowH);
+
+      y += rowH;
     }
 
-    doc.text((p.name || "-").toUpperCase(), col.nama, y + 10);
-
-    doc.text(
-      `${p.pob || "-"}, ${p.dob || "-"}`,
-      col.ttl,
-      y + 10
-    );
-
-    doc.text(
-      `${p.age || "-"} THN`,
-      col.usia,
-      y + 10,
-      { align: "right" }
-    );
-
-    // garis tipis
-    doc.setDrawColor(...COLOR.LINE);
-    doc.setLineWidth(0.2);
-    doc.line(PAGE.M, y + rowH, PAGE.W - PAGE.M, y + rowH);
-
-    y += rowH;
+    y += 5;
   }
 
   return y + 10;
