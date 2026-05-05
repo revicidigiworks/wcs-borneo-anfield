@@ -1,18 +1,18 @@
 import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 /* =====================
    CONFIG
 ===================== */
 const COLOR = {
   PRIMARY: [200, 16, 46],
-  DARK: [20, 20, 20],
-  GRAY: [120, 120, 120],
-  BORDER: [220, 220, 220],
+  DARK: [15, 15, 15],
+  GRAY: [100, 100, 100],
+  BORDER: [210, 210, 210],
 };
 
 const PAGE = {
   W: 210,
-  H: 297,
   M: 15,
 };
 
@@ -35,26 +35,27 @@ const toBase64 = async (url) => {
 };
 
 /* =====================
-   HEADER
+   HEADER (PRO STYLE)
 ===================== */
 const drawHeader = (doc, team) => {
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
+  doc.setFontSize(20);
   doc.setTextColor(...COLOR.DARK);
   doc.text("WORLD CUP SERIES 2026", PAGE.M, 15);
 
   doc.setFontSize(10);
   doc.setTextColor(...COLOR.PRIMARY);
-  doc.text("BORNEO ANFIELD • OFFICIAL TEAM FORM", PAGE.M, 21);
+  doc.text("OFFICIAL TEAM REGISTRATION FORM", PAGE.M, 21);
 
   doc.setDrawColor(...COLOR.PRIMARY);
-  doc.line(PAGE.M, 24, PAGE.W - PAGE.M, 24);
+  doc.setLineWidth(1);
+  doc.line(PAGE.M, 25, PAGE.W - PAGE.M, 25);
 
   doc.setFontSize(9);
   doc.setTextColor(...COLOR.GRAY);
-  doc.text(`TIM: ${team.name}`, PAGE.W - PAGE.M, 15, { align: "right" });
+  doc.text(`TEAM: ${team.name}`, PAGE.W - PAGE.M, 15, { align: "right" });
 
-  return 30;
+  return 32;
 };
 
 /* =====================
@@ -63,9 +64,6 @@ const drawHeader = (doc, team) => {
 const drawTeamInfo = (doc, team, y) => {
   const left = PAGE.M;
   const right = PAGE.W / 2;
-
-  doc.setFontSize(9);
-  doc.setTextColor(...COLOR.DARK);
 
   const data = [
     ["Manager", team.manager],
@@ -76,6 +74,9 @@ const drawTeamInfo = (doc, team, y) => {
     ["Alamat", team.address],
   ];
 
+  doc.setFontSize(9);
+  doc.setTextColor(...COLOR.DARK);
+
   data.forEach((d, i) => {
     const x = i % 2 === 0 ? left : right;
     const row = Math.floor(i / 2);
@@ -84,92 +85,98 @@ const drawTeamInfo = (doc, team, y) => {
     doc.text(`${d[0]}:`, x, y + row * 8);
 
     doc.setFont("helvetica", "normal");
-    doc.text(d[1] || "-", x + 28, y + row * 8);
+    doc.text(d[1] || "-", x + 30, y + row * 8);
   });
 
   return y + 28;
 };
 
 /* =====================
-   PLAYER CARD
+   FOTO GRID (3x4 STYLE)
 ===================== */
-const drawPlayer = async (doc, p, x, y, index) => {
-  const cardW = 85;
-  const cardH = 42;
+const drawPhotos = async (doc, players, y) => {
+  const sizeW = 18;
+  const sizeH = 24;
 
-  // border
-  doc.setDrawColor(...COLOR.BORDER);
-  doc.rect(x, y, cardW, cardH);
+  let x = PAGE.M;
+  let row = 0;
 
-  // number
-  doc.setFontSize(8);
-  doc.setTextColor(...COLOR.GRAY);
-  doc.text(`#${index + 1}`, x + 2, y + 5);
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].photo) {
+      const img = await toBase64(players[i].photo);
 
-  // FOTO
-  if (p.photo) {
-    const img = await toBase64(p.photo);
-    if (img) {
-      doc.addImage(img, "JPEG", x + 3, y + 8, 18, 24);
+      if (img) {
+        doc.addImage(img, "JPEG", x, y, sizeW, sizeH);
+      }
+    }
+
+    // nama kecil di bawah foto
+    doc.setFontSize(6);
+    doc.text(
+      (players[i].name || "-").substring(0, 12),
+      x + sizeW / 2,
+      y + sizeH + 3,
+      { align: "center" }
+    );
+
+    x += 22;
+
+    if ((i + 1) % 8 === 0) {
+      x = PAGE.M;
+      row++;
+      y += 32;
     }
   }
 
-  // DATA
-  doc.setFontSize(8);
-  doc.setTextColor(...COLOR.DARK);
-
-  const tx = x + 24;
-
-  doc.setFont("helvetica", "bold");
-  doc.text("Nama:", tx, y + 10);
-
-  doc.setFont("helvetica", "normal");
-  doc.text((p.name || "-").substring(0, 22), tx + 18, y + 10);
-
-  doc.setFont("helvetica", "bold");
-  doc.text("TTL:", tx, y + 17);
-
-  doc.setFont("helvetica", "normal");
-  doc.text(`${p.pob || "-"}, ${p.dob || "-"}`, tx + 18, y + 17);
-
-  doc.setFont("helvetica", "bold");
-  doc.text("Usia:", tx, y + 24);
-
-  doc.setFont("helvetica", "normal");
-  doc.text(`${p.age || "-"} th`, tx + 18, y + 24);
+  return y + 5;
 };
 
 /* =====================
-   PLAYERS GRID
+   TABLE (PRO CLEAN)
 ===================== */
-const drawPlayers = async (doc, players, startY) => {
-  let y = startY;
-  let x = PAGE.M;
+const drawTable = (doc, players, y) => {
+  autoTable(doc, {
+    startY: y,
+    margin: { left: PAGE.M, right: PAGE.M },
 
-  for (let i = 0; i < players.length; i++) {
-    await drawPlayer(doc, players[i], x, y, i);
+    head: [["NO", "NAMA LENGKAP", "TEMPAT LAHIR", "TANGGAL LAHIR", "USIA"]],
 
-    if (i % 2 === 0) {
-      x = PAGE.W / 2 + 5;
-    } else {
-      x = PAGE.M;
-      y += 48;
+    body: players.map((p, i) => [
+      i + 1,
+      (p.name || "-").toUpperCase(),
+      p.pob || "-",
+      p.dob || "-",
+      `${p.age || "-"} TH`,
+    ]),
 
-      if (y > 250) {
-        doc.addPage();
-        y = 20;
-      }
-    }
-  }
+    theme: "grid",
 
-  return y;
+    styles: {
+      fontSize: 8,
+      cellPadding: 3,
+    },
+
+    headStyles: {
+      fillColor: COLOR.PRIMARY,
+      textColor: 255,
+      fontStyle: "bold",
+      halign: "center",
+    },
+
+    columnStyles: {
+      0: { halign: "center", cellWidth: 10 },
+      4: { halign: "center", cellWidth: 20 },
+    },
+  });
+
+  return doc.lastAutoTable.finalY + 5;
 };
 
 /* =====================
    SIGNATURE
 ===================== */
 const drawSignature = (doc) => {
-  const y = PAGE.H - 40;
+  const y = doc.internal.pageSize.height - 35;
 
   doc.setFontSize(9);
   doc.setTextColor(...COLOR.DARK);
@@ -196,12 +203,15 @@ export const exportTeamsPDF = async (teams) => {
 
     let y = drawHeader(doc, team);
     y = drawTeamInfo(doc, team, y);
-    y += 5;
 
-    y = await drawPlayers(doc, team.players || [], y);
+    // FOTO GRID
+    y = await drawPhotos(doc, team.players || [], y);
+
+    // TABLE
+    y = drawTable(doc, team.players || [], y);
 
     drawSignature(doc);
   }
 
-  doc.save("TEAM_REGISTRATION.pdf");
+  doc.save("FINAL_FORM_PANITIA.pdf");
 };
