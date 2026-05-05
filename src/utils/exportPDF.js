@@ -171,51 +171,54 @@ const drawPlayers = async (doc, players, yStart) => {
 
   // 🔥 CARD RAPI
   const drawCard = async (p, x, y, index) => {
-    if (!p) return;
+  if (!p) return;
 
-    // BOX
-    doc.setDrawColor(...COLOR.BORDER);
-    doc.rect(x, y, boxW, boxH);
+  // BOX
+  doc.setDrawColor(...COLOR.BORDER);
+  doc.rect(x, y, boxW, boxH);
 
-    // FOTO
-    if (p.photo) {
-      const img = await toBase64(p.photo);
-      if (img) {
-        doc.addImage(img, "JPEG", x + 3, y + 4, 20, 24);
-      }
+  // FOTO
+  if (p.photo) {
+    const img = await toBase64(p.photo);
+    if (img) {
+      doc.addImage(img, "JPEG", x + 3, y + 4, 20, 24);
     }
+  }
 
-    const textX = x + 26;
-    const lineW = boxW - 35; // 🔥 FIX AUTO WIDTH
+  const labelX = x + 26;
+  const valueX = x + 48; // 🔥 FIX ALIGN SEMUA VALUE
+  const maxWidth = boxW - 52;
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text(`No. ${index}`, textX, y + 7);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.text(`No. ${index}`, labelX, y + 7);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setDrawColor(180); // garis lebih soft
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
 
-    // NAMA
-    doc.text("Nama:", textX, y + 13);
-    doc.text(
-      (p.name || "-").toUpperCase().slice(0, 28),
-      textX + 18,
-      y + 12
-    );
+  // 🔥 NAMA (AUTO WRAP + LIMIT)
+  doc.text("Nama:", labelX, y + 13);
+  doc.text(p.name || "-", valueX, y + 13, {
+    maxWidth,
+  });
 
-    // POSISI
-    doc.text("Posisi:", textX, y + 19);
-    doc.text(p.position || "-", textX + 18, y + 18);
+  // 🔥 POSISI
+  doc.text("Posisi:", labelX, y + 19);
+  doc.text(p.position || "-", valueX, y + 19, {
+    maxWidth,
+  });
 
-    // TTL
-    doc.text("TTL:", textX, y + 25);
-    doc.text(
-      `${p.pob || "-"}, ${p.dob || "-"}`.slice(0, 30),
-      textX + 18,
-      y + 24
-    );
-  };
+  // 🔥 TTL
+  doc.text("TTL:", labelX, y + 25);
+  doc.text(
+    `${p.pob || "-"}, ${p.dob || "-"}`,
+    valueX,
+    y + 25,
+    {
+      maxWidth,
+    }
+  );
+};
 
   // LOOP 2 KOLOM
   for (let i = 0; i < sortedPlayers.length; i += 2) {
