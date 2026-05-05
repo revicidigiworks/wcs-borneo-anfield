@@ -275,17 +275,7 @@ export default function Dashboard() {
                         </button>
                       </div>
                       <div className="space-y-3">
-                        {p.position && (
-  <span className={`
-    inline-block text-[10px] font-bold px-2 py-1 rounded
-    ${p.position === "Kiper" && "bg-blue-100 text-blue-700"}
-    ${p.position === "Belakang" && "bg-red-100 text-red-700"}
-    ${p.position === "Tengah" && "bg-yellow-100 text-yellow-800"}
-    ${p.position === "Depan" && "bg-green-100 text-green-700"}
-  `}>
-    {p.position}
-  </span>
-)}
+                        
                         <input
                           placeholder="Nama Lengkap"
                           value={p.name}
