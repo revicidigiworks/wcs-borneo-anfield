@@ -183,29 +183,29 @@ export default function Dashboard() {
 
             <div className="p-6 space-y-8">
               {/* 🔥 LINK EDIT TIM */}
-  <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs">
-    <p className="font-bold mb-1">Link Edit Tim</p>
+              <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-xs">
+                <p className="font-bold mb-1">Link Edit Tim</p>
 
-    <div className="flex gap-2">
-      <input
-        value={`${window.location.origin}/edit/${active.editToken}`}
-        readOnly
-        className="flex-1 border rounded px-2 py-1 text-xs"
-      />
+                <div className="flex gap-2">
+                  <input
+                    value={`${window.location.origin}/edit/${active.editToken}`}
+                    readOnly
+                    className="flex-1 border rounded px-2 py-1 text-xs"
+                  />
 
-      <button
-        onClick={() => {
-          navigator.clipboard.writeText(
-            `${window.location.origin}/edit/${active.editToken}`
-          );
-          alert("Link disalin");
-        }}
-        className="bg-green-600 text-white px-3 rounded text-xs"
-      >
-        Copy
-      </button>
-    </div>
-  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        `${window.location.origin}/edit/${active.editToken}`
+                      );
+                      alert("Link disalin");
+                    }}
+                    className="bg-green-600 text-white px-3 rounded text-xs"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
               {/* DESKTOP HEADER */}
               <div className="hidden md:flex justify-between items-end border-b pb-6">
                 <div>
@@ -228,7 +228,7 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
-              
+
 
               {/* FORM SECTION */}
               <section className="space-y-4">
@@ -296,32 +296,27 @@ export default function Dashboard() {
                           />
                         </div>
 
-                        {/* FOTO */}
-                        {p.photo && (
-                          <img
-                            src={p.photo}
-                            alt="Foto"
-                            onClick={() => window.open(p.photo)}
-                            className="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-80"
-                          />
-                        )}
+<div className="flex gap-3">
 
-                        {/* KTP (opsional tampil) */}
-                        {p.ktp && (
-                          <img
-                            src={p.ktp}
-                            alt="KTP"
-                            onClick={() => window.open(p.ktp)}
-                            className="w-full h-28 object-cover rounded-lg cursor-pointer hover:opacity-80"
-                          />
-                        )}
+  {p.photo && (
+    <img
+      src={p.photo}
+      alt="Foto"
+      onClick={() => window.open(p.photo)}
+      className="w-24 h-32 object-cover rounded-md border cursor-pointer"
+    />
+  )}
 
-                        <input
-                          placeholder="Nama Lengkap"
-                          value={p.name}
-                          onChange={(e) => updatePlayer(i, "name", e.target.value)}
-                          className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-sm font-medium"
-                        />
+  {p.ktp && (
+    <img
+      src={p.ktp}
+      alt="KTP"
+      onClick={() => window.open(p.ktp)}
+      className="w-32 h-20 object-cover rounded-md border cursor-pointer"
+    />
+  )}
+
+</div>
                       </div>
                     </div>
                   ))}
