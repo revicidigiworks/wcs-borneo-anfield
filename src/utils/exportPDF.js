@@ -1,23 +1,13 @@
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 /* =====================
    CONFIG
 ===================== */
-const COLOR = {
-  PRIMARY: [200, 16, 46],
-  DARK: [15, 15, 15],
-  GRAY: [100, 100, 100],
-  BORDER: [210, 210, 210],
-};
-
-const PAGE = {
-  W: 210,
-  M: 15,
-};
+const M = 15;
+const PAGE_W = 210;
 
 /* =====================
-   IMAGE CONVERTER
+   IMAGE HELPER
 ===================== */
 const toBase64 = async (url) => {
   try {
@@ -35,25 +25,24 @@ const toBase64 = async (url) => {
 };
 
 /* =====================
-   HEADER (PRO STYLE)
+   HEADER
 ===================== */
 const drawHeader = (doc, team) => {
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(20);
-  doc.setTextColor(...COLOR.DARK);
-  doc.text("WORLD CUP SERIES 2026", PAGE.M, 15);
+  doc.setFontSize(18);
+  doc.text("WORLD CUP SERIES 2026", M, 15);
 
   doc.setFontSize(10);
-  doc.setTextColor(...COLOR.PRIMARY);
-  doc.text("OFFICIAL TEAM REGISTRATION FORM", PAGE.M, 21);
+  doc.setTextColor(200, 16, 46);
+  doc.text("OFFICIAL TEAM SHEET", M, 21);
 
-  doc.setDrawColor(...COLOR.PRIMARY);
-  doc.setLineWidth(1);
-  doc.line(PAGE.M, 25, PAGE.W - PAGE.M, 25);
+  doc.setDrawColor(200, 16, 46);
+  doc.setLineWidth(0.8);
+  doc.line(M, 25, PAGE_W - M, 25);
 
+  doc.setTextColor(0);
   doc.setFontSize(9);
-  doc.setTextColor(...COLOR.GRAY);
-  doc.text(`TEAM: ${team.name}`, PAGE.W - PAGE.M, 15, { align: "right" });
+  doc.text(`TEAM: ${team.name}`, PAGE_W - M, 15, { align: "right" });
 
   return 32;
 };
@@ -62,8 +51,8 @@ const drawHeader = (doc, team) => {
    TEAM INFO
 ===================== */
 const drawTeamInfo = (doc, team, y) => {
-  const left = PAGE.M;
-  const right = PAGE.W / 2;
+  const left = M;
+  const right = PAGE_W / 2;
 
   const data = [
     ["Manager", team.manager],
@@ -75,7 +64,6 @@ const drawTeamInfo = (doc, team, y) => {
   ];
 
   doc.setFontSize(9);
-  doc.setTextColor(...COLOR.DARK);
 
   data.forEach((d, i) => {
     const x = i % 2 === 0 ? left : right;
@@ -92,84 +80,69 @@ const drawTeamInfo = (doc, team, y) => {
 };
 
 /* =====================
-   FOTO GRID (3x4 STYLE)
+   DRAW TABLE HEADER
 ===================== */
-const drawPhotos = async (doc, players, y) => {
-  const sizeW = 18;
-  const sizeH = 24;
+const drawTableHeader = (doc, y) => {
+  const cols = ["NO", "NAMA", "TTL", "USIA", "FOTO"];
+  const colX = [M, M + 12, M + 70, M + 140, M + 155];
 
-  let x = PAGE.M;
-  let row = 0;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
 
-  for (let i = 0; i < players.length; i++) {
-    if (players[i].photo) {
-      const img = await toBase64(players[i].photo);
+  cols.forEach((c, i) => {
+    doc.text(c, colX[i], y);
+  });
 
-      if (img) {
-        doc.addImage(img, "JPEG", x, y, sizeW, sizeH);
-      }
-    }
+  doc.setDrawColor(0);
+  doc.line(M, y + 2, PAGE_W - M, y + 2);
 
-    // nama kecil di bawah foto
-    doc.setFontSize(6);
-    doc.text(
-      (players[i].name || "-").substring(0, 12),
-      x + sizeW / 2,
-      y + sizeH + 3,
-      { align: "center" }
-    );
-
-    x += 22;
-
-    if ((i + 1) % 8 === 0) {
-      x = PAGE.M;
-      row++;
-      y += 32;
-    }
-  }
-
-  return y + 5;
+  return y + 6;
 };
 
 /* =====================
-   TABLE (PRO CLEAN)
+   DRAW PLAYERS
 ===================== */
-const drawTable = (doc, players, y) => {
-  autoTable(doc, {
-    startY: y,
-    margin: { left: PAGE.M, right: PAGE.M },
+const drawPlayers = async (doc, players, startY) => {
+  let y = startY;
 
-    head: [["NO", "NAMA LENGKAP", "TEMPAT LAHIR", "TANGGAL LAHIR", "USIA"]],
+  const colX = {
+    no: M,
+    name: M + 12,
+    ttl: M + 70,
+    age: M + 140,
+    photo: M + 155,
+  };
 
-    body: players.map((p, i) => [
-      i + 1,
-      (p.name || "-").toUpperCase(),
-      p.pob || "-",
-      p.dob || "-",
-      `${p.age || "-"} TH`,
-    ]),
+  for (let i = 0; i < players.length; i++) {
+    const p = players[i];
 
-    theme: "grid",
+    if (y > 260) {
+      doc.addPage();
+      y = 20;
+      drawTableHeader(doc, y);
+      y += 6;
+    }
 
-    styles: {
-      fontSize: 8,
-      cellPadding: 3,
-    },
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
 
-    headStyles: {
-      fillColor: COLOR.PRIMARY,
-      textColor: 255,
-      fontStyle: "bold",
-      halign: "center",
-    },
+    doc.text(String(i + 1), colX.no, y);
+    doc.text((p.name || "-").substring(0, 25), colX.name, y);
+    doc.text(`${p.pob || "-"}, ${p.dob || "-"}`, colX.ttl, y);
+    doc.text(`${p.age || "-"} TH`, colX.age, y);
 
-    columnStyles: {
-      0: { halign: "center", cellWidth: 10 },
-      4: { halign: "center", cellWidth: 20 },
-    },
-  });
+    // FOTO
+    if (p.photo) {
+      const img = await toBase64(p.photo);
+      if (img) {
+        doc.addImage(img, "JPEG", colX.photo, y - 5, 16, 20);
+      }
+    }
 
-  return doc.lastAutoTable.finalY + 5;
+    y += 10;
+  }
+
+  return y;
 };
 
 /* =====================
@@ -179,17 +152,16 @@ const drawSignature = (doc) => {
   const y = doc.internal.pageSize.height - 35;
 
   doc.setFontSize(9);
-  doc.setTextColor(...COLOR.DARK);
 
-  doc.text("MANAGER TIM", PAGE.M + 20, y);
-  doc.text("PANITIA", PAGE.W - PAGE.M - 30, y);
+  doc.text("MANAGER TIM", M + 20, y);
+  doc.text("PANITIA", PAGE_W - M - 30, y);
 
-  doc.line(PAGE.M + 5, y + 15, PAGE.M + 60, y + 15);
-  doc.line(PAGE.W - PAGE.M - 60, y + 15, PAGE.W - PAGE.M - 5, y + 15);
+  doc.line(M + 5, y + 15, M + 60, y + 15);
+  doc.line(PAGE_W - M - 60, y + 15, PAGE_W - M - 5, y + 15);
 };
 
 /* =====================
-   MAIN EXPORT
+   EXPORT
 ===================== */
 export const exportTeamsPDF = async (teams) => {
   const doc = new jsPDF("p", "mm", "a4");
@@ -204,14 +176,11 @@ export const exportTeamsPDF = async (teams) => {
     let y = drawHeader(doc, team);
     y = drawTeamInfo(doc, team, y);
 
-    // FOTO GRID
-    y = await drawPhotos(doc, team.players || [], y);
-
-    // TABLE
-    y = drawTable(doc, team.players || [], y);
+    y = drawTableHeader(doc, y);
+    y = await drawPlayers(doc, team.players || [], y);
 
     drawSignature(doc);
   }
 
-  doc.save("FINAL_FORM_PANITIA.pdf");
+  doc.save("FINAL_FORM_RESMI.pdf");
 };
