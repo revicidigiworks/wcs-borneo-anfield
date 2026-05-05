@@ -234,26 +234,6 @@ const drawSignature = (doc) => {
   doc.line(PAGE.W - PAGE.M - 60, y + 15, PAGE.W - PAGE.M - 5, y + 15);
 };
 
-/* ===================== FOOTER ===================== */
-const drawFooter = (doc) => {
-  const pages = doc.internal.getNumberOfPages();
-
-  for (let i = 1; i <= pages; i++) {
-    doc.setPage(i);
-
-    const h = doc.internal.pageSize.height;
-
-    drawLine(doc, h - 15, COLOR.BORDER, 0.2);
-
-    doc.setFontSize(7);
-    doc.setTextColor(...COLOR.TEXT_MUTE);
-
-    doc.text("Borneo Anfield", PAGE.M, h - 10);
-    doc.text(`Halaman ${i} dari ${pages}`, PAGE.W - PAGE.M, h - 10, {
-      align: "right",
-    });
-  }
-};
 
 /* ===================== EXPORT ===================== */
 export const exportTeamsPDF = async (teams) => {
