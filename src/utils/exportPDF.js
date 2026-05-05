@@ -198,7 +198,6 @@ const drawPlayers = async (doc, players, yStart) => {
 
     // NAMA
     doc.text("Nama:", textX, y + 13);
-    doc.line(textX + 18, y + 13, textX + 18 + lineW, y + 13);
     doc.text(
       (p.name || "-").toUpperCase().slice(0, 28),
       textX + 18,
@@ -207,12 +206,10 @@ const drawPlayers = async (doc, players, yStart) => {
 
     // POSISI
     doc.text("Posisi:", textX, y + 19);
-    doc.line(textX + 18, y + 19, textX + 18 + lineW, y + 19);
     doc.text(p.position || "-", textX + 18, y + 18);
 
     // TTL
     doc.text("TTL:", textX, y + 25);
-    doc.line(textX + 18, y + 25, textX + 18 + lineW, y + 25);
     doc.text(
       `${p.pob || "-"}, ${p.dob || "-"}`.slice(0, 30),
       textX + 18,
