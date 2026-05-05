@@ -1,20 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../services/firebase";
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    // 🔐 simple auth (nanti bisa upgrade Firebase Auth)
-    if (email === "admineo@bas.com" && password === "picklebas*") {
-      localStorage.setItem("admin", "true");
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // 🔥 ini sekarang REAL LOGIN
       navigate("/admin/dashboard");
-    } else {
-      alert("Login gagal");
+    } catch (err) {
+      console.error(err);
+      alert("Login gagal ❌");
     }
   };
 
@@ -25,7 +29,7 @@ export default function Login() {
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Email admin"
           className="w-full h-10 px-3 text-white"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
