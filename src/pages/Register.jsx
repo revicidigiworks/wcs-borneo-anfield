@@ -10,6 +10,8 @@ import {
 } from "firebase/firestore";
 import { Trash2, Plus, ShieldCheck, Users } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
+import logoWCS from "../assets/img/logo-wcs.webp";
+
 
 export default function Register() {
   const navigate = useNavigate();
@@ -34,17 +36,17 @@ export default function Register() {
   });
 
   const [players, setPlayers] = useState([
-  {
-    id: Date.now(),
-    name: "",
-    pob: "",
-    dob: "",
-    age: "",
-    position: "", // 🔥 TAMBAH INI
-    ktp: null,
-    photo: null,
-  },
-]);
+    {
+      id: Date.now(),
+      name: "",
+      pob: "",
+      dob: "",
+      age: "",
+      position: "", // 🔥 TAMBAH INI
+      ktp: null,
+      photo: null,
+    },
+  ]);
 
   const [loading, setLoading] = useState(false);
 
@@ -90,22 +92,22 @@ export default function Register() {
     setPlayers(updated);
   };
 
- const addPlayer = () => {
-  if (players.length >= 16) return alert("Maksimal hanya 16 pemain");
-  setPlayers([
-    ...players,
-    {
-      id: Date.now() + Math.random(),
-      name: "",
-      pob: "",
-      dob: "",
-      age: "",
-      position: "", // 🔥 WAJIB
-      ktp: null,
-      photo: null,
-    },
-  ]);
-};
+  const addPlayer = () => {
+    if (players.length >= 16) return alert("Maksimal hanya 16 pemain");
+    setPlayers([
+      ...players,
+      {
+        id: Date.now() + Math.random(),
+        name: "",
+        pob: "",
+        dob: "",
+        age: "",
+        position: "", // 🔥 WAJIB
+        ktp: null,
+        photo: null,
+      },
+    ]);
+  };
 
   const removePlayer = (index) => {
     if (players.length === 1) return alert("Minimal harus ada 1 pemain");
@@ -156,7 +158,7 @@ export default function Register() {
       if (age < 17 || age > 50)
         return alert(`Usia pemain ke-${i + 1} harus 17 - 50 tahun`), false;
       if (!p.position)
-  return alert(`Posisi pemain ke-${i + 1} wajib diisi`), false;
+        return alert(`Posisi pemain ke-${i + 1} wajib diisi`), false;
 
       if (!p.ktp) return alert(`KTP pemain ke-${i + 1} wajib upload`), false;
       if (!p.photo) return alert(`Foto pemain ke-${i + 1} wajib upload`), false;
@@ -301,15 +303,33 @@ export default function Register() {
     <div className="min-h-screen bg-[#f5f5f5] px-3 py-4 md:py-10">
       <div className="max-w-5xl mx-auto bg-white rounded-xl overflow-hidden shadow-2xl border border-gray-200">
         <div className="bg-[#111111] text-white px-5 py-6 md:px-8 border-b-4 border-[#c8102e]">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[3px] text-white/70">
-            <ShieldCheck size={16} /> Secure Team Registration
+          <div className="flex items-center justify-between gap-4">
+
+            {/* LEFT CONTENT */}
+            <div>
+              <div className="flex items-center gap-2 text-[10px] sm:text-xs uppercase tracking-[3px] text-white/70">
+                <ShieldCheck size={16} /> Secure Team Registration
+              </div>
+
+              <h1 className="text-xl sm:text-2xl md:text-4xl font-bold mt-2">
+                PENDAFTARAN TIM
+              </h1>
+
+              <p className="text-white/70 text-xs sm:text-sm mt-1">
+                Pendaftaran dibuka 05 Mei 2026 • Ditutup 01 Juni 2026
+              </p>
+            </div>
+
+            {/* RIGHT LOGO */}
+            <div className="flex-shrink-0">
+              <img
+                src={logoWCS}
+                alt="WCS Logo"
+                className="w-12 sm:w-16 md:w-20 object-contain"
+              />
+            </div>
+
           </div>
-          <h1 className="text-2xl md:text-4xl font-bold mt-2">
-            PENDAFTARAN TIM
-          </h1>
-          <p className="text-white/70 text-sm mt-1">
-            Pendaftaran dibuka 05 Mei 2026 • Ditutup 01 Juni 2026
-          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-8">
@@ -345,7 +365,7 @@ export default function Register() {
                       Pemain #{i + 1}
                     </span>
 
-                    
+
                   </div>
 
                   <input value={p.name} onChange={(e) => handlePlayerChange(i, "name", e.target.value)} placeholder="Contoh: Risal Gerrad (sesuai KTP)" className="border rounded-md px-4 h-11 text-sm w-full" />
@@ -384,19 +404,19 @@ export default function Register() {
                     />
                   </div>
                   <div>
-  <p className="text-[10px] text-gray-500 mb-1">Posisi</p>
-  <select
-    value={p.position}
-    onChange={(e) => handlePlayerChange(i, "position", e.target.value)}
-    className="border rounded-md px-3 h-11 text-sm w-full"
-  >
-    <option value="">Pilih Posisi</option>
-    <option value="Kiper">Kiper</option>
-    <option value="Belakang">Belakang</option>
-    <option value="Tengah">Tengah</option>
-    <option value="Depan">Depan</option>
-  </select>
-</div>
+                    <p className="text-[10px] text-gray-500 mb-1">Posisi</p>
+                    <select
+                      value={p.position}
+                      onChange={(e) => handlePlayerChange(i, "position", e.target.value)}
+                      className="border rounded-md px-3 h-11 text-sm w-full"
+                    >
+                      <option value="">Pilih Posisi</option>
+                      <option value="Kiper">Kiper</option>
+                      <option value="Belakang">Belakang</option>
+                      <option value="Tengah">Tengah</option>
+                      <option value="Depan">Depan</option>
+                    </select>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
                     <div>
@@ -426,37 +446,37 @@ export default function Register() {
                   </div>
 
 
-                  
-                 <div className="flex items-center gap-3 text-sm">
 
-  {/* ➕ TAMBAH */}
-  {i === players.length - 1 && (
-    <button
-      type="button"
-      onClick={addPlayer}
-      className="flex items-center gap-1 text-green-600 hover:text-green-700 font-medium transition"
-    >
-      <Plus size={16} />
-      <span>Tambah</span>
-    </button>
-  )}
+                  <div className="flex items-center gap-3 text-sm">
 
-  {/* SEPARATOR */}
-  {i === players.length - 1 && (
-    <span className="text-gray-300">|</span>
-  )}
+                    {/* ➕ TAMBAH */}
+                    {i === players.length - 1 && (
+                      <button
+                        type="button"
+                        onClick={addPlayer}
+                        className="flex items-center gap-1 text-green-600 hover:text-green-700 font-medium transition"
+                      >
+                        <Plus size={16} />
+                        <span>Tambah</span>
+                      </button>
+                    )}
 
-  {/* 🗑 HAPUS */}
-  <button
-    type="button"
-    onClick={() => removePlayer(i)}
-    className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium transition"
-  >
-    <Trash2 size={16} />
-    <span>Hapus</span>
-  </button>
+                    {/* SEPARATOR */}
+                    {i === players.length - 1 && (
+                      <span className="text-gray-300">|</span>
+                    )}
 
-</div>
+                    {/* 🗑 HAPUS */}
+                    <button
+                      type="button"
+                      onClick={() => removePlayer(i)}
+                      className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium transition"
+                    >
+                      <Trash2 size={16} />
+                      <span>Hapus</span>
+                    </button>
+
+                  </div>
                 </div>
               ))}
             </div>
