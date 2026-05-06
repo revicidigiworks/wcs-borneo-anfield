@@ -56,11 +56,11 @@ export default function Home() {
 
         {/* Title */}
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-black mb-2 tracking-tight text-slate-900">
-          WORLD CUP <span className="text-red-600">SERIES</span>
+          WORLD CUP <span className="text-red-600">SERIES 2026</span>
         </h1>
 
         <p className="text-base sm:text-lg md:text-2xl font-light mb-8 text-slate-500 tracking-wide">
-          Borneo Anfield <span className="font-semibold text-yellow-500">2026</span>
+          Borneo Anfield Stadium <span className="font-semibold text-yellow-500">2026</span>
         </p>
 
         {/* 🔥 INFO PREMIUM (DIVIDER KUNING & MOBILE FIX) */}
