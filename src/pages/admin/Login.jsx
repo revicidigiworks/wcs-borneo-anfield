@@ -19,15 +19,13 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Clear broken old session
+  // Clear old session
   useEffect(() => {
     signOut(auth).catch(() => {});
   }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    console.log("LOGIN CLICKED");
 
     setError("");
 
@@ -36,23 +34,16 @@ export default function Login() {
 
       const cleanEmail = email.trim().toLowerCase();
 
-      console.log("EMAIL:", cleanEmail);
-      console.log("START LOGIN");
-
-      const userCredential =
-        await signInWithEmailAndPassword(
-          auth,
-          cleanEmail,
-          password
-        );
-
-      console.log("SUCCESS LOGIN");
-      console.log(userCredential);
+      await signInWithEmailAndPassword(
+        auth,
+        cleanEmail,
+        password
+      );
 
       navigate("/admin/dashboard");
+
     } catch (err) {
-      console.log("MASUK CATCH");
-      console.error("LOGIN ERROR:", err);
+      console.error(err);
 
       switch (err.code) {
         case "auth/invalid-email":
@@ -79,43 +70,56 @@ export default function Login() {
           break;
 
         default:
-          setError(err.message || "Login gagal.");
+          setError("Login gagal.");
       }
+
     } finally {
-      console.log("FINALLY");
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-red-100 px-6">
+      
       <form
         onSubmit={handleLogin}
-        className="w-full max-w-sm bg-[#111] border border-white/10 rounded-2xl p-6 space-y-5 shadow-2xl"
+        className="w-full max-w-sm bg-white border border-red-100 rounded-3xl p-7 space-y-6 shadow-2xl shadow-red-100"
       >
+        
         {/* Header */}
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-white">
-            Admin Login
-          </h1>
+        <div className="space-y-2 text-center">
+          
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-200">
+            <span className="text-white font-black text-xl">
+              A
+            </span>
+          </div>
 
-          <p className="text-sm text-gray-400">
-            Masuk ke dashboard admin
-          </p>
+          <div>
+            <h1 className="text-2xl font-black text-gray-900">
+              Admin Login
+            </h1>
+
+            <p className="text-sm text-gray-500 mt-1">
+              Masuk ke dashboard admin
+            </p>
+          </div>
+
         </div>
 
         {/* Error */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">
+          <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-2xl px-4 py-3">
             {error}
           </div>
         )}
 
         {/* Email */}
         <div className="space-y-2">
+          
           <label
             htmlFor="admin-email"
-            className="text-sm text-gray-300"
+            className="text-sm font-semibold text-gray-700"
           >
             Email
           </label>
@@ -126,25 +130,28 @@ export default function Login() {
             name="email"
             autoComplete="email"
             placeholder="admin@email.com"
-            className="w-full h-11 rounded-lg bg-[#1a1a1a] border border-white/10 px-4 text-white outline-none focus:border-red-500"
+            className="w-full h-12 rounded-2xl bg-gray-50 border border-gray-200 px-4 text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all"
             value={email}
             onChange={(e) =>
               setEmail(e.target.value)
             }
             required
           />
+
         </div>
 
         {/* Password */}
         <div className="space-y-2">
+          
           <label
             htmlFor="admin-password"
-            className="text-sm text-gray-300"
+            className="text-sm font-semibold text-gray-700"
           >
             Password
           </label>
 
           <div className="relative">
+
             <input
               type={
                 showPassword ? "text" : "password"
@@ -153,7 +160,7 @@ export default function Login() {
               name="password"
               autoComplete="current-password"
               placeholder="••••••••"
-              className="w-full h-11 rounded-lg bg-[#1a1a1a] border border-white/10 px-4 pr-12 text-white outline-none focus:border-red-500"
+              className="w-full h-12 rounded-2xl bg-gray-50 border border-gray-200 px-4 pr-12 text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all"
               value={password}
               onChange={(e) =>
                 setPassword(e.target.value)
@@ -166,7 +173,7 @@ export default function Login() {
               onClick={() =>
                 setShowPassword(!showPassword)
               }
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-600 transition-colors"
             >
               {showPassword ? (
                 <EyeOff size={18} />
@@ -174,18 +181,22 @@ export default function Login() {
                 <Eye size={18} />
               )}
             </button>
+
           </div>
+
         </div>
 
         {/* Submit */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-11 rounded-lg bg-red-600 hover:bg-red-700 transition text-white font-semibold disabled:opacity-50"
+          className="w-full h-12 rounded-2xl bg-red-600 hover:bg-red-700 transition-all text-white font-bold shadow-lg shadow-red-200 disabled:opacity-50"
         >
           {loading ? "Loading..." : "Login"}
         </button>
+
       </form>
+
     </div>
   );
 }
