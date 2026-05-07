@@ -215,10 +215,9 @@ const drawTeamInfo = (doc, team, y) => {
 const drawPlayers = async (doc, players, yStart) => {
   let y = yStart;
 
-  /* LEBIH COMPACT */
   const boxW = 86;
-  const boxH = 36;
-  const gapX = 10;
+  const boxH = 40;
+  const gapX = 8;
 
   const leftX = PAGE.M;
   const rightX = PAGE.M + boxW + gapX;
@@ -254,19 +253,20 @@ const drawPlayers = async (doc, players, yStart) => {
 
     /* CARD */
     doc.setFillColor(255, 255, 255);
-    doc.setDrawColor(...COLOR.BORDER);
+    doc.setDrawColor(215, 215, 215);
+    doc.setLineWidth(0.25);
 
     doc.roundedRect(
       x,
       y,
       boxW,
       boxH,
-      2,
-      2,
+      1.5,
+      1.5,
       "FD"
     );
 
-    /* FOTO LEBIH KECIL */
+    /* FOTO */
     if (p.photo) {
       const img = await toBase64(p.photo);
 
@@ -276,46 +276,46 @@ const drawPlayers = async (doc, players, yStart) => {
           "JPEG",
           x + 3,
           y + 4,
-          16,
-          20
+          18,
+          22
         );
       }
     }
 
-    /* NOMOR */
+    /* BADGE NOMOR */
     doc.setFillColor(...COLOR.PRIMARY);
 
     doc.roundedRect(
       x + 3,
-      y + 26,
-      16,
-      5,
+      y + 29,
+      18,
+      6,
       1,
       1,
       "F"
     );
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(6);
+    doc.setFontSize(6.5);
     doc.setTextColor(255);
 
     doc.text(
-      `#${no}`,
-      x + 11,
-      y + 29.5,
+      `PLAYER ${no}`,
+      x + 12,
+      y + 33,
       { align: "center" }
     );
 
     /* CONTENT */
-    const labelX = x + 22;
-    const colonX = x + 35;
-    const valueX = x + 37;
+    const labelX = x + 25;
+    const colonX = x + 39;
+    const valueX = x + 41;
 
     doc.setTextColor(...COLOR.TEXT);
 
     const row = (label, value, rowY) => {
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(6.7);
+      doc.setFontSize(7.2);
 
       doc.text(label, labelX, rowY);
 
@@ -328,30 +328,30 @@ const drawPlayers = async (doc, players, yStart) => {
         valueX,
         rowY,
         {
-          maxWidth: 44,
+          maxWidth: 40,
         }
       );
     };
 
-    row("Nama", p.name, y + 7);
-    row("NIK", p.nik, y + 12);
-    row("Posisi", p.position, y + 17);
+    row("Nama", p.name, y + 8);
+    row("NIK", p.nik, y + 14);
+    row("Posisi", p.position, y + 20);
 
     row(
       "TTL",
       `${p.pob || "-"}, ${p.dob || "-"}`,
-      y + 22
+      y + 26
     );
 
     row(
       "Umur",
-      `${p.age || "-"} Th`,
-      y + 27
+      `${p.age || "-"} Tahun`,
+      y + 32
     );
   };
 
   for (let i = 0; i < sortedPlayers.length; i += 2) {
-    if (y + boxH > 250) {
+    if (y + boxH > 248) {
       doc.addPage();
       y = 20;
     }
