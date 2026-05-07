@@ -7,6 +7,7 @@ import {
 
 import { Eye, EyeOff } from "lucide-react";
 import { auth } from "../../services/firebase";
+import logoBAS from "../../assets/img/logo-bas.webp";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -89,21 +90,13 @@ export default function Login() {
         {/* Header */}
         <div className="space-y-2 text-center">
           
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-200">
-            <span className="text-white font-black text-xl">
-              A
-            </span>
-          </div>
-
-          <div>
-            <h1 className="text-2xl font-black text-gray-900">
-              Admin Login
-            </h1>
-
-            <p className="text-sm text-gray-500 mt-1">
-              Masuk ke dashboard admin
-            </p>
-          </div>
+          <div className="flex justify-center">
+  <img
+    src={logoBAS}
+    alt="BAS Logo"
+    className="w-24 object-contain drop-shadow-lg"
+  />
+</div>
 
         </div>
 
