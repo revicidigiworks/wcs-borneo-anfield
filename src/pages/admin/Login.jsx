@@ -5,6 +5,7 @@ import {
   signOut,
 } from "firebase/auth";
 
+import { Eye, EyeOff } from "lucide-react";
 import { auth } from "../../services/firebase";
 
 export default function Login() {
@@ -13,10 +14,12 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Clear old broken sessions
+  // Clear broken old session
   useEffect(() => {
     signOut(auth).catch(() => {});
   }, []);
@@ -24,26 +27,31 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    setError("");
+    console.log("LOGIN CLICKED");
 
-    // Basic validation
-    if (!email || !password) {
-      return setError("Email dan password wajib diisi.");
-    }
+    setError("");
 
     try {
       setLoading(true);
 
       const cleanEmail = email.trim().toLowerCase();
 
-      await signInWithEmailAndPassword(
-        auth,
-        cleanEmail,
-        password
-      );
+      console.log("EMAIL:", cleanEmail);
+      console.log("START LOGIN");
+
+      const userCredential =
+        await signInWithEmailAndPassword(
+          auth,
+          cleanEmail,
+          password
+        );
+
+      console.log("SUCCESS LOGIN");
+      console.log(userCredential);
 
       navigate("/admin/dashboard");
     } catch (err) {
+      console.log("MASUK CATCH");
       console.error("LOGIN ERROR:", err);
 
       switch (err.code) {
@@ -71,9 +79,10 @@ export default function Login() {
           break;
 
         default:
-          setError("Login gagal. Silakan coba lagi.");
+          setError(err.message || "Login gagal.");
       }
     } finally {
+      console.log("FINALLY");
       setLoading(false);
     }
   };
@@ -82,8 +91,9 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-black px-6">
       <form
         onSubmit={handleLogin}
-        className="w-full max-w-sm bg-[#111] border border-white/10 rounded-2xl p-6 space-y-4 shadow-2xl"
+        className="w-full max-w-sm bg-[#111] border border-white/10 rounded-2xl p-6 space-y-5 shadow-2xl"
       >
+        {/* Header */}
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-white">
             Admin Login
@@ -94,12 +104,14 @@ export default function Login() {
           </p>
         </div>
 
+        {/* Error */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">
             {error}
           </div>
         )}
 
+        {/* Email */}
         <div className="space-y-2">
           <label
             htmlFor="admin-email"
@@ -123,6 +135,7 @@ export default function Login() {
           />
         </div>
 
+        {/* Password */}
         <div className="space-y-2">
           <label
             htmlFor="admin-password"
@@ -131,21 +144,40 @@ export default function Login() {
             Password
           </label>
 
-          <input
-            type="password"
-            id="admin-password"
-            name="password"
-            autoComplete="current-password"
-            placeholder="••••••••"
-            className="w-full h-11 rounded-lg bg-[#1a1a1a] border border-white/10 px-4 text-white outline-none focus:border-red-500"
-            value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
-            required
-          />
+          <div className="relative">
+            <input
+              type={
+                showPassword ? "text" : "password"
+              }
+              id="admin-password"
+              name="password"
+              autoComplete="current-password"
+              placeholder="••••••••"
+              className="w-full h-11 rounded-lg bg-[#1a1a1a] border border-white/10 px-4 pr-12 text-white outline-none focus:border-red-500"
+              value={password}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
+              required
+            />
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowPassword(!showPassword)
+              }
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+            >
+              {showPassword ? (
+                <EyeOff size={18} />
+              ) : (
+                <Eye size={18} />
+              )}
+            </button>
+          </div>
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
           disabled={loading}
