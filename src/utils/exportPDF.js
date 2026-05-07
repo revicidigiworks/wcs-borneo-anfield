@@ -215,8 +215,8 @@ const drawTeamInfo = (doc, team, y) => {
 const drawPlayers = async (doc, players, yStart) => {
   let y = yStart;
 
-  const boxW = 86;
-  const boxH = 40;
+  const boxW = 82;
+  const boxH = 38;
   const gapX = 8;
 
   const leftX = PAGE.M;
@@ -384,31 +384,51 @@ const drawSignature = (doc) => {
   doc.setFontSize(9);
   doc.setTextColor(...COLOR.SECONDARY);
 
+  /* AREA MANAGER */
+  const managerStart = PAGE.M + 10;
+  const managerEnd = PAGE.M + 65;
+  const managerCenter =
+    (managerStart + managerEnd) / 2;
+
+  /* AREA PANITIA */
+  const panitiaStart =
+    PAGE.W - PAGE.M - 65;
+
+  const panitiaEnd =
+    PAGE.W - PAGE.M - 10;
+
+  const panitiaCenter =
+    (panitiaStart + panitiaEnd) / 2;
+
+  /* TEXT */
   doc.text(
     "MANAJER TIM",
-    PAGE.M + 28,
-    y
+    managerCenter,
+    y,
+    { align: "center" }
   );
 
   doc.text(
     "PANITIA",
-    PAGE.W - PAGE.M - 32,
-    y
+    panitiaCenter,
+    y,
+    { align: "center" }
   );
 
+  /* GARIS */
   doc.setDrawColor(...COLOR.BORDER);
 
   doc.line(
-    PAGE.M + 5,
+    managerStart,
     y + 18,
-    PAGE.M + 60,
+    managerEnd,
     y + 18
   );
 
   doc.line(
-    PAGE.W - PAGE.M - 60,
+    panitiaStart,
     y + 18,
-    PAGE.W - PAGE.M - 5,
+    panitiaEnd,
     y + 18
   );
 };
