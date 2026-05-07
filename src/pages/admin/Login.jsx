@@ -17,9 +17,14 @@ export default function Login() {
       // 🔥 ini sekarang REAL LOGIN
       navigate("/admin/dashboard");
     } catch (err) {
-      console.error(err);
-      alert("Login gagal ❌");
-    }
+  console.error("ERROR LOGIN:", err);
+
+  alert(`
+${err.code}
+
+${err.message}
+  `);
+}
   };
 
   return (
