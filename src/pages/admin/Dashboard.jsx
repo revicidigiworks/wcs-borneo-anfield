@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import { db } from "../../services/firebase";
-import { collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+  query,
+  orderBy,
+  serverTimestamp
+} from "firebase/firestore";
 import { exportTeamsPDF } from "../../utils/exportPDF";
 import {
   Search,
@@ -25,16 +34,30 @@ export default function Dashboard() {
 
   const fetchTeams = async () => {
     setLoading(true);
-    const snap = await getDocs(collection(db, "teams"));
-    const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+    const q = query(
+      collection(db, "teams"),
+      orderBy("createdAt", "desc")
+    );
+
+    const snap = await getDocs(q);
+
+    const data = snap.docs.map((d) => ({
+      id: d.id,
+      ...d.data()
+    }));
+
     setTeams(data);
+
     setLoading(false);
+
+    return data;
   };
 
   useEffect(() => { fetchTeams(); }, []);
 
   const filtered = teams.filter((t) =>
-    t.name.toLowerCase().includes(search.toLowerCase())
+    (t.name || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const handleSelectTeam = (team) => {
@@ -45,7 +68,7 @@ export default function Dashboard() {
   const updateField = (field, value) => setActive({ ...active, [field]: value });
 
   const updatePlayer = (i, field, value) => {
-    const updated = [...active.players];
+    const updated = [...(active.players || [])];
     updated[i][field] = value;
     setActive({ ...active, players: updated });
   };
@@ -54,26 +77,214 @@ export default function Dashboard() {
     const newPlayer = {
       id: Date.now(),
       name: "",
+      nik: "",
       pob: "",
       dob: "",
       position: "",
-      photo: "",   // 🔥 WAJIB
-      ktp: ""      // optional
+      photo: "",
+      ktp: ""
     };
     setActive({ ...active, players: [...(active.players || []), newPlayer] });
   };
 
   const removePlayer = (index) => {
-    const updated = active.players.filter((_, i) => i !== index);
+    const updated = (active.players || []).filter((_, i) => i !== index);
     setActive({ ...active, players: updated });
+  };
+
+  const calcAge = (dob) => {
+    if (!dob) return 0;
+
+    const birth = new Date(dob);
+    const today = new Date();
+
+    let age = today.getFullYear() - birth.getFullYear();
+
+    const m = today.getMonth() - birth.getMonth();
+
+    if (
+      m < 0 ||
+      (m === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
   };
 
   const handleSave = async () => {
     try {
-      await updateDoc(doc(db, "teams", active.id), { ...active });
+
+      if (!confirm("Simpan perubahan data tim ini?")) return;
+      if ((active.players || []).length < 1) {
+        alert("Minimal harus ada 1 pemain");
+        return;
+      }
+
+      const uniqueCheck = new Set();
+      const nikCheck = new Set();
+
+      for (let i = 0; i < (active.players || []).length; i++) {
+
+        const p = active.players[i];
+
+        if (!p.photo) {
+          alert(`Foto pemain ke-${i + 1} wajib ada`);
+          return;
+        }
+
+        if (!p.ktp) {
+          alert(`KTP pemain ke-${i + 1} wajib ada`);
+          return;
+        }
+
+        if ((p.name || "").trim().length < 3) {
+          alert(`Nama pemain ke-${i + 1} tidak valid`);
+          return;
+        }
+
+        if ((p.pob || "").trim().length < 3) {
+          alert(`Tempat lahir pemain ke-${i + 1} tidak valid`);
+          return;
+        }
+
+        if (!p.dob) {
+          alert(`Tanggal lahir pemain ke-${i + 1} wajib diisi`);
+          return;
+        }
+
+        const age = calcAge(p.dob);
+
+        if (age < 17) {
+          alert(`Usia pemain ke-${i + 1} minimal 17 tahun`);
+          return;
+        }
+
+        if (age > 50) {
+          alert(`Usia pemain ke-${i + 1} maksimal 50 tahun`);
+          return;
+        }
+
+        const key =
+          (p.name || "").trim().toLowerCase() +
+          (p.pob || "").trim().toLowerCase() +
+          (p.dob || "");
+
+        if (uniqueCheck.has(key)) {
+          alert(`Pemain duplicate pada pemain ke-${i + 1}`);
+          return;
+        }
+
+        if (nikCheck.has((p.nik || "").trim())) {
+          alert(`NIK duplicate pada pemain ke-${i + 1}`);
+          return;
+        }
+
+        if (!/^\d{16}$/.test((p.nik || "").trim())) {
+          alert(`NIK pemain ke-${i + 1} harus 16 digit`);
+          return;
+        }
+
+        if (!p.position) {
+          alert(`Posisi pemain ke-${i + 1} wajib diisi`);
+          return;
+        }
+
+        uniqueCheck.add(key);
+        nikCheck.add((p.nik || "").trim());
+      }
+
+      // VALIDASI ANTAR TIM
+      const snapshot = await getDocs(collection(db, "teams"));
+
+      const existingPlayers = [];
+      const existingNiks = [];
+
+      snapshot.forEach((teamDoc) => {
+
+        // skip tim sendiri
+        if (teamDoc.id === active.id) return;
+
+        const data = teamDoc.data();
+
+        if (data.players) {
+
+          data.players.forEach((p) => {
+
+            existingPlayers.push(
+              (p.name || "").toLowerCase() +
+              (p.pob || "").toLowerCase() +
+              (p.dob || "")
+            );
+
+            existingNiks.push(
+              (p.nik || "").trim()
+            );
+
+          });
+
+        }
+      });
+
+      for (let i = 0; i < (active.players || []).length; i++) {
+
+        const p = active.players[i];
+
+        const key =
+          (p.name || "").trim().toLowerCase() +
+          (p.pob || "").trim().toLowerCase() +
+          (p.dob || "");
+
+        if (existingPlayers.includes(key)) {
+          alert(`Pemain ${p.name} sudah terdaftar di tim lain`);
+          return;
+        }
+
+        if (existingNiks.includes((p.nik || "").trim())) {
+          alert(`NIK ${p.nik} sudah terdaftar di tim lain`);
+          return;
+        }
+      }
+
+      // CLEAN PLAYERS
+      const cleanPlayers = (active.players || []).map((p) => ({
+        id: p.id,
+        nik: (p.nik || "").trim(),
+        name: (p.name || "").trim(),
+        pob: (p.pob || "").trim(),
+        dob: p.dob || "",
+        age: calcAge(p.dob),
+        position: p.position || "",
+        photo: p.photo || "",
+        ktp: p.ktp || "",
+      }));
+
+      // SAVE
+      await updateDoc(doc(db, "teams", active.id), {
+        name: active.name || "",
+        manager: active.manager || "",
+        phone: active.phone || "",
+        address: active.address || "",
+        official1: active.official1 || "",
+        official2: active.official2 || "",
+        official3: active.official3 || "",
+        players: cleanPlayers,
+        isLocked: active.isLocked || false,
+        updatedAt: serverTimestamp(),
+      });
+
       alert("Data berhasil diperbarui!");
-      fetchTeams();
+
+      const refreshedData = await fetchTeams();
+
+      const refreshedTeam = refreshedData.find(
+        (t) => t.id === active.id
+      );
+
+      setActive(refreshedTeam);
+
     } catch (err) {
+      console.error(err);
       alert("Gagal memperbarui data.");
     }
   };
@@ -83,7 +294,7 @@ export default function Dashboard() {
       await deleteDoc(doc(db, "teams", id));
       setActive(null);
       if (window.innerWidth < 768) setView("list");
-      fetchTeams();
+      await fetchTeams();
     }
   };
 
@@ -113,12 +324,18 @@ export default function Dashboard() {
           </div>
 
           <button
-            onClick={() => exportTeamsPDF(
-              teams.map(t => ({
+            onClick={() => {
+              const optimizedTeams = teams.map((t) => ({
                 ...t,
-                players: (t.players || []).filter(p => p.photo) // 🔥 hanya yg ada foto
-              }))
-            )}
+                players: (t.players || []).map((p) => ({
+                  ...p,
+                  photo: "",
+                  ktp: "",
+                })),
+              }));
+
+              exportTeamsPDF(optimizedTeams);
+            }}
             className="w-full bg-slate-900 text-white py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 mb-4 hover:bg-slate-800 transition-all"
           >
             <Download size={14} /> Export Semua Tim (.PDF)
@@ -174,7 +391,7 @@ export default function Dashboard() {
               <button
                 onClick={() => exportTeamsPDF({
                   ...active,
-                  players: (active.players || []).filter(p => p.photo)
+                  players: active?.players || []
                 })}
                 className="p-2 text-blue-600 active:bg-blue-50 rounded-full"
               >
@@ -216,7 +433,10 @@ export default function Dashboard() {
                 <div className="flex gap-2">
                   {/* Tombol Export Per Tim Desktop */}
                   <button
-                    onClick={() => exportTeamsPDF(active)}
+                    onClick={() => exportTeamsPDF({
+                      ...active,
+                      players: active?.players || []
+                    })}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-100 transition-colors border border-blue-100"
                   >
                     <Download size={14} /> EXPORT TIM INI
@@ -275,12 +495,25 @@ export default function Dashboard() {
                         </button>
                       </div>
                       <div className="space-y-3">
-                        
+
                         <input
                           placeholder="Nama Lengkap"
                           value={p.name}
                           onChange={(e) => updatePlayer(i, "name", e.target.value)}
                           className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-sm font-medium"
+                        />
+                        <input
+                          placeholder="NIK 16 Digit"
+                          value={p.nik || ""}
+                          maxLength={16}
+                          onChange={(e) =>
+                            updatePlayer(
+                              i,
+                              "nik",
+                              e.target.value.replace(/\D/g, "")
+                            )
+                          }
+                          className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-xs"
                         />
 
                         <div className="grid grid-cols-2 gap-2">
@@ -317,7 +550,7 @@ export default function Dashboard() {
                             <img
                               src={p.photo}
                               alt="Foto"
-                              onClick={() => window.open(p.photo)}
+                              onClick={() => window.open(p.photo, "_blank")}
                               className="w-24 h-32 object-cover rounded-md border cursor-pointer"
                             />
                           )}
@@ -326,7 +559,7 @@ export default function Dashboard() {
                             <img
                               src={p.ktp}
                               alt="KTP"
-                              onClick={() => window.open(p.ktp)}
+                              onClick={() => window.open(p.ktp, "_blank")}
                               className="w-32 h-20 object-cover rounded-md border cursor-pointer"
                             />
                           )}

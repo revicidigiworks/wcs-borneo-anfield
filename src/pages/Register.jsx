@@ -38,11 +38,12 @@ export default function Register() {
   const [players, setPlayers] = useState([
     {
       id: Date.now(),
+      nik: "",
       name: "",
       pob: "",
       dob: "",
       age: "",
-      position: "", // 🔥 TAMBAH INI
+      position: "",
       ktp: null,
       photo: null,
     },
@@ -98,6 +99,7 @@ export default function Register() {
       ...players,
       {
         id: Date.now() + Math.random(),
+        nik: "",
         name: "",
         pob: "",
         dob: "",
@@ -148,6 +150,9 @@ export default function Register() {
       if (sanitizeText(p.name).length < 3)
         return alert(`Nama pemain ke-${i + 1} tidak valid`), false;
 
+      if (!/^\d{16}$/.test(p.nik))
+        return alert(`NIK pemain ke-${i + 1} harus 16 digit`), false;
+
       if (sanitizeText(p.pob).length < 3)
         return alert(`Tempat lahir pemain ke-${i + 1} tidak valid`), false;
 
@@ -165,18 +170,26 @@ export default function Register() {
     }
 
     const uniqueCheck = new Set();
+    const nikCheck = new Set();
 
     for (let i = 0; i < players.length; i++) {
+      const p = players[i];
+
       const key =
-        sanitizeText(players[i].name).toLowerCase() +
-        players[i].pob.toLowerCase() +
-        players[i].dob;
+        sanitizeText(p.name).toLowerCase() +
+        p.pob.toLowerCase() +
+        p.dob;
 
       if (uniqueCheck.has(key)) {
         return alert(`Pemain duplikat di form (index ${i + 1})`), false;
       }
 
+      if (nikCheck.has(p.nik)) {
+        return alert(`NIK pemain duplikat pada pemain ke-${i + 1}`), false;
+      }
+
       uniqueCheck.add(key);
+      nikCheck.add(p.nik);
     }
 
     return true;
@@ -219,8 +232,8 @@ export default function Register() {
         return;
       }
 
-      // 🔥 CEK DUPLIKAT SEBELUM UPLOAD
       const existingPlayers = [];
+      const existingNiks = [];
 
       snapshot.forEach((doc) => {
         const data = doc.data();
@@ -229,6 +242,8 @@ export default function Register() {
             existingPlayers.push(
               p.name.toLowerCase() + p.pob.toLowerCase() + p.dob
             );
+
+            existingNiks.push(p.nik?.trim());
           });
         }
       });
@@ -241,6 +256,11 @@ export default function Register() {
 
         if (existingPlayers.includes(key)) {
           alert(`Pemain ${players[i].name} sudah terdaftar di tim lain`);
+          return;
+        }
+
+        if (existingNiks.includes(players[i].nik)) {
+          alert(`NIK ${players[i].nik} sudah terdaftar`);
           return;
         }
       }
@@ -256,6 +276,7 @@ export default function Register() {
 
         cleanPlayers.push({
           id: p.id,
+          nik: p.nik.trim(),
           name: sanitizeText(p.name),
           pob: sanitizeText(p.pob),
           dob: p.dob,
@@ -369,9 +390,25 @@ export default function Register() {
                   </div>
 
                   <input value={p.name} onChange={(e) => handlePlayerChange(i, "name", e.target.value)} placeholder="Contoh: Risal Gerrad (sesuai KTP)" className="border rounded-md px-4 h-11 text-sm w-full" />
+                  <div>
+                    <p className="text-[10px] text-gray-500 mb-1">NIK</p>
+
+                    <input
+                      value={p.nik}
+                      onChange={(e) =>
+                        handlePlayerChange(
+                          i,
+                          "nik",
+                          e.target.value.replace(/\D/g, "")
+                        )
+                      }
+                      placeholder="16 digit NIK"
+                      maxLength={16}
+                      className="border rounded-md px-4 h-11 text-sm w-full"
+                    />
+                  </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-
                     <div>
                       <p className="text-[10px] text-gray-500 mb-1">Tempat Lahir</p>
                       <input
@@ -488,7 +525,11 @@ export default function Register() {
             <p>• Edit maksimal sampai 08 Juni 2026 (H-5).</p>
           </div>
 
-          <button type="submit" disabled={loading} className="w-full bg-[#c8102e] hover:bg-[#a70d26] text-white h-12 rounded-md font-bold uppercase tracking-wide disabled:opacity-50">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#c8102e] hover:bg-[#a70d26] text-white h-12 rounded-md font-bold uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             {loading ? "Menyimpan Data..." : "Simpan & Dapatkan Link Edit"}
           </button>
         </form>
