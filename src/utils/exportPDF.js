@@ -216,7 +216,7 @@ const drawPlayers = async (doc, players, yStart) => {
   let y = yStart;
 
   const boxW = 86;
-  const boxH = 48;
+  const boxH = 34; // sebelumnya 48
   const gapX = 10;
 
   const leftX = PAGE.M;
@@ -246,7 +246,7 @@ const drawPlayers = async (doc, players, yStart) => {
 
   drawLine(doc, y + 3);
 
-  y += 10;
+  y += 9;
 
   const drawCard = async (p, x, y, no) => {
     if (!p) return;
@@ -273,82 +273,80 @@ const drawPlayers = async (doc, players, yStart) => {
         doc.addImage(
           img,
           "JPEG",
-          x + 4,
-          y + 5,
-          22,
-          28
+          x + 3,
+          y + 4,
+          16,
+          20
         );
       }
     }
 
-    /* NUMBER */
+    /* NUMBER BADGE */
     doc.setFillColor(...COLOR.PRIMARY);
 
     doc.roundedRect(
-      x + 4,
-      y + 35,
-      22,
-      7,
+      x + 3,
+      y + 26,
+      16,
+      5,
       1,
       1,
       "F"
     );
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(7);
+    doc.setFontSize(6);
     doc.setTextColor(255);
 
     doc.text(
-      `PEMAIN #${no}`,
-      x + 15,
-      y + 40,
+      `#${no}`,
+      x + 11,
+      y + 29.5,
       { align: "center" }
     );
 
     /* CONTENT */
-    const labelX = x + 30;
-    const colonX = x + 49;
-    const valueX = x + 52;
-
-    doc.setTextColor(...COLOR.TEXT);
+    const startX = x + 23;
 
     const row = (label, value, rowY) => {
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(7.5);
+      doc.setTextColor(...COLOR.TEXT);
 
-      doc.text(label, labelX, rowY);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(6.8);
+
+      doc.text(`${label}:`, startX, rowY);
 
       doc.setFont("helvetica", "normal");
 
-      doc.text(":", colonX, rowY);
-
       doc.text(
         String(value || "-"),
-        valueX,
+        startX + 14,
         rowY,
         {
-          maxWidth: 28,
+          maxWidth: 45,
         }
       );
     };
 
-    row("Nama", p.name, y + 9);
-    row("NIK", p.nik, y + 15);
-    row("Posisi", p.position, y + 21);
+    row("Nama", p.name, y + 8);
+    row("NIK", p.nik, y + 13);
+    row("Posisi", p.position, y + 18);
+
     row(
       "TTL",
       `${p.pob || "-"}, ${p.dob || "-"}`,
-      y + 27
+      y + 23
     );
+
     row(
       "Umur",
-      `${p.age || "-"} Tahun`,
-      y + 33
+      `${p.age || "-"} Th`,
+      y + 28
     );
   };
 
   for (let i = 0; i < sortedPlayers.length; i += 2) {
-    if (y + boxH > 245) {
+    if (y + boxH > 250) {
       doc.addPage();
       y = 20;
     }
@@ -367,7 +365,7 @@ const drawPlayers = async (doc, players, yStart) => {
       i + 2
     );
 
-    y += boxH + 8;
+    y += boxH + 5;
   }
 
   return y;
