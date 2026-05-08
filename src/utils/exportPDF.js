@@ -703,7 +703,7 @@ export const exportTeamsPDF =
       const players =
         team.players || [];
 
-      const chunkSize = 6;
+      const chunkSize = 8;
 
       const chunks = [];
 
