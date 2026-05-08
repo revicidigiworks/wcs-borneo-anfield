@@ -175,12 +175,8 @@ const drawInfoBar = (
    WATERMARK
 ========================= */
 
-const drawWatermark = async (
-  doc
-) => {
-  const logo = await toBase64(
-    logoWCS
-  );
+const drawWatermark = async (doc) => {
+  const logo = await toBase64(logoWCS);
 
   if (!logo) return;
 
@@ -188,17 +184,20 @@ const drawWatermark = async (
 
   doc.setGState(
     new doc.GState({
-      opacity: 0.06,
+      opacity: 0.05,
     })
   );
+
+  /* WATERMARK PROPORSIONAL */
+  const size = 70;
 
   doc.addImage(
     logo,
     "PNG",
-    55,
-    92,
-    100,
-    100
+    (PAGE.W - size) / 2,
+    108,
+    size,
+    size
   );
 
   doc.restoreGraphicsState();
@@ -301,9 +300,10 @@ const drawPlayersPage = async (
 ) => {
   await drawWatermark(doc);
 
-  let y = isFirstPage ? 130 : 55;
+  let y = isFirstPage ? 128 : 52;
 
   doc.setFont("helvetica", "bold");
+
   doc.setFontSize(12);
 
   doc.setTextColor(...COLOR.DARK);
@@ -316,7 +316,7 @@ const drawPlayersPage = async (
 
   drawLine(doc, y + 4);
 
-  y += 12;
+  y += 10;
 
   const leftX = 10;
   const rightX = 108;
@@ -335,10 +335,17 @@ const drawPlayersPage = async (
 
     const row = Math.floor(i / 2);
 
+    /* CARD HEIGHT LEBIH COMPACT */
     const cardY =
-      y + row * 52;
+      y + row * 40;
 
     /* FOTO */
+
+    const photoX = column;
+    const photoY = cardY;
+
+    const photoW = 20;
+    const photoH = 28;
 
     if (player.photo) {
       const img = await toBase64(
@@ -349,37 +356,37 @@ const drawPlayersPage = async (
         doc.addImage(
           img,
           "JPEG",
-          column,
-          cardY,
-          23,
-          35
+          photoX,
+          photoY,
+          photoW,
+          photoH
         );
       } else {
-        doc.setFillColor(80);
+        doc.setFillColor(90);
 
         doc.rect(
-          column,
-          cardY,
-          23,
-          35,
+          photoX,
+          photoY,
+          photoW,
+          photoH,
           "F"
         );
       }
     } else {
-      doc.setFillColor(80);
+      doc.setFillColor(90);
 
       doc.rect(
-        column,
-        cardY,
-        23,
-        35,
+        photoX,
+        photoY,
+        photoW,
+        photoH,
         "F"
       );
     }
 
-    /* CONTENT */
+    /* TEXT */
 
-    const tx = column + 30;
+    const tx = column + 26;
 
     const writeRow = (
       label,
@@ -391,7 +398,7 @@ const drawPlayersPage = async (
         "bold"
       );
 
-      doc.setFontSize(8.5);
+      doc.setFontSize(7.5);
 
       doc.setTextColor(
         ...COLOR.DARK
@@ -405,7 +412,7 @@ const drawPlayersPage = async (
 
       doc.text(
         ":",
-        tx + 17,
+        tx + 14,
         yy
       );
 
@@ -416,15 +423,18 @@ const drawPlayersPage = async (
 
       doc.text(
         String(value || "-"),
-        tx + 21,
-        yy
+        tx + 18,
+        yy,
+        {
+          maxWidth: 55,
+        }
       );
     };
 
     writeRow(
       "NAMA",
       player.name,
-      cardY + 8
+      cardY + 6
     );
 
     writeRow(
@@ -432,19 +442,19 @@ const drawPlayersPage = async (
       `${player.pob || "-"}, ${
         player.dob || "-"
       }`,
-      cardY + 15
+      cardY + 12
     );
 
     writeRow(
       "NIK",
       player.nik,
-      cardY + 22
+      cardY + 18
     );
 
     writeRow(
       "POSISI",
       player.position,
-      cardY + 29
+      cardY + 24
     );
   }
 };
