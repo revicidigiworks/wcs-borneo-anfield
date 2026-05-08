@@ -54,18 +54,54 @@ const drawLine = (
 
 const toBase64 = async (url) => {
   try {
-    const res = await fetch(url);
+    return await new Promise(
+      (resolve) => {
+        const img = new Image();
 
-    const blob = await res.blob();
+        img.crossOrigin =
+          "Anonymous";
 
-    return await new Promise((resolve) => {
-      const reader = new FileReader();
+        img.onload = () => {
+          const canvas =
+            document.createElement(
+              "canvas"
+            );
 
-      reader.onloadend = () =>
-        resolve(reader.result);
+          canvas.width =
+            img.width;
 
-      reader.readAsDataURL(blob);
-    });
+          canvas.height =
+            img.height;
+
+          const ctx =
+            canvas.getContext("2d");
+
+          /* BACKGROUND PUTIH */
+          ctx.fillStyle = "#FFFFFF";
+
+          ctx.fillRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+
+          ctx.drawImage(
+            img,
+            0,
+            0
+          );
+
+          resolve(
+            canvas.toDataURL(
+              "image/png"
+            )
+          );
+        };
+
+        img.src = url;
+      }
+    );
   } catch {
     return null;
   }
@@ -132,7 +168,7 @@ const drawHeader = async (
   doc.text(
     "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
     PAGE.M,
-    50
+    56
   );
 
   return 58;
