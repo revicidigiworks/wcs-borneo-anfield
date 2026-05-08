@@ -168,7 +168,7 @@ const drawHeader = async (
   doc.text(
     "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
     PAGE.M,
-    62
+    60
   );
 
   return 58;
@@ -667,7 +667,7 @@ export const exportTeamsPDF =
       y = drawInfoBar(
         doc,
         team,
-        y
+        y + 6
       );
 
       y = drawTeamInfo(
