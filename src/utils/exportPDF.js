@@ -4,7 +4,7 @@ import jsPDF from "jspdf";
    ASSET
 ========================= */
 
-import templateImg from "../assets/img/template.webp";
+import templateImg from "../assets/img/template.png";
 import logoWCS from "../assets/img/logo-wcs.webp";
 
 /* =========================
@@ -321,7 +321,7 @@ const drawTeamInfo = (
     startX
   ) => {
     data.forEach((item, i) => {
-      const rowY = y + i * 9;
+      const rowY = y + i * 7;
 
       doc.setFont(
         "helvetica",
@@ -362,7 +362,7 @@ const drawTeamInfo = (
     PAGE.W / 2 + 5
   );
 
-  return y + 30;
+  return y + 22;
 };
 
 /* =========================
@@ -377,11 +377,11 @@ const drawPlayersPage = async (
   await drawWatermark(doc);
 
   let y = isFirstPage
-    ? 124
+    ? 126
     : 52;
 
   doc.setFont(
-    "arial",
+    "helvetica",
     "bold"
   );
 
