@@ -4,7 +4,7 @@ import jsPDF from "jspdf";
    ASSET
 ========================= */
 
-import templateImg from "../assets/img/template.png";
+import templateImg from "../assets/img/template.webp";
 import logoWCS from "../assets/img/logo-wcs.webp";
 
 /* =========================
@@ -168,7 +168,7 @@ const drawHeader = async (
   doc.text(
     "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
     PAGE.M,
-    60
+    62
   );
 
   return 58;
@@ -377,11 +377,11 @@ const drawPlayersPage = async (
   await drawWatermark(doc);
 
   let y = isFirstPage
-    ? 120
+    ? 124
     : 52;
 
   doc.setFont(
-    "helvetica",
+    "arial",
     "bold"
   );
 
@@ -667,7 +667,7 @@ export const exportTeamsPDF =
       y = drawInfoBar(
         doc,
         team,
-        y + 6
+        y + 8
       );
 
       y = drawTeamInfo(
