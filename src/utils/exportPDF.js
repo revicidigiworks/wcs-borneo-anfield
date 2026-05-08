@@ -1,90 +1,28 @@
 import jsPDF from "jspdf";
-import logoWCS from "../assets/img/logo-wcs.webp";
 
-/* =====================================================
-   PREMIUM WORLD CUP SERIES PDF EXPORT
-   CLEAN • MODERN • PREMIUM • 16 PLAYERS READY
-===================================================== */
+/* =========================================================
+   PREMIUM FOOTBALL DOSSIER DESIGN SYSTEM
+========================================================= */
 
 const COLOR = {
-  GOLD: [212, 175, 55],
-  NAVY: [8, 20, 46],
-  DARK: [25, 25, 25],
+  PRIMARY: [200, 16, 46],
+  DARK: [15, 15, 15],
   TEXT: [55, 55, 55],
-  MUTED: [120, 120, 120],
-  BORDER: [228, 228, 228],
-  LIGHT: [248, 248, 248],
+  MUTED: [130, 130, 130],
+  LINE: [228, 228, 228],
+  SOFT: [248, 248, 248],
   WHITE: [255, 255, 255],
 };
 
 const PAGE = {
   W: 210,
   H: 297,
-  M: 12,
+  M: 14,
 };
 
-/* =====================================================
+/* =========================================================
    HELPERS
-===================================================== */
-
-const line = (
-  doc,
-  x1,
-  y1,
-  x2,
-  y2,
-  color = COLOR.BORDER,
-  width = 0.3
-) => {
-  doc.setDrawColor(...color);
-  doc.setLineWidth(width);
-  doc.line(x1, y1, x2, y2);
-};
-
-const box = (
-  doc,
-  x,
-  y,
-  w,
-  h,
-  fill = COLOR.WHITE,
-  border = COLOR.BORDER
-) => {
-  doc.setFillColor(...fill);
-  doc.setDrawColor(...border);
-
-  doc.roundedRect(x, y, w, h, 2, 2, "FD");
-};
-
-const text = (
-  doc,
-  value,
-  x,
-  y,
-  size = 10,
-  style = "normal",
-  color = COLOR.TEXT,
-  align = "left"
-) => {
-  doc.setFont("helvetica", style);
-  doc.setFontSize(size);
-  doc.setTextColor(...color);
-
-  doc.text(String(value || "-"), x, y, {
-    align,
-  });
-};
-
-const meta = () => ({
-  docId: `WCS-2026-${Math.floor(
-    100000 + Math.random() * 900000
-  )}`,
-
-  verify: Math.random()
-    .toString(36)
-    .substring(2, 10)
-    .toUpperCase(),
-});
+========================================================= */
 
 const sanitizeFileName = (name = "TEAM") =>
   name
@@ -92,20 +30,71 @@ const sanitizeFileName = (name = "TEAM") =>
     .replace(/\s+/g, "_")
     .toUpperCase();
 
-/* =====================================================
-   IMAGE
-===================================================== */
+const meta = () => ({
+  doc: `WCS-${Math.floor(Math.random() * 999999)}`,
+  verification: Math.random()
+    .toString(36)
+    .substring(2, 10)
+    .toUpperCase(),
+});
+
+const line = (
+  doc,
+  x1,
+  y1,
+  x2,
+  y2,
+  color = COLOR.LINE,
+  width = 0.3
+) => {
+  doc.setDrawColor(...color);
+  doc.setLineWidth(width);
+  doc.line(x1, y1, x2, y2);
+};
+
+const shadowRect = (
+  doc,
+  x,
+  y,
+  w,
+  h,
+  radius = 3
+) => {
+  doc.setFillColor(235, 235, 235);
+
+  doc.roundedRect(
+    x + 1,
+    y + 1.2,
+    w,
+    h,
+    radius,
+    radius,
+    "F"
+  );
+
+  doc.setFillColor(...COLOR.WHITE);
+
+  doc.roundedRect(
+    x,
+    y,
+    w,
+    h,
+    radius,
+    radius,
+    "F"
+  );
+};
 
 const toBase64 = async (url) => {
   try {
     const res = await fetch(url);
-
     const blob = await res.blob();
 
     return await new Promise((resolve) => {
       const reader = new FileReader();
 
-      reader.onloadend = () => resolve(reader.result);
+      reader.onloadend = () =>
+        resolve(reader.result);
 
       reader.readAsDataURL(blob);
     });
@@ -114,179 +103,300 @@ const toBase64 = async (url) => {
   }
 };
 
-/* =====================================================
-   HEADER PREMIUM
-===================================================== */
+/* =========================================================
+   WATERMARK
+========================================================= */
 
-const drawHeader = async (doc, team, m) => {
-  /* TOP ACCENT */
-  doc.setFillColor(...COLOR.NAVY);
-  doc.rect(0, 0, PAGE.W, 7, "F");
+const drawWatermark = async (doc) => {
+  try {
+    const logo = await toBase64(
+      "/assets/img/logo-wcs.webp"
+    );
 
-  /* TITLE */
-  text(
-    doc,
-    "WORLD CUP",
-    PAGE.M,
-    20,
-    24,
-    "bold",
-    COLOR.DARK
-  );
+    if (!logo) return;
 
-  text(
-    doc,
-    "SERIES 2026",
-    PAGE.M,
-    31,
-    24,
-    "bold",
-    COLOR.GOLD
-  );
+    doc.saveGraphicsState();
 
-  text(
-    doc,
-    "DOKUMEN RESMI PENDAFTARAN TIM",
-    PAGE.M,
-    39,
-    10,
-    "normal",
-    COLOR.MUTED
-  );
+    doc.setGState(
+      new doc.GState({ opacity: 0.05 })
+    );
 
-  /* RIGHT INFO */
-  box(doc, 138, 14, 60, 25, COLOR.LIGHT);
-
-  text(
-    doc,
-    `Tim : ${team.name || "-"}`,
-    143,
-    22,
-    8,
-    "normal"
-  );
-
-  text(
-    doc,
-    `Doc ID : ${m.docId}`,
-    143,
-    28,
-    8,
-    "normal"
-  );
-
-  text(
-    doc,
-    `Verifikasi : ${m.verify}`,
-    143,
-    34,
-    8,
-    "normal"
-  );
-
-  /* GOLD LINE */
-  doc.setDrawColor(...COLOR.GOLD);
-  doc.setLineWidth(0.8);
-  doc.line(PAGE.M, 46, PAGE.W - PAGE.M, 46);
-
-    /* LOGO WCS */
-  const logo = await toBase64(logoWCS);
-
-  if (logo) {
     doc.addImage(
       logo,
       "WEBP",
-      PAGE.W - 48,
-      12,
-      24,
-      24
+      45,
+      75,
+      120,
+      120
     );
-  }
 
-  return 55;
+    doc.restoreGraphicsState();
+  } catch {}
 };
 
-/* =====================================================
-   STATUS BAR
-===================================================== */
+/* =========================================================
+   PREMIUM HEADER
+========================================================= */
 
-const drawStatusBar = (doc, total, y) => {
-  box(
+const drawHeader = async (
+  doc,
+  team,
+  metaData
+) => {
+  await drawWatermark(doc);
+
+  /* TOP RED BAR */
+  doc.setFillColor(...COLOR.PRIMARY);
+
+  doc.rect(0, 0, PAGE.W, 6, "F");
+
+  /* RED DECOR */
+  doc.setFillColor(...COLOR.PRIMARY);
+
+  doc.rect(PAGE.W - 50, 20, 50, 2.2, "F");
+
+  doc.rect(PAGE.W - 32, 25, 32, 1.2, "F");
+
+  /* TITLE */
+  doc.setTextColor(...COLOR.DARK);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(28);
+
+  doc.text(
+    "TOURNAMENT",
+    PAGE.M,
+    28
+  );
+
+  doc.text(
+    "REGISTRATION",
+    PAGE.M,
+    38
+  );
+
+  doc.text(
+    "DOSSIER",
+    PAGE.M,
+    48
+  );
+
+  /* SUBTEXT */
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+
+  doc.setTextColor(...COLOR.MUTED);
+
+  doc.text(
+    "OFFICIAL FOOTBALL TEAM ACCREDITATION DOCUMENT",
+    PAGE.M,
+    56
+  );
+
+  /* LOGO */
+  try {
+    const logo = await toBase64(
+      "/assets/img/logo-wcs.webp"
+    );
+
+    if (logo) {
+      doc.addImage(
+        logo,
+        "WEBP",
+        PAGE.W - 48,
+        18,
+        28,
+        28
+      );
+    }
+  } catch {}
+
+  /* FLOATING META CARD */
+  shadowRect(
+    doc,
+    PAGE.W - 78,
+    58,
+    64,
+    34,
+    4
+  );
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7);
+
+  doc.setTextColor(...COLOR.MUTED);
+
+  doc.text(
+    "DOCUMENT ID",
+    PAGE.W - 72,
+    67
+  );
+
+  doc.text(
+    "VERIFICATION",
+    PAGE.W - 72,
+    78
+  );
+
+  doc.text(
+    "TEAM STATUS",
+    PAGE.W - 72,
+    89
+  );
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+
+  doc.setTextColor(...COLOR.DARK);
+
+  doc.text(
+    metaData.doc,
+    PAGE.W - 72,
+    72
+  );
+
+  doc.text(
+    metaData.verification,
+    PAGE.W - 72,
+    83
+  );
+
+  doc.setTextColor(...COLOR.PRIMARY);
+
+  doc.text(
+    "APPROVED",
+    PAGE.W - 72,
+    94
+  );
+
+  return 104;
+};
+
+/* =========================================================
+   TEAM INFO SECTION
+========================================================= */
+
+const drawTeamInfo = (
+  doc,
+  team,
+  y
+) => {
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+
+  doc.setTextColor(...COLOR.PRIMARY);
+
+  doc.text(
+    "TEAM INFORMATION",
+    PAGE.M,
+    y
+  );
+
+  line(
+    doc,
+    PAGE.M,
+    y + 4,
+    PAGE.W - PAGE.M,
+    y + 4
+  );
+
+  y += 14;
+
+  shadowRect(
     doc,
     PAGE.M,
     y,
     PAGE.W - PAGE.M * 2,
-    18,
-    COLOR.NAVY,
-    COLOR.NAVY
+    34,
+    4
   );
 
-  const itemW = (PAGE.W - PAGE.M * 2) / 3;
+  const leftX = PAGE.M + 8;
+  const rightX = PAGE.W / 2 + 5;
 
-  line(doc, PAGE.M + itemW, y + 3, PAGE.M + itemW, y + 15, [60, 60, 60]);
+  const row = (
+    label,
+    value,
+    x,
+    yy
+  ) => {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
 
-  line(doc, PAGE.M + itemW * 2, y + 3, PAGE.M + itemW * 2, y + 15, [60, 60, 60]);
+    doc.setTextColor(...COLOR.MUTED);
 
-  text(doc, "TOTAL PEMAIN", PAGE.M + 10, y + 7, 8, "normal", COLOR.WHITE);
+    doc.text(
+      label.toUpperCase(),
+      x,
+      yy
+    );
 
-  text(doc, total, PAGE.M + 10, y + 14, 16, "bold", COLOR.GOLD);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
 
-  text(doc, "STATUS", PAGE.M + itemW + 10, y + 7, 8, "normal", COLOR.WHITE);
+    doc.setTextColor(...COLOR.DARK);
 
-  text(doc, "VALID", PAGE.M + itemW + 10, y + 14, 16, "bold", COLOR.GOLD);
-
-  text(doc, "DOKUMEN", PAGE.M + itemW * 2 + 10, y + 7, 8, "normal", COLOR.WHITE);
-
-  text(doc, "TERVERIFIKASI", PAGE.M + itemW * 2 + 10, y + 14, 14, "bold", COLOR.GOLD);
-
-  return y + 26;
-};
-
-/* =====================================================
-   TEAM INFO
-===================================================== */
-
-const drawTeamInfo = (doc, team, y) => {
-  text(doc, "INFORMASI TIM", PAGE.M, y, 12, "bold", COLOR.DARK);
-
-  doc.setFillColor(...COLOR.GOLD);
-  doc.rect(PAGE.M, y + 3, 1.5, 8, "F");
-
-  y += 10;
-
-  box(doc, PAGE.M, y, PAGE.W - PAGE.M * 2, 38);
-
-  const left = [
-    ["Nama Tim", team.name],
-    ["Manager", team.manager],
-    ["WhatsApp", team.phone],
-  ];
-
-  const right = [
-    ["Official 1", team.official1],
-    ["Official 2", team.official2],
-    ["Official 3", team.official3],
-  ];
-
-  const drawColumn = (data, startX) => {
-    data.forEach((item, i) => {
-      const yy = y + 10 + i * 10;
-
-      text(doc, item[0], startX, yy, 8, "bold", COLOR.MUTED);
-
-      text(doc, item[1] || "-", startX, yy + 5, 10, "normal", COLOR.DARK);
-    });
+    doc.text(
+      value || "-",
+      x,
+      yy + 6
+    );
   };
 
-  drawColumn(left, PAGE.M + 10);
-  drawColumn(right, PAGE.W / 2 + 10);
+  row(
+    "Team Name",
+    team.name,
+    leftX,
+    y + 10
+  );
 
-  return y + 50;
+  row(
+    "Manager",
+    team.manager,
+    leftX,
+    y + 24
+  );
+
+  row(
+    "WhatsApp",
+    team.phone,
+    rightX,
+    y + 10
+  );
+
+  row(
+    "Total Players",
+    `${team.players?.length || 0} Players`,
+    rightX,
+    y + 24
+  );
+
+  return y + 48;
 };
 
-/* =====================================================
+/* =========================================================
+   POSITION BADGE
+========================================================= */
+
+const badgeColor = (position) => {
+  switch (position) {
+    case "Kiper":
+      return [30, 30, 30];
+
+    case "Belakang":
+      return [38, 70, 140];
+
+    case "Tengah":
+      return [140, 90, 10];
+
+    default:
+      return COLOR.PRIMARY;
+  }
+};
+
+/* =========================================================
    PLAYER CARD
-===================================================== */
+========================================================= */
 
 const drawPlayerCard = async (
   doc,
@@ -295,291 +405,394 @@ const drawPlayerCard = async (
   y,
   no
 ) => {
-  const cardW = 43;
-  const cardH = 52;
+  const W = 84;
+  const H = 42;
 
-  box(doc, x, y, cardW, cardH);
+  shadowRect(doc, x, y, W, H, 4);
 
-  /* NUMBER */
-  doc.setFillColor(...COLOR.GOLD);
+  /* LARGE TRANSPARENT NUMBER */
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(42);
 
-  doc.roundedRect(x + 2, y + 2, 5, 5, 1, 1, "F");
+  doc.setTextColor(242, 242, 242);
 
-  text(doc, no, x + 4.5, y + 5.5, 7, "bold", COLOR.WHITE, "center");
+  doc.text(
+    String(no).padStart(2, "0"),
+    x + 64,
+    y + 33
+  );
 
   /* PHOTO */
   if (player.photo) {
-    const img = await toBase64(player.photo);
+    try {
+      const img = await toBase64(
+        player.photo
+      );
 
-    if (img) {
-      doc.addImage(img, "JPEG", x + 2, y + 7, 14, 18);
-    }
+      if (img) {
+        doc.addImage(
+          img,
+          "JPEG",
+          x + 5,
+          y + 5,
+          20,
+          24
+        );
+      }
+    } catch {}
   }
 
+  /* RED SIDE ACCENT */
+  doc.setFillColor(...COLOR.PRIMARY);
+
+  doc.rect(x, y, 3, H, "F");
+
   /* NAME */
-  text(
-    doc,
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+
+  doc.setTextColor(...COLOR.DARK);
+
+  doc.text(
     player.name || "-",
-    x + 18,
-    y + 11,
-    7.5,
-    "bold",
-    COLOR.DARK
+    x + 30,
+    y + 10,
+    {
+      maxWidth: 44,
+    }
   );
 
-  text(
-    doc,
-    player.position || "-",
-    x + 18,
-    y + 17,
-    7,
-    "bold",
-    COLOR.GOLD
+  /* POSITION BADGE */
+  const badge = badgeColor(
+    player.position
   );
 
-  /* DETAIL */
-  text(doc, player.nik || "-", x + 18, y + 24, 5.8);
+  doc.setFillColor(...badge);
 
-  text(
-    doc,
-    `${player.pob || "-"}, ${player.dob || "-"}`,
-    x + 18,
-    y + 30,
-    5.6
+  doc.roundedRect(
+    x + 30,
+    y + 14,
+    22,
+    6,
+    2,
+    2,
+    "F"
   );
 
-  text(
-    doc,
-    `${player.age || "-"} Tahun`,
-    x + 18,
-    y + 36,
-    5.8
+  doc.setFontSize(6.5);
+
+  doc.setTextColor(255);
+
+  doc.text(
+    (
+      player.position || "-"
+    ).toUpperCase(),
+    x + 41,
+    y + 18,
+    {
+      align: "center",
+    }
   );
 
-  /* BOTTOM */
-  doc.setFillColor(...COLOR.NAVY);
-
-  doc.roundedRect(x + 2, y + 44, cardW - 4, 6, 1, 1, "F");
-
-  text(
+  /* DIVIDER */
+  line(
     doc,
-    `PLAYER ${no}`,
-    x + cardW / 2,
-    y + 48,
-    7,
-    "bold",
-    COLOR.WHITE,
-    "center"
+    x + 30,
+    y + 24,
+    x + 76,
+    y + 24
+  );
+
+  /* INFO */
+  const info = (
+    label,
+    value,
+    yy
+  ) => {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(6);
+
+    doc.setTextColor(...COLOR.MUTED);
+
+    doc.text(
+      label.toUpperCase(),
+      x + 30,
+      yy
+    );
+
+    doc.setFont("helvetica", "normal");
+
+    doc.setTextColor(...COLOR.TEXT);
+
+    doc.text(
+      value || "-",
+      x + 48,
+      yy,
+      {
+        maxWidth: 28,
+      }
+    );
+  };
+
+  info("NIK", player.nik, y + 30);
+
+  info(
+    "TTL",
+    `${player.pob || "-"}, ${
+      player.dob || "-"
+    }`,
+    y + 35
+  );
+
+  info(
+    "AGE",
+    `${player.age || "-"} YEARS`,
+    y + 40
   );
 };
 
-/* =====================================================
-   PLAYER PAGE
-===================================================== */
+/* =========================================================
+   PLAYER SECTION
+========================================================= */
 
-const drawPlayersPage = async (
+const drawPlayers = async (
   doc,
-  players
+  players,
+  yStart
 ) => {
-  doc.addPage();
+  let y = yStart;
 
-  text(
-    doc,
-    "DAFTAR 16 PEMAIN",
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+
+  doc.setTextColor(...COLOR.PRIMARY);
+
+  doc.text(
+    "REGISTERED PLAYERS",
     PAGE.M,
-    22,
-    14,
-    "bold",
-    COLOR.DARK
+    y
   );
 
-  doc.setFillColor(...COLOR.GOLD);
-  doc.rect(PAGE.M, 25, 1.5, 9, "F");
+  line(
+    doc,
+    PAGE.M,
+    y + 4,
+    PAGE.W - PAGE.M,
+    y + 4
+  );
 
-  let x = PAGE.M;
-  let y = 30;
+  y += 10;
 
-  const cols = 4;
-  const gap = 4;
+  const cardW = 84;
+  const cardH = 42;
+  const gapX = 10;
+  const gapY = 8;
 
-  const cardW = 43;
-  const cardH = 52;
+  const leftX = PAGE.M;
+  const rightX =
+    PAGE.M + cardW + gapX;
 
-  for (let i = 0; i < players.length; i++) {
+  for (
+    let i = 0;
+    i < players.length;
+    i += 2
+  ) {
+    if (y + cardH > 245) {
+      doc.addPage();
+
+      await drawWatermark(doc);
+
+      y = 24;
+    }
+
     await drawPlayerCard(
       doc,
       players[i],
-      x,
+      leftX,
       y,
       i + 1
     );
 
-    x += cardW + gap;
-
-    if ((i + 1) % cols === 0) {
-      x = PAGE.M;
-      y += cardH + 5;
+    if (players[i + 1]) {
+      await drawPlayerCard(
+        doc,
+        players[i + 1],
+        rightX,
+        y,
+        i + 2
+      );
     }
+
+    y += cardH + gapY;
   }
+
+  return y;
 };
 
-/* =====================================================
-   SIGNATURE
-===================================================== */
+/* =========================================================
+   SIGNATURE AREA
+========================================================= */
 
-const drawSignature = (doc, team) => {
-  const y = 245;
+const drawSignature = (
+  doc,
+  team
+) => {
+  const y = PAGE.H - 42;
 
-  box(doc, PAGE.M, y, PAGE.W - PAGE.M * 2, 34, [252, 252, 252]);
-
-  /* LEFT */
-  text(doc, "MANAJER TIM", 50, y + 10, 9, "bold", COLOR.DARK, "center");
-
-  text(
+  line(
     doc,
-    team.manager || "-",
-    50,
-    y + 17,
-    9,
-    "normal",
-    COLOR.TEXT,
-    "center"
+    PAGE.M,
+    y - 8,
+    PAGE.W - PAGE.M,
+    y - 8
   );
 
-  line(doc, 28, y + 26, 72, y + 26, COLOR.GOLD, 0.6);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
 
-  /* CENTER */
-  text(doc, "WORLD CUP SERIES", 105, y + 14, 11, "bold", COLOR.GOLD, "center");
+  doc.setTextColor(...COLOR.DARK);
 
-  /* RIGHT */
-  text(doc, "PANITIA", 160, y + 10, 9, "bold", COLOR.DARK, "center");
+  doc.text(
+    "TEAM MANAGER",
+    42,
+    y
+  );
 
-  text(doc, "DENY KUNCORO", 160, y + 17, 9, "normal", COLOR.TEXT, "center");
+  doc.text(
+    "TOURNAMENT OFFICIAL",
+    PAGE.W - 70,
+    y
+  );
 
-  line(doc, 138, y + 26, 182, y + 26, COLOR.GOLD, 0.6);
+  line(
+    doc,
+    28,
+    y + 22,
+    72,
+    y + 22
+  );
+
+  line(
+    doc,
+    PAGE.W - 84,
+    y + 22,
+    PAGE.W - 40,
+    y + 22
+  );
+
+  doc.setFontSize(8);
+
+  doc.setTextColor(...COLOR.MUTED);
+
+  doc.text(
+    team.manager || "-",
+    50,
+    y + 27,
+    {
+      align: "center",
+    }
+  );
 };
 
-/* =====================================================
+/* =========================================================
    FOOTER
-===================================================== */
+========================================================= */
 
 const drawFooter = (doc) => {
-  const pages = doc.internal.getNumberOfPages();
+  const totalPages =
+    doc.internal.getNumberOfPages();
 
-  for (let i = 1; i <= pages; i++) {
+  for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
 
-    /* BOTTOM BAR */
-    doc.setFillColor(...COLOR.NAVY);
-    doc.rect(0, PAGE.H - 12, PAGE.W, 12, "F");
-
-    text(
+    line(
       doc,
-      "WORLD CUP SERIES 2026",
       PAGE.M,
-      PAGE.H - 4,
-      8,
-      "normal",
-      COLOR.GOLD
+      PAGE.H - 12,
+      PAGE.W - PAGE.M,
+      PAGE.H - 12
     );
 
-    text(
-      doc,
-      `Halaman ${i}/${pages}`,
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+
+    doc.setTextColor(...COLOR.MUTED);
+
+    doc.text(
+      "WORLD CUP SERIES 2026 • OFFICIAL REGISTRATION DOSSIER",
+      PAGE.M,
+      PAGE.H - 6
+    );
+
+    doc.text(
+      `${i}/${totalPages}`,
       PAGE.W - PAGE.M,
-      PAGE.H - 4,
-      8,
-      "normal",
-      COLOR.WHITE,
-      "right"
+      PAGE.H - 6,
+      {
+        align: "right",
+      }
     );
   }
 };
 
-/* =====================================================
-   EXPORT PDF
-===================================================== */
+/* =========================================================
+   EXPORT
+========================================================= */
 
-export const exportTeamsPDF = async (teams) => {
-  const doc = new jsPDF("p", "mm", "a4");
+export const exportTeamsPDF = async (
+  teams
+) => {
+  const doc = new jsPDF(
+    "p",
+    "mm",
+    "a4"
+  );
 
-  const teamList = Array.isArray(teams)
+  const list = Array.isArray(teams)
     ? teams
     : [teams];
 
-  for (let i = 0; i < teamList.length; i++) {
+  for (let i = 0; i < list.length; i++) {
     if (i > 0) doc.addPage();
 
-    const team = teamList[i];
+    const team = list[i];
 
     const m = meta();
 
-    let y = await drawHeader(doc, team, m);
-
-    y = drawStatusBar(
+    let y = await drawHeader(
       doc,
-      team.players?.length || 0,
-      y
+      team,
+      m
     );
 
     y = drawTeamInfo(doc, team, y);
 
-    /* PREVIEW 4 PLAYER DI HALAMAN 1 */
-
-    text(
+    y = await drawPlayers(
       doc,
-      "PREVIEW PEMAIN",
-      PAGE.M,
-      y,
-      12,
-      "bold",
-      COLOR.DARK
+      team.players || [],
+      y
     );
-
-    doc.setFillColor(...COLOR.GOLD);
-    doc.rect(PAGE.M, y + 3, 1.5, 8, "F");
-
-    y += 10;
-
-    const previewPlayers = (
-      team.players || []
-    ).slice(0, 4);
-
-    let startX = PAGE.M;
-
-    for (let p = 0; p < previewPlayers.length; p++) {
-      await drawPlayerCard(
-        doc,
-        previewPlayers[p],
-        startX,
-        y,
-        p + 1
-      );
-
-      startX += 47;
-    }
 
     drawSignature(doc, team);
-
-    /* PAGE 2 = FULL 16 PLAYER */
-    await drawPlayersPage(
-      doc,
-      team.players || []
-    );
   }
 
   drawFooter(doc);
 
-  /* SAVE */
+  /* FILE NAME */
   const isBulk = Array.isArray(teams);
 
   if (isBulk) {
-    doc.save("ALL_TEAM_WCS_2026.pdf");
-  } else {
-    const teamName = sanitizeFileName(
-      teams?.name || "TEAM"
+    doc.save(
+      "ALL_TEAM_WCS_2026.pdf"
     );
+  } else {
+    const teamName =
+      sanitizeFileName(
+        teams?.name || "TEAM"
+      );
 
-    doc.save(`${teamName}_WCS_2026.pdf`);
+    doc.save(
+      `${teamName}_WCS_2026.pdf`
+    );
   }
 };
