@@ -4,7 +4,7 @@ import jsPDF from "jspdf";
    ASSET
 ========================= */
 
-import templateImg from "../assets/img/template.png";
+import templateImg from "../assets/img/template.webp";
 import logoWCS from "../assets/img/logo-wcs.webp";
 
 /* =========================
@@ -67,34 +67,51 @@ const toBase64 = async (url) => {
               "canvas"
             );
 
-          canvas.width =
-            img.width;
+          /* RESIZE */
+          const maxWidth = 1200;
 
-          canvas.height =
+          let width = img.width;
+          let height =
             img.height;
+
+          if (
+            width > maxWidth
+          ) {
+            height *=
+              maxWidth / width;
+
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
 
           const ctx =
             canvas.getContext("2d");
 
-          /* BACKGROUND PUTIH */
-          ctx.fillStyle = "#FFFFFF";
+          ctx.fillStyle =
+            "#FFFFFF";
 
           ctx.fillRect(
             0,
             0,
-            canvas.width,
-            canvas.height
+            width,
+            height
           );
 
           ctx.drawImage(
             img,
             0,
-            0
+            0,
+            width,
+            height
           );
 
+          /* JPEG COMPRESS */
           resolve(
             canvas.toDataURL(
-              "image/png"
+              "image/jpeg",
+              0.65
             )
           );
         };
@@ -137,7 +154,7 @@ const drawTemplate = async (
 
   doc.addImage(
     template,
-    "PNG",
+    "JPEG",
     0,
     0,
     width,
@@ -639,11 +656,12 @@ const drawFooter = async (
 
 export const exportTeamsPDF =
   async (teams) => {
-    const doc = new jsPDF(
-      "p",
-      "mm",
-      "a4"
-    );
+    const doc = new jsPDF({
+  orientation: "p",
+  unit: "mm",
+  format: "a4",
+  compress: true,
+});
 
     const list =
       Array.isArray(teams)
