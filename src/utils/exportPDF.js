@@ -100,29 +100,54 @@ const drawHeader = async (
   );
 
   if (header) {
+    const img = new Image();
+
+    img.src = header;
+
+    await new Promise((resolve) => {
+      img.onload = resolve;
+    });
+
+    /* RATIO ASLI IMAGE */
+    const pdfWidth = PAGE.W;
+
+    const ratio =
+      img.height / img.width;
+
+    const pdfHeight =
+      pdfWidth * ratio;
+
     doc.addImage(
       header,
       "PNG",
       0,
       0,
-      PAGE.W,
-      42
+      pdfWidth,
+      pdfHeight
     );
+
+    doc.setFont(
+      "helvetica",
+      "bold"
+    );
+
+    doc.setFontSize(12);
+
+    doc.setTextColor(
+      ...COLOR.DARK
+    );
+
+    doc.text(
+      "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
+      PAGE.M,
+      pdfHeight + 12
+    );
+
+    return pdfHeight + 20;
   }
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(13);
-  doc.setTextColor(...COLOR.DARK);
-
-  doc.text(
-    "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
-    PAGE.M,
-    56
-  );
-
-  return 64;
+  return 50;
 };
-
 /* =========================
    INFO BAR
 ========================= */
@@ -175,10 +200,26 @@ const drawInfoBar = (
    WATERMARK
 ========================= */
 
-const drawWatermark = async (doc) => {
-  const logo = await toBase64(logoWCS);
+/* =========================
+   WATERMARK
+========================= */
+
+const drawWatermark = async (
+  doc
+) => {
+  const logo = await toBase64(
+    logoWCS
+  );
 
   if (!logo) return;
+
+  const img = new Image();
+
+  img.src = logo;
+
+  await new Promise((resolve) => {
+    img.onload = resolve;
+  });
 
   doc.saveGraphicsState();
 
@@ -188,16 +229,20 @@ const drawWatermark = async (doc) => {
     })
   );
 
-  /* WATERMARK PROPORSIONAL */
-  const size = 70;
+  /* WIDTH ONLY */
+  const width = 55;
+
+  /* AUTO HEIGHT */
+  const height =
+    width * (img.height / img.width);
 
   doc.addImage(
     logo,
     "PNG",
-    (PAGE.W - size) / 2,
+    (PAGE.W - width) / 2,
     108,
-    size,
-    size
+    width,
+    height
   );
 
   doc.restoreGraphicsState();
@@ -463,6 +508,10 @@ const drawPlayersPage = async (
    SIGNATURE
 ========================= */
 
+/* =========================
+   SIGNATURE
+========================= */
+
 const drawSignature = async (
   doc
 ) => {
@@ -496,14 +545,31 @@ const drawSignature = async (
     }
   );
 
+  /* LOGO PROPORSIONAL */
   if (logo) {
+    const img = new Image();
+
+    img.src = logo;
+
+    await new Promise((resolve) => {
+      img.onload = resolve;
+    });
+
+    /* WIDTH ONLY */
+    const width = 16;
+
+    /* AUTO HEIGHT */
+    const height =
+      width *
+      (img.height / img.width);
+
     doc.addImage(
       logo,
       "PNG",
-      95,
-      y - 5,
-      20,
-      30
+      96,
+      y - 1,
+      width,
+      height
     );
   }
 
@@ -565,7 +631,7 @@ const drawFooter = async (
     doc.text(
       `HAL ${i}/${totalPages}`,
       PAGE.W - 8,
-      PAGE.H - 3.5,
+      PAGE.H - 5.5,
       {
         align: "right",
       }
