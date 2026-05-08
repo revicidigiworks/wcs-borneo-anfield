@@ -397,6 +397,42 @@ export default function Dashboard() {
               >
                 <FileText size={20} />
               </button>
+
+              {/* DELETE */}
+              <button
+                onClick={async () => {
+
+                  const confirmDelete = window.confirm(
+                    `Yakin ingin menghapus tim "${active.name}" ?`
+                  );
+
+                  if (!confirmDelete) return;
+
+                  try {
+
+                    await deleteDoc(doc(db, "teams", active.id));
+
+                    alert("Tim berhasil dihapus ✅");
+
+                    setActive(null);
+
+                    setView("list");
+
+                    fetchTeams();
+
+                  } catch (err) {
+
+                    console.error(err);
+
+                    alert("Gagal menghapus tim ❌");
+
+                  }
+
+                }}
+                className="p-2 text-red-600 active:bg-red-50 rounded-full"
+              >
+                <Trash2 size={20} />
+              </button>
             </div>
 
             <div className="p-6 space-y-8">
