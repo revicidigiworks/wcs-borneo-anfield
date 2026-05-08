@@ -168,7 +168,7 @@ const drawHeader = async (
   doc.text(
     "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
     PAGE.M,
-    56
+    62
   );
 
   return 58;
