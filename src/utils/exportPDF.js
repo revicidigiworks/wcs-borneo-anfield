@@ -43,6 +43,7 @@ const drawLine = (
   width = 0.3
 ) => {
   doc.setDrawColor(...color);
+
   doc.setLineWidth(width);
 
   doc.line(
@@ -91,13 +92,13 @@ const toBase64 = async (url) => {
 ========================= */
 
 const drawHeader = async (
-  doc,
-  team,
-  metaData
+  doc
 ) => {
   const header = await toBase64(
     headerImg
   );
+
+  let headerHeight = 34;
 
   if (header) {
     const img = new Image();
@@ -108,46 +109,44 @@ const drawHeader = async (
       img.onload = resolve;
     });
 
-    /* RATIO ASLI IMAGE */
-    const pdfWidth = PAGE.W;
+    const width = PAGE.W;
 
-    const ratio =
-      img.height / img.width;
+    const height =
+      width *
+      (img.height / img.width);
 
-    const pdfHeight =
-      pdfWidth * ratio;
+    headerHeight = height;
 
     doc.addImage(
       header,
       "PNG",
       0,
       0,
-      pdfWidth,
-      pdfHeight
+      width,
+      height
     );
-
-    doc.setFont(
-      "helvetica",
-      "bold"
-    );
-
-    doc.setFontSize(12);
-
-    doc.setTextColor(
-      ...COLOR.DARK
-    );
-
-    doc.text(
-      "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
-      PAGE.M,
-      pdfHeight + 12
-    );
-
-    return pdfHeight + 20;
   }
 
-  return 50;
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(12);
+
+  doc.setTextColor(
+    ...COLOR.DARK
+  );
+
+  doc.text(
+    "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
+    PAGE.M,
+    headerHeight + 12
+  );
+
+  return headerHeight + 20;
 };
+
 /* =========================
    INFO BAR
 ========================= */
@@ -170,7 +169,11 @@ const drawInfoBar = (
     "F"
   );
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
   doc.setFontSize(10);
 
   doc.setTextColor(255);
@@ -182,23 +185,19 @@ const drawInfoBar = (
   );
 
   doc.text(
-    `STATUS : VALID`,
+    "STATUS : VALID",
     PAGE.M + 70,
     y + 10
   );
 
   doc.text(
-    `DOKUMEN : TERVERIFIKASI`,
+    "DOKUMEN : TERVERIFIKASI",
     PAGE.M + 130,
     y + 10
   );
 
   return y + 26;
 };
-
-/* =========================
-   WATERMARK
-========================= */
 
 /* =========================
    WATERMARK
@@ -229,12 +228,11 @@ const drawWatermark = async (
     })
   );
 
-  /* WIDTH ONLY */
   const width = 55;
 
-  /* AUTO HEIGHT */
   const height =
-    width * (img.height / img.width);
+    width *
+    (img.height / img.width);
 
   doc.addImage(
     logo,
@@ -257,9 +255,16 @@ const drawTeamInfo = (
   team,
   y
 ) => {
-  doc.setFont("helvetica", "bold");
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
   doc.setFontSize(12);
-  doc.setTextColor(...COLOR.DARK);
+
+  doc.setTextColor(
+    ...COLOR.DARK
+  );
 
   doc.text(
     "INFORMASI TIM",
@@ -297,8 +302,6 @@ const drawTeamInfo = (
 
       doc.setFontSize(9);
 
-      doc.setTextColor(...COLOR.DARK);
-
       doc.text(
         item[0],
         startX,
@@ -335,7 +338,7 @@ const drawTeamInfo = (
 };
 
 /* =========================
-   PLAYER SECTION
+   PLAYERS
 ========================= */
 
 const drawPlayersPage = async (
@@ -345,13 +348,20 @@ const drawPlayersPage = async (
 ) => {
   await drawWatermark(doc);
 
-  let y = isFirstPage ? 128 : 52;
+  let y = isFirstPage
+    ? 128
+    : 52;
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
 
   doc.setFontSize(12);
 
-  doc.setTextColor(...COLOR.DARK);
+  doc.setTextColor(
+    ...COLOR.DARK
+  );
 
   doc.text(
     "DAFTAR PEMAIN",
@@ -380,11 +390,8 @@ const drawPlayersPage = async (
 
     const row = Math.floor(i / 2);
 
-    /* CARD HEIGHT LEBIH COMPACT */
     const cardY =
       y + row * 40;
-
-    /* FOTO */
 
     const photoX = column;
     const photoY = cardY;
@@ -400,21 +407,11 @@ const drawPlayersPage = async (
       if (img) {
         doc.addImage(
           img,
-          "JPEG",
+          "PNG",
           photoX,
           photoY,
           photoW,
           photoH
-        );
-      } else {
-        doc.setFillColor(90);
-
-        doc.rect(
-          photoX,
-          photoY,
-          photoW,
-          photoH,
-          "F"
         );
       }
     } else {
@@ -429,8 +426,6 @@ const drawPlayersPage = async (
       );
     }
 
-    /* TEXT */
-
     const tx = column + 26;
 
     const writeRow = (
@@ -444,10 +439,6 @@ const drawPlayersPage = async (
       );
 
       doc.setFontSize(7.5);
-
-      doc.setTextColor(
-        ...COLOR.DARK
-      );
 
       doc.text(
         label,
@@ -508,10 +499,6 @@ const drawPlayersPage = async (
    SIGNATURE
 ========================= */
 
-/* =========================
-   SIGNATURE
-========================= */
-
 const drawSignature = async (
   doc
 ) => {
@@ -521,11 +508,16 @@ const drawSignature = async (
 
   const y = 248;
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
 
   doc.setFontSize(11);
 
-  doc.setTextColor(...COLOR.DARK);
+  doc.setTextColor(
+    ...COLOR.DARK
+  );
 
   doc.text(
     "MANAGER TIM",
@@ -545,7 +537,6 @@ const drawSignature = async (
     }
   );
 
-  /* LOGO PROPORSIONAL */
   if (logo) {
     const img = new Image();
 
@@ -555,10 +546,8 @@ const drawSignature = async (
       img.onload = resolve;
     });
 
-    /* WIDTH ONLY */
     const width = 16;
 
-    /* AUTO HEIGHT */
     const height =
       width *
       (img.height / img.width);
@@ -612,17 +601,37 @@ const drawFooter = async (
     doc.setPage(i);
 
     if (footer) {
+      const img = new Image();
+
+      img.src = footer;
+
+      await new Promise(
+        (resolve) => {
+          img.onload = resolve;
+        }
+      );
+
+      const width = PAGE.W;
+
+      const height =
+        width *
+        (img.height /
+          img.width);
+
       doc.addImage(
         footer,
         "PNG",
         0,
-        PAGE.H - 12,
-        PAGE.W,
-        12
+        PAGE.H - height,
+        width,
+        height
       );
     }
 
-    doc.setFont("helvetica", "bold");
+    doc.setFont(
+      "helvetica",
+      "bold"
+    );
 
     doc.setFontSize(8);
 
@@ -640,7 +649,7 @@ const drawFooter = async (
 };
 
 /* =========================
-   MAIN EXPORT
+   EXPORT
 ========================= */
 
 export const exportTeamsPDF =
@@ -667,14 +676,8 @@ export const exportTeamsPDF =
 
       const team = list[t];
 
-      const metaData = meta();
-
       let y =
-        await drawHeader(
-          doc,
-          team,
-          metaData
-        );
+        await drawHeader(doc);
 
       y = drawInfoBar(
         doc,
@@ -687,10 +690,6 @@ export const exportTeamsPDF =
         team,
         y
       );
-
-      /* ======================
-         PLAYER PAGINATION
-      ====================== */
 
       const players =
         team.players || [];
@@ -720,10 +719,15 @@ export const exportTeamsPDF =
         if (c > 0) {
           doc.addPage();
 
-          await drawHeader(
+          const nextY =
+            await drawHeader(
+              doc
+            );
+
+          drawInfoBar(
             doc,
             team,
-            metaData
+            nextY
           );
         }
 
@@ -734,14 +738,10 @@ export const exportTeamsPDF =
         );
       }
 
-      /* SIGNATURE */
       await drawSignature(doc);
     }
 
-    /* FOOTER */
     await drawFooter(doc);
-
-    /* SAVE */
 
     const isBulk =
       Array.isArray(teams);
