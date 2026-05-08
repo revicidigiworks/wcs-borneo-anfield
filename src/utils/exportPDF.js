@@ -167,7 +167,8 @@ const drawTemplate = async (
 ========================= */
 
 const drawHeader = async (
-  doc
+  doc,
+  showTitle = true
 ) => {
   await drawTemplate(doc);
 
@@ -182,11 +183,13 @@ const drawHeader = async (
     ...COLOR.DARK
   );
 
-  doc.text(
-    "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
-    PAGE.M,
-    62
-  );
+  if (showTitle) {
+    doc.text(
+      "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
+      PAGE.M,
+      72
+    );
+  }
 
   return 58;
 };
@@ -281,7 +284,7 @@ const drawWatermark = async (
 
   doc.addImage(
     logo,
-    "PNG",
+    "JPEG",
     (PAGE.W - width) / 2,
     110,
     width,
@@ -395,7 +398,7 @@ const drawPlayersPage = async (
 
   let y = isFirstPage
     ? 126
-    : 52;
+    : 100;
 
   doc.setFont(
     "helvetica",
@@ -511,8 +514,7 @@ const drawPlayersPage = async (
 
     writeRow(
       "TTL",
-      `${player.pob || "-"}, ${
-        player.dob || "-"
+      `${player.pob || "-"}, ${player.dob || "-"
       }`,
       cardY + 10
     );
@@ -587,7 +589,7 @@ const drawSignature = async (
 
     doc.addImage(
       logo,
-      "PNG",
+      "JPEG",
       (PAGE.W - width) / 2,
       y - 2,
       width,
@@ -657,11 +659,11 @@ const drawFooter = async (
 export const exportTeamsPDF =
   async (teams) => {
     const doc = new jsPDF({
-  orientation: "p",
-  unit: "mm",
-  format: "a4",
-  compress: true,
-});
+      orientation: "p",
+      unit: "mm",
+      format: "a4",
+      
+    });
 
     const list =
       Array.isArray(teams)
@@ -679,8 +681,12 @@ export const exportTeamsPDF =
 
       const team = list[t];
 
+      /* PAGE 1 */
       let y =
-        await drawHeader(doc);
+        await drawHeader(
+          doc,
+          true
+        );
 
       y = drawInfoBar(
         doc,
@@ -719,11 +725,13 @@ export const exportTeamsPDF =
         c < chunks.length;
         c++
       ) {
+        /* PAGE 2+ */
         if (c > 0) {
           doc.addPage();
 
           await drawHeader(
-            doc
+            doc,
+            false
           );
         }
 
