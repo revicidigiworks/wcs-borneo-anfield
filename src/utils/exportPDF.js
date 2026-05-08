@@ -435,7 +435,7 @@ const drawPlayersPage = async (
     const row = Math.floor(i / 2);
 
     const cardY =
-      y + row * 35;
+      y + row * 28;
 
     /* FOTO */
 
