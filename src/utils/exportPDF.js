@@ -4,8 +4,7 @@ import jsPDF from "jspdf";
    ASSET
 ========================= */
 
-import headerImg from "../assets/img/header.png";
-import footerImg from "../assets/img/footer.png";
+import templateImg from "../assets/img/template.png";
 import logoWCS from "../assets/img/logo-wcs.webp";
 
 /* =========================
@@ -22,7 +21,6 @@ const COLOR = {
   RED: [220, 20, 35],
   DARK: [18, 18, 18],
   TEXT: [40, 40, 40],
-  MUTED: [120, 120, 120],
   LINE: [220, 220, 220],
 };
 
@@ -43,6 +41,7 @@ const drawLine = (
   width = 0.3
 ) => {
   doc.setDrawColor(...color);
+
   doc.setLineWidth(width);
 
   doc.line(
@@ -52,20 +51,6 @@ const drawLine = (
     y
   );
 };
-
-const meta = () => ({
-  doc: `WCS-${Math.floor(
-    Math.random() * 999999
-  )}`,
-  verify: Math.random()
-    .toString(36)
-    .substring(2, 10)
-    .toUpperCase(),
-});
-
-/* =========================
-   IMAGE TO BASE64
-========================= */
 
 const toBase64 = async (url) => {
   try {
@@ -87,40 +72,70 @@ const toBase64 = async (url) => {
 };
 
 /* =========================
-   HEADER
+   TEMPLATE
+========================= */
+
+const drawTemplate = async (
+  doc
+) => {
+  const template =
+    await toBase64(
+      templateImg
+    );
+
+  if (!template) return;
+
+  const img = new Image();
+
+  img.src = template;
+
+  await new Promise((resolve) => {
+    img.onload = resolve;
+  });
+
+  const width = PAGE.W;
+
+  const height =
+    width *
+    (img.height / img.width);
+
+  doc.addImage(
+    template,
+    "PNG",
+    0,
+    0,
+    width,
+    height
+  );
+};
+
+/* =========================
+   HEADER TITLE
 ========================= */
 
 const drawHeader = async (
-  doc,
-  team,
-  metaData
+  doc
 ) => {
-  const header = await toBase64(
-    headerImg
+  await drawTemplate(doc);
+
+  doc.setFont(
+    "helvetica",
+    "bold"
   );
 
-  if (header) {
-    doc.addImage(
-      header,
-      "PNG",
-      0,
-      0,
-      PAGE.W,
-      42
-    );
-  }
+  doc.setFontSize(12);
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(13);
-  doc.setTextColor(...COLOR.DARK);
+  doc.setTextColor(
+    ...COLOR.DARK
+  );
 
   doc.text(
     "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
     PAGE.M,
-    56
+    50
   );
 
-  return 64;
+  return 58;
 };
 
 /* =========================
@@ -141,44 +156,60 @@ const drawInfoBar = (
     PAGE.M,
     y,
     PAGE.W - PAGE.M * 2,
-    16,
+    14,
     "F"
   );
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(10);
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(9);
 
   doc.setTextColor(255);
 
   doc.text(
     `TOTAL PEMAIN : ${total}`,
-    PAGE.M + 7,
-    y + 10
+    PAGE.M + 6,
+    y + 9
   );
 
   doc.text(
-    `STATUS : VALID`,
+    "STATUS : VALID",
     PAGE.M + 70,
-    y + 10
+    y + 9
   );
 
   doc.text(
-    `DOKUMEN : TERVERIFIKASI`,
-    PAGE.M + 130,
-    y + 10
+    "DOKUMEN : TERVERIFIKASI",
+    PAGE.M + 125,
+    y + 9
   );
 
-  return y + 26;
+  return y + 22;
 };
 
 /* =========================
    WATERMARK
 ========================= */
 
-const drawWatermark = async (doc) => {
-  const logo = await toBase64(logoWCS);
+const drawWatermark = async (
+  doc
+) => {
+  const logo = await toBase64(
+    logoWCS
+  );
 
   if (!logo) return;
+
+  const img = new Image();
+
+  img.src = logo;
+
+  await new Promise((resolve) => {
+    img.onload = resolve;
+  });
 
   doc.saveGraphicsState();
 
@@ -188,16 +219,20 @@ const drawWatermark = async (doc) => {
     })
   );
 
-  /* WATERMARK PROPORSIONAL */
-  const size = 70;
+  /* TANPA DIUBAH RATIO */
+  const width = 55;
+
+  const height =
+    width *
+    (img.height / img.width);
 
   doc.addImage(
     logo,
     "PNG",
-    (PAGE.W - size) / 2,
-    108,
-    size,
-    size
+    (PAGE.W - width) / 2,
+    110,
+    width,
+    height
   );
 
   doc.restoreGraphicsState();
@@ -212,9 +247,16 @@ const drawTeamInfo = (
   team,
   y
 ) => {
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.setTextColor(...COLOR.DARK);
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(11);
+
+  doc.setTextColor(
+    ...COLOR.DARK
+  );
 
   doc.text(
     "INFORMASI TIM",
@@ -224,7 +266,7 @@ const drawTeamInfo = (
 
   drawLine(doc, y + 4);
 
-  y += 14;
+  y += 12;
 
   const left = [
     ["NAMA TIM", team.name],
@@ -243,16 +285,14 @@ const drawTeamInfo = (
     startX
   ) => {
     data.forEach((item, i) => {
-      const rowY = y + i * 10;
+      const rowY = y + i * 9;
 
       doc.setFont(
         "helvetica",
         "bold"
       );
 
-      doc.setFontSize(9);
-
-      doc.setTextColor(...COLOR.DARK);
+      doc.setFontSize(8);
 
       doc.text(
         item[0],
@@ -262,7 +302,7 @@ const drawTeamInfo = (
 
       doc.text(
         ":",
-        startX + 40,
+        startX + 35,
         rowY
       );
 
@@ -273,7 +313,7 @@ const drawTeamInfo = (
 
       doc.text(
         item[1] || "-",
-        startX + 44,
+        startX + 39,
         rowY
       );
     });
@@ -286,7 +326,7 @@ const drawTeamInfo = (
     PAGE.W / 2 + 5
   );
 
-  return y + 36;
+  return y + 30;
 };
 
 /* =========================
@@ -300,13 +340,16 @@ const drawPlayersPage = async (
 ) => {
   await drawWatermark(doc);
 
-  let y = isFirstPage ? 128 : 52;
+  let y = isFirstPage
+    ? 120
+    : 52;
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
 
-  doc.setFontSize(12);
-
-  doc.setTextColor(...COLOR.DARK);
+  doc.setFontSize(11);
 
   doc.text(
     "DAFTAR PEMAIN",
@@ -335,17 +378,17 @@ const drawPlayersPage = async (
 
     const row = Math.floor(i / 2);
 
-    /* CARD HEIGHT LEBIH COMPACT */
     const cardY =
-      y + row * 40;
+      y + row * 35;
 
     /* FOTO */
 
     const photoX = column;
     const photoY = cardY;
 
-    const photoW = 20;
-    const photoH = 28;
+    /* LEBIH PENDEK */
+    const photoW = 18;
+    const photoH = 24;
 
     if (player.photo) {
       const img = await toBase64(
@@ -355,38 +398,18 @@ const drawPlayersPage = async (
       if (img) {
         doc.addImage(
           img,
-          "JPEG",
+          "PNG",
           photoX,
           photoY,
           photoW,
           photoH
         );
-      } else {
-        doc.setFillColor(90);
-
-        doc.rect(
-          photoX,
-          photoY,
-          photoW,
-          photoH,
-          "F"
-        );
       }
-    } else {
-      doc.setFillColor(90);
-
-      doc.rect(
-        photoX,
-        photoY,
-        photoW,
-        photoH,
-        "F"
-      );
     }
 
     /* TEXT */
 
-    const tx = column + 26;
+    const tx = column + 24;
 
     const writeRow = (
       label,
@@ -398,11 +421,7 @@ const drawPlayersPage = async (
         "bold"
       );
 
-      doc.setFontSize(7.5);
-
-      doc.setTextColor(
-        ...COLOR.DARK
-      );
+      doc.setFontSize(7.2);
 
       doc.text(
         label,
@@ -412,7 +431,7 @@ const drawPlayersPage = async (
 
       doc.text(
         ":",
-        tx + 14,
+        tx + 13,
         yy
       );
 
@@ -423,7 +442,7 @@ const drawPlayersPage = async (
 
       doc.text(
         String(value || "-"),
-        tx + 18,
+        tx + 17,
         yy,
         {
           maxWidth: 55,
@@ -434,7 +453,7 @@ const drawPlayersPage = async (
     writeRow(
       "NAMA",
       player.name,
-      cardY + 6
+      cardY + 5
     );
 
     writeRow(
@@ -442,19 +461,19 @@ const drawPlayersPage = async (
       `${player.pob || "-"}, ${
         player.dob || "-"
       }`,
-      cardY + 12
+      cardY + 10
     );
 
     writeRow(
       "NIK",
       player.nik,
-      cardY + 18
+      cardY + 15
     );
 
     writeRow(
       "POSISI",
       player.position,
-      cardY + 24
+      cardY + 20
     );
   }
 };
@@ -472,11 +491,12 @@ const drawSignature = async (
 
   const y = 248;
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
 
-  doc.setFontSize(11);
-
-  doc.setTextColor(...COLOR.DARK);
+  doc.setFontSize(10);
 
   doc.text(
     "MANAGER TIM",
@@ -496,14 +516,29 @@ const drawSignature = async (
     }
   );
 
+  /* LOGO TANPA DISTORT */
   if (logo) {
+    const img = new Image();
+
+    img.src = logo;
+
+    await new Promise((resolve) => {
+      img.onload = resolve;
+    });
+
+    const width = 15;
+
+    const height =
+      width *
+      (img.height / img.width);
+
     doc.addImage(
       logo,
       "PNG",
-      95,
-      y - 5,
-      20,
-      30
+      (PAGE.W - width) / 2,
+      y - 2,
+      width,
+      height
     );
   }
 
@@ -511,16 +546,16 @@ const drawSignature = async (
 
   doc.line(
     22,
-    y + 24,
+    y + 22,
     68,
-    y + 24
+    y + 22
   );
 
   doc.line(
     142,
-    y + 24,
+    y + 22,
     188,
-    y + 24
+    y + 22
   );
 };
 
@@ -534,10 +569,6 @@ const drawFooter = async (
   const totalPages =
     doc.internal.getNumberOfPages();
 
-  const footer = await toBase64(
-    footerImg
-  );
-
   for (
     let i = 1;
     i <= totalPages;
@@ -545,27 +576,20 @@ const drawFooter = async (
   ) {
     doc.setPage(i);
 
-    if (footer) {
-      doc.addImage(
-        footer,
-        "PNG",
-        0,
-        PAGE.H - 12,
-        PAGE.W,
-        12
-      );
-    }
-
-    doc.setFont("helvetica", "bold");
+    doc.setFont(
+      "helvetica",
+      "bold"
+    );
 
     doc.setFontSize(8);
 
     doc.setTextColor(255);
 
+    /* NAIK 2 */
     doc.text(
       `HAL ${i}/${totalPages}`,
       PAGE.W - 8,
-      PAGE.H - 3.5,
+      PAGE.H - 7.5,
       {
         align: "right",
       }
@@ -574,7 +598,7 @@ const drawFooter = async (
 };
 
 /* =========================
-   MAIN EXPORT
+   EXPORT
 ========================= */
 
 export const exportTeamsPDF =
@@ -601,14 +625,8 @@ export const exportTeamsPDF =
 
       const team = list[t];
 
-      const metaData = meta();
-
       let y =
-        await drawHeader(
-          doc,
-          team,
-          metaData
-        );
+        await drawHeader(doc);
 
       y = drawInfoBar(
         doc,
@@ -621,10 +639,6 @@ export const exportTeamsPDF =
         team,
         y
       );
-
-      /* ======================
-         PLAYER PAGINATION
-      ====================== */
 
       const players =
         team.players || [];
@@ -655,9 +669,7 @@ export const exportTeamsPDF =
           doc.addPage();
 
           await drawHeader(
-            doc,
-            team,
-            metaData
+            doc
           );
         }
 
@@ -668,14 +680,10 @@ export const exportTeamsPDF =
         );
       }
 
-      /* SIGNATURE */
       await drawSignature(doc);
     }
 
-    /* FOOTER */
     await drawFooter(doc);
-
-    /* SAVE */
 
     const isBulk =
       Array.isArray(teams);
