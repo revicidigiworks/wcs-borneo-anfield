@@ -187,7 +187,7 @@ const drawHeader = async (
     doc.text(
       "FORMULIR PENDAFTARAN & VERIFIKASI TIM",
       PAGE.M,
-      60
+      62
     );
   }
 
@@ -398,7 +398,7 @@ const drawPlayersPage = async (
 
   let y = isFirstPage
     ? 126
-    : 80;
+    : 62;
 
   doc.setFont(
     "helvetica",
