@@ -18,6 +18,7 @@ import {
   Copy,
   ChevronDown,
 } from "lucide-react";
+import imageCompression from "browser-image-compression";
 
 export default function EditTeam() {
   const { token } = useParams();
@@ -43,6 +44,24 @@ export default function EditTeam() {
   const registrationCloseDate = "01 Juni 2026";
   const rosterEditCloseDate = "08 Juni 2026";
   const hardLockDate = new Date("2026-06-08T23:59:59");
+
+ const compressImage = async (file) => {
+  const options = {
+    maxSizeMB: 0.13,
+    maxWidthOrHeight: 1200,
+    useWebWorker: true,
+    fileType: "image/webp",
+  };
+
+  try {
+    const compressedFile = await imageCompression(file, options);
+
+    return compressedFile;
+  } catch (error) {
+    console.error("Compress error:", error);
+    return file;
+  }
+};
 
   const calcAge = (dob) => {
     if (!dob) return "";
@@ -221,16 +240,17 @@ export default function EditTeam() {
   const handleFileChangeEdit = async (index, field, file) => {
     if (!file) return;
 
-    const MAX_FILE_SIZE = 200 * 1024;
+    const MAX_FILE_SIZE = 500 * 1024;
 
     if (file.size > MAX_FILE_SIZE) {
-      alert("Ukuran maksimal 200KB");
+      alert("Ukuran maksimal 500KB");
       return;
     }
 
     try {
+      const compressedFile = await compressImage(file);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", compressedFile);
       formData.append("upload_preset", "unsigned_upload");
 
       const res = await fetch(
@@ -249,7 +269,10 @@ export default function EditTeam() {
       }
 
       const updated = [...players];
-      updated[index][field] = data.secure_url;
+      updated[index][field] = data.secure_url.replace(
+        "/upload/",
+        "/upload/f_auto,q_auto/"
+      );
 
       setPlayers(updated);
 
@@ -551,7 +574,7 @@ export default function EditTeam() {
 
                             <div>
                               <p className="text-[10px] text-gray-500 mb-1">
-                                Ganti KTP (JPG/PNG, max 200KB)
+                                Ganti KTP (JPG/PNG, max 500KB)
                               </p>
                               <input
                                 type="file"
@@ -565,7 +588,7 @@ export default function EditTeam() {
 
                             <div>
                               <p className="text-[10px] text-gray-500 mb-1">
-                                Ganti Foto Pemain (JPG/PNG, max 200KB)
+                                Ganti Foto Pemain (JPG/PNG, max 500KB)
                               </p>
                               <input
                                 type="file"

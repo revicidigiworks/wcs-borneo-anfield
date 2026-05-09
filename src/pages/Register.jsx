@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import { Trash2, Plus, ShieldCheck, Users } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
+import imageCompression from "browser-image-compression";
 import logoWCS from "../assets/img/logo-wcs.webp";
 
 
@@ -51,6 +52,24 @@ export default function Register() {
 
   const [loading, setLoading] = useState(false);
 
+  const compressImage = async (file) => {
+    const options = {
+      maxSizeMB: 0.13,
+      maxWidthOrHeight: 1200,
+      useWebWorker: true,
+      fileType: "image/webp",
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+
+      return compressedFile;
+    } catch (error) {
+      console.error("Compress error:", error);
+      return file;
+    }
+  };
+
   const calcAge = (dob) => {
     if (!dob) return "";
     const birth = new Date(dob);
@@ -78,19 +97,28 @@ export default function Register() {
     setPlayers(updated);
   };
 
-  const MAX_FILE_SIZE = 200 * 1024;
+  const MAX_FILE_SIZE = 500 * 1024;
 
-  const handleFileChange = (index, field, file) => {
+  const handleFileChange = async (index, field, file) => {
     if (!file) return;
 
     if (file.size > MAX_FILE_SIZE) {
-      alert("Ukuran file maksimal 200KB");
+      alert("Ukuran file maksimal 500KB");
       return;
     }
 
-    const updated = [...players];
-    updated[index][field] = file;
-    setPlayers(updated);
+    try {
+      const compressedFile = await compressImage(file);
+
+      const updated = [...players];
+      updated[index][field] = compressedFile;
+
+      setPlayers(updated);
+
+    } catch (error) {
+      console.error(error);
+      alert("Gagal memproses gambar");
+    }
   };
 
   const addPlayer = () => {
@@ -215,7 +243,10 @@ export default function Register() {
       throw new Error("Upload gagal");
     }
 
-    return data.secure_url;
+    return data.secure_url.replace(
+      "/upload/",
+      "/upload/f_auto,q_auto/"
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -458,7 +489,7 @@ export default function Register() {
 
                     <div>
                       <p className="text-[10px] text-gray-500 mb-1">
-                        Upload KTP (JPG/PNG, max 200KB)
+                        Upload KTP (JPG/PNG, max 500KB)
                       </p>
                       <input
                         type="file"
@@ -470,7 +501,7 @@ export default function Register() {
 
                     <div>
                       <p className="text-[10px] text-gray-500 mb-1">
-                        Upload Foto Pemain (JPG/PNG, max 200KB)
+                        Upload Foto Pemain (JPG/PNG, max 500KB)
                       </p>
                       <input
                         type="file"

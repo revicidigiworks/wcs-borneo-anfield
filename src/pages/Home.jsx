@@ -42,7 +42,7 @@ export default function Home() {
               <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
 
               <span className="text-[11px] tracking-[0.25em] uppercase font-black text-red-600">
-                Official Tournament 2026
+                Official Tournament Mini Soccer
               </span>
             </div>
 
