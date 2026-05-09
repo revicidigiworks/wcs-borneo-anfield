@@ -644,7 +644,7 @@ export default function EditTeam() {
 
             <p>• Simpan link edit privat ini dengan baik untuk melakukan perubahan data tim.</p>
             <p>• Pendaftaran tim baru ditutup pada {registrationCloseDate}.</p>
-            <p>• Revisi roster pemain masih diperbolehkan sampai {rosterEditCloseDate} pukul 23:59 WIB.</p>
+            <p>• Revisi roster pemain masih diperbolehkan sampai {rosterEditCloseDate} pukul 23:59 WITA.</p>
             <p>• Setelah tanggal tersebut sistem otomatis mengunci seluruh data pemain (H-5 tournament).</p>
             <p>• Panitia tidak bertanggung jawab apabila link edit hilang atau dibagikan ke pihak lain.</p>
           </div>
