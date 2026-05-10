@@ -397,7 +397,7 @@ const drawPlayersPage = async (
   await drawWatermark(doc);
 
   let y = isFirstPage
-    ? 124
+    ? 122
     : 62;
 
   doc.setFont(
@@ -435,7 +435,7 @@ const drawPlayersPage = async (
     const row = Math.floor(i / 2);
 
     const cardY =
-      y + row * 28;
+      y + row * 30;
 
     /* FOTO */
 
@@ -465,7 +465,7 @@ const drawPlayersPage = async (
 
     /* TEXT */
 
-    const tx = column + 27;
+    const tx = column + 29;
 
     const writeRow = (
       label,
@@ -477,7 +477,7 @@ const drawPlayersPage = async (
         "bold"
       );
 
-      doc.setFontSize(8);
+      doc.setFontSize(10);
 
       doc.text(
         label,
