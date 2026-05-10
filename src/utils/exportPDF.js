@@ -348,7 +348,7 @@ const drawTeamInfo = (
         "bold"
       );
 
-      doc.setFontSize(8);
+      doc.setFontSize(9);
 
       doc.text(
         item[0],
@@ -397,7 +397,7 @@ const drawPlayersPage = async (
   await drawWatermark(doc);
 
   let y = isFirstPage
-    ? 122
+    ? 123
     : 62;
 
   doc.setFont(
@@ -435,7 +435,7 @@ const drawPlayersPage = async (
     const row = Math.floor(i / 2);
 
     const cardY =
-      y + row * 30;
+      y + row * 32;
 
     /* FOTO */
 
@@ -477,7 +477,7 @@ const drawPlayersPage = async (
         "bold"
       );
 
-      doc.setFontSize(10);
+      doc.setFontSize(9);
 
       doc.text(
         label,
