@@ -516,19 +516,19 @@ const drawPlayersPage = async (
       "TTL",
       `${player.pob || "-"}, ${player.dob || "-"
       }`,
-      cardY + 10
+      cardY + 11
     );
 
     writeRow(
       "NIK",
       player.nik,
-      cardY + 15
+      cardY + 17
     );
 
     writeRow(
       "POSISI",
       player.position,
-      cardY + 20
+      cardY + 23
     );
   }
 };
