@@ -52,13 +52,23 @@ export default function Register() {
 
   const [loading, setLoading] = useState(false);
 
-  const compressImage = async (file) => {
-    const options = {
-      maxSizeMB: 0.13,
-      maxWidthOrHeight: 1200,
-      useWebWorker: true,
-      fileType: "image/webp",
-    };
+  const compressImage = async (file, type) => {
+    const options =
+      type === "ktp"
+        ? {
+          maxSizeMB: 0.3,
+          maxWidthOrHeight: 1800,
+          useWebWorker: true,
+          fileType: "image/jpeg",
+          initialQuality: 0.85,
+        }
+        : {
+          maxSizeMB: 0.12,
+          maxWidthOrHeight: 1200,
+          useWebWorker: true,
+          fileType: "image/webp",
+          initialQuality: 0.7,
+        };
 
     try {
       const compressedFile = await imageCompression(file, options);
@@ -68,6 +78,7 @@ export default function Register() {
       console.error("Compress error:", error);
       return file;
     }
+
   };
 
   const calcAge = (dob) => {
@@ -108,7 +119,7 @@ export default function Register() {
     }
 
     try {
-      const compressedFile = await compressImage(file);
+      const compressedFile = await compressImage(file, field);
 
       const updated = [...players];
       updated[index][field] = compressedFile;
@@ -487,27 +498,55 @@ export default function Register() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-                    <div>
-                      <p className="text-[10px] text-gray-500 mb-1">
-                        Upload KTP (JPG/PNG, max 500KB)
+
+                    {/* KTP */}
+                    <div className="border rounded-xl p-4 bg-white">
+                      <p className="text-xs font-semibold text-gray-700">
+                        Upload KTP 
                       </p>
+
+                      <p className="text-[11px] text-gray-500 mt-1">
+                        JPG / PNG • Maksimal Ukuran File 500KB
+                      </p>
+
+                      <p className="text-[11px] text-red-500 mt-1">
+                        Pastikan foto terang dan tulisan terbaca jelas
+                      </p>
+
                       <input
                         type="file"
                         accept="image/*"
                         onChange={(e) => handleFileChange(i, "ktp", e.target.files[0])}
-                        className="border rounded-md px-2 h-11 text-sm w-full"
+                        className="mt-3 block w-full text-sm text-gray-600
+    file:mr-3 file:px-4 file:py-2
+    file:border-0 file:rounded-md
+    file:bg-[#c8102e] file:text-white
+    hover:file:bg-[#a70d26]"
                       />
                     </div>
-
-                    <div>
-                      <p className="text-[10px] text-gray-500 mb-1">
-                        Upload Foto Pemain (JPG/PNG, max 500KB)
+                    {/* FOTO PEMAIN */}
+                    <div className="border rounded-xl p-4 bg-white">
+                      <p className="text-xs font-semibold text-gray-700">
+                        Upload Foto Pemain
                       </p>
+
+                      <p className="text-[11px] text-gray-500 mt-1">
+                        JPG / PNG / WEBP • Maksimal Ukuran File 500KB
+                      </p>
+
+                      <p className="text-[11px] text-red-500 mt-1">
+                        Gunakan foto portrait / close-up agar wajah terlihat jelas
+                      </p>
+
                       <input
                         type="file"
                         accept="image/*"
                         onChange={(e) => handleFileChange(i, "photo", e.target.files[0])}
-                        className="border rounded-md px-2 h-11 text-sm w-full"
+                        className="mt-3 block w-full text-sm text-gray-600
+    file:mr-3 file:px-4 file:py-2
+    file:border-0 file:rounded-md
+    file:bg-[#c8102e] file:text-white
+    hover:file:bg-[#a70d26]"
                       />
                     </div>
 
