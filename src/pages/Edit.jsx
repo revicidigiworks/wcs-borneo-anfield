@@ -45,23 +45,33 @@ export default function EditTeam() {
   const rosterEditCloseDate = "08 Juni 2026";
   const hardLockDate = new Date("2026-06-08T23:59:59");
 
- const compressImage = async (file) => {
-  const options = {
-    maxSizeMB: 0.13,
-    maxWidthOrHeight: 1200,
-    useWebWorker: true,
-    fileType: "image/webp",
+  const compressImage = async (file, type) => {
+    const options =
+      type === "ktp"
+        ? {
+          maxSizeMB: 0.3,
+          maxWidthOrHeight: 1800,
+          useWebWorker: true,
+          fileType: "image/jpeg",
+          initialQuality: 0.85,
+        }
+        : {
+          maxSizeMB: 0.12,
+          maxWidthOrHeight: 1200,
+          useWebWorker: true,
+          fileType: "image/webp",
+          initialQuality: 0.7,
+        };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+
+      return compressedFile;
+    } catch (error) {
+      console.error("Compress error:", error);
+      return file;
+    }
   };
-
-  try {
-    const compressedFile = await imageCompression(file, options);
-
-    return compressedFile;
-  } catch (error) {
-    console.error("Compress error:", error);
-    return file;
-  }
-};
 
   const calcAge = (dob) => {
     if (!dob) return "";
@@ -248,7 +258,7 @@ export default function EditTeam() {
     }
 
     try {
-      const compressedFile = await compressImage(file);
+      const compressedFile = await compressImage(file, field);
       const formData = new FormData();
       formData.append("file", compressedFile);
       formData.append("upload_preset", "unsigned_upload");
@@ -572,31 +582,59 @@ export default function EditTeam() {
                         {!locked && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
 
-                            <div>
-                              <p className="text-[10px] text-gray-500 mb-1">
-                                Ganti KTP (JPG/PNG, max 500KB)
+                            {/* KTP */}
+                            <div className="border rounded-xl p-4 bg-[#fafafa]">
+                              <p className="text-xs font-semibold text-gray-700">
+                                Ganti KTP
                               </p>
+
+                              <p className="text-[11px] text-gray-500 mt-1">
+                                JPG / PNG • Maksimal 500KB
+                              </p>
+
+                              <p className="text-[11px] text-red-500 mt-1">
+                                Pastikan foto terang dan tulisan terbaca jelas
+                              </p>
+
                               <input
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
                                   handleFileChangeEdit(i, "ktp", e.target.files[0])
                                 }
-                                className="border rounded-md px-2 h-10 text-xs w-full"
+                                className="mt-3 block w-full text-sm text-gray-600
+    file:mr-3 file:px-4 file:py-2
+    file:border-0 file:rounded-md
+    file:bg-[#c8102e] file:text-white
+    hover:file:bg-[#a70d26]"
                               />
                             </div>
-
-                            <div>
-                              <p className="text-[10px] text-gray-500 mb-1">
-                                Ganti Foto Pemain (JPG/PNG, max 500KB)
+                            
+                            {/* FOTO PEMAIN */}
+                            <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 bg-[#fafafa]">
+                              <p className="text-xs font-semibold text-gray-700">
+                                Ganti Foto Pemain
                               </p>
+
+                              <p className="text-[11px] text-gray-500 mt-1">
+                                JPG / PNG • Maksimal 500KB
+                              </p>
+
+                              <p className="text-[11px] text-red-500 mt-1">
+                                Gunakan foto portrait / close-up agar wajah terlihat jelas
+                              </p>
+
                               <input
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
                                   handleFileChangeEdit(i, "photo", e.target.files[0])
                                 }
-                                className="border rounded-md px-2 h-10 text-xs w-full"
+                                className="mt-3 block w-full text-sm text-gray-600
+    file:mr-3 file:px-4 file:py-2
+    file:border-0 file:rounded-md
+    file:bg-[#c8102e] file:text-white
+    hover:file:bg-[#a70d26]"
                               />
                             </div>
 

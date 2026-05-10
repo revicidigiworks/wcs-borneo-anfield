@@ -498,11 +498,10 @@ export default function Register() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-
                     {/* KTP */}
                     <div className="border rounded-xl p-4 bg-white">
                       <p className="text-xs font-semibold text-gray-700">
-                        Upload KTP 
+                        Upload KTP
                       </p>
 
                       <p className="text-[11px] text-gray-500 mt-1">
@@ -524,6 +523,7 @@ export default function Register() {
     hover:file:bg-[#a70d26]"
                       />
                     </div>
+
                     {/* FOTO PEMAIN */}
                     <div className="border rounded-xl p-4 bg-white">
                       <p className="text-xs font-semibold text-gray-700">
@@ -551,8 +551,6 @@ export default function Register() {
                     </div>
 
                   </div>
-
-
 
                   <div className="flex items-center gap-3 text-sm">
 
