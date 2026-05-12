@@ -99,8 +99,26 @@ const toBase64 = async (url) => {
             height
           );
 
+          const targetRatio = 20 / 26;
+
+          let cropWidth = width;
+          let cropHeight = height;
+
+          if (width / height > targetRatio) {
+            cropWidth = height * targetRatio;
+          } else {
+            cropHeight = width / targetRatio;
+          }
+
+          const sx = (width - cropWidth) / 2;
+          const sy = (height - cropHeight) / 2;
+
           ctx.drawImage(
             img,
+            sx,
+            sy,
+            cropWidth,
+            cropHeight,
             0,
             0,
             width,
@@ -662,7 +680,7 @@ export const exportTeamsPDF =
       orientation: "p",
       unit: "mm",
       format: "a4",
-      
+
     });
 
     const list =
@@ -758,7 +776,7 @@ export const exportTeamsPDF =
       const teamName =
         sanitizeFileName(
           teams?.name ||
-            "TEAM"
+          "TEAM"
         );
 
       doc.save(
