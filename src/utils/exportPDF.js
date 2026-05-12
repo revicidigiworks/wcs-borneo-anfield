@@ -124,6 +124,66 @@ const toBase64 = async (url) => {
   }
 };
 
+const toBase64PlayerPhoto = async (url) => {
+  try {
+    return await new Promise((resolve) => {
+      const img = new Image();
+
+      img.crossOrigin = "Anonymous";
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+
+        const width = img.width;
+        const height = img.height;
+
+        const targetRatio = 20 / 26;
+
+        let cropWidth = width;
+        let cropHeight = height;
+
+        if (width / height > targetRatio) {
+          cropWidth = height * targetRatio;
+        } else {
+          cropHeight = width / targetRatio;
+        }
+
+        const sx = (width - cropWidth) / 2;
+        const sy = (height - cropHeight) / 2;
+
+        canvas.width = 500;
+        canvas.height = 650;
+
+        const ctx = canvas.getContext("2d");
+
+        ctx.fillStyle = "#FFFFFF";
+
+        ctx.fillRect(0, 0, 500, 650);
+
+        ctx.drawImage(
+          img,
+          sx,
+          sy,
+          cropWidth,
+          cropHeight,
+          0,
+          0,
+          500,
+          650
+        );
+
+        resolve(
+          canvas.toDataURL("image/jpeg", 0.7)
+        );
+      };
+
+      img.src = url;
+    });
+  } catch {
+    return null;
+  }
+};
+
 /* =========================
    TEMPLATE
 ========================= */
@@ -447,7 +507,7 @@ const drawPlayersPage = async (
     const photoH = 26;
 
     if (player.photo) {
-      const img = await toBase64(
+      const img = await toBase64PlayerPhoto(
         player.photo
       );
 
