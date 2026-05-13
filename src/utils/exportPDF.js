@@ -574,8 +574,7 @@ const drawPlayersPage = async (
 
     writeRow(
       "TTL",
-      `${player.pob || "-"}, ${player.dob || "-"
-      }`,
+      `${(player.pob || "-").toUpperCase()}, ${player.dob || "-"}`,
       cardY + 11
     );
 
