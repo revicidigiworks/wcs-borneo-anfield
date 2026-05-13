@@ -543,7 +543,7 @@ export default function Dashboard() {
                         <input
                           placeholder="Nama Lengkap"
                           value={p.name}
-                          onChange={(e) => updatePlayer(i, "name", e.target.value)}
+                          onChange={(e) => updatePlayer(i, "name", e.target.value.toUpperCase)}
                           className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-sm font-medium"
                         />
                         <input
@@ -564,7 +564,7 @@ export default function Dashboard() {
                           <input
                             placeholder="Tempat Lahir"
                             value={p.pob}
-                            onChange={(e) => updatePlayer(i, "pob", e.target.value)}
+                            onChange={(e) => updatePlayer(i, "pob", e.target.value.toUpperCase)}
                             className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-xs"
                           />
                           <input
@@ -578,7 +578,7 @@ export default function Dashboard() {
                         {/* 🔥 POSISI */}
                         <select
                           value={p.position || ""}
-                          onChange={(e) => updatePlayer(i, "position", e.target.value)}
+                          onChange={(e) => updatePlayer(i, "position", e.target.value.toUpperCase)}
                           className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-xs"
                         >
                           <option value="">Pilih Posisi</option>
