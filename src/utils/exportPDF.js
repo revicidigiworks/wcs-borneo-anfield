@@ -385,15 +385,15 @@ const drawTeamInfo = (
   y += 12;
 
   const left = [
-    ["NAMA TIM", team.name],
-    ["MANAGER", team.manager],
+    ["NAMA TIM", (team.name || "").toUpperCase()],
+    ["MANAGER", (team.manager || "").toUpperCase()],
     ["NO WHATSAPP", team.phone],
   ];
 
   const right = [
-    ["OFFICIAL 1", team.official1],
-    ["OFFICIAL 2", team.official2],
-    ["OFFICIAL 3", team.official3],
+    ["OFFICIAL 1", (team.official1 || "").toUpperCase()],
+    ["OFFICIAL 2", (team.official2 || "").toUpperCase()],
+    ["OFFICIAL 3", (team.official3 || "").toUpperCase()],
   ];
 
   const drawColumn = (
@@ -568,7 +568,7 @@ const drawPlayersPage = async (
 
     writeRow(
       "NAMA",
-      player.name,
+      (player.name || "").toUpperCase(),
       cardY + 5
     );
 
@@ -587,7 +587,7 @@ const drawPlayersPage = async (
 
     writeRow(
       "POSISI",
-      player.position,
+      (player.position || "").toUpperCase(),
       cardY + 23
     );
   }
@@ -722,7 +722,7 @@ export const exportTeamsPDF =
       orientation: "p",
       unit: "mm",
       format: "a4",
-      
+
     });
 
     const list =
@@ -818,7 +818,7 @@ export const exportTeamsPDF =
       const teamName =
         sanitizeFileName(
           teams?.name ||
-            "TEAM"
+          "TEAM"
         );
 
       doc.save(
