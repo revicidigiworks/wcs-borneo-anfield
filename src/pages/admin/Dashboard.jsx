@@ -493,7 +493,15 @@ export default function Dashboard() {
                   <div className="w-1 h-6 bg-red-600 rounded-full"></div> Detail Informasi
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {["name", "manager", "phone", "address"].map((field) => (
+                  {[
+                    "name",
+                    "manager",
+                    "phone",
+                    "address",
+                    "official1",
+                    "official2",
+                    "official3"
+                  ].map((field) => (
                     <div key={field} className="space-y-1">
                       <label className="text-[10px] font-bold uppercase text-gray-400 ml-1">{field}</label>
                       <input
