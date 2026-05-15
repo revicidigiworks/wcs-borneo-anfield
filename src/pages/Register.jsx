@@ -13,7 +13,6 @@ import { v4 as uuidv4 } from "uuid";
 import imageCompression from "browser-image-compression";
 import logoWCS from "../assets/img/logo-wcs.webp";
 
-
 export default function Register() {
   const navigate = useNavigate();
 
@@ -28,10 +27,20 @@ export default function Register() {
 
   const [team, setTeam] = useState({
     name: "",
+
     manager: "",
+    managerPhoto: null,
+    managerKtp: null,
+
     official1: "",
+    official1Photo: null,
+
     official2: "",
+    official2Photo: null,
+
     official3: "",
+    official3Photo: null,
+
     phone: "",
     address: "",
   });
@@ -56,19 +65,19 @@ export default function Register() {
     const options =
       type === "ktp"
         ? {
-          maxSizeMB: 0.3,
-          maxWidthOrHeight: 1800,
-          useWebWorker: true,
-          fileType: "image/jpeg",
-          initialQuality: 0.85,
-        }
+            maxSizeMB: 0.3,
+            maxWidthOrHeight: 1800,
+            useWebWorker: true,
+            fileType: "image/jpeg",
+            initialQuality: 0.85,
+          }
         : {
-          maxSizeMB: 0.12,
-          maxWidthOrHeight: 1200,
-          useWebWorker: true,
-          fileType: "image/webp",
-          initialQuality: 0.7,
-        };
+            maxSizeMB: 0.12,
+            maxWidthOrHeight: 1200,
+            useWebWorker: true,
+            fileType: "image/webp",
+            initialQuality: 0.7,
+          };
 
     try {
       const compressedFile = await imageCompression(file, options);
@@ -78,7 +87,6 @@ export default function Register() {
       console.error("Compress error:", error);
       return file;
     }
-
   };
 
   const calcAge = (dob) => {
@@ -95,6 +103,28 @@ export default function Register() {
 
   const handleChange = (e) => {
     setTeam({ ...team, [e.target.name]: e.target.value });
+  };
+  const handleTeamFileChange = async (field, file) => {
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert("Ukuran file maksimal 500KB");
+      return;
+    }
+
+    try {
+      const type = field.toLowerCase().includes("ktp") ? "ktp" : "photo";
+
+      const compressedFile = await compressImage(file, type);
+
+      setTeam((prev) => ({
+        ...prev,
+        [field]: compressedFile,
+      }));
+    } catch (error) {
+      console.error(error);
+      alert("Gagal memproses gambar");
+    }
   };
 
   const handlePlayerChange = (index, field, value) => {
@@ -125,7 +155,6 @@ export default function Register() {
       updated[index][field] = compressedFile;
 
       setPlayers(updated);
-
     } catch (error) {
       console.error(error);
       alert("Gagal memproses gambar");
@@ -157,55 +186,69 @@ export default function Register() {
 
   const validateForm = () => {
     if (registrationNotOpenYet)
-      return alert("Pendaftaran belum dibuka"), false;
+      return (alert("Pendaftaran belum dibuka"), false);
 
     if (registrationClosed)
-      return alert("Pendaftaran telah ditutup pada 01 Juni 2026"), false;
+      return (alert("Pendaftaran telah ditutup pada 01 Juni 2026"), false);
 
     if (sanitizeText(team.name).length < 3)
-      return alert("Nama tim minimal 3 karakter"), false;
+      return (alert("Nama tim minimal 3 karakter"), false);
 
     if (sanitizeText(team.manager).length < 3)
-      return alert("Nama Manager / PIC wajib diisi"), false;
+      return (alert("Nama Manager / PIC wajib diisi"), false);
+
+    if (!team.managerPhoto) return (alert("Foto Manager wajib upload"), false);
+
+    if (!team.managerKtp) return (alert("KTP Manager wajib upload"), false);
+
+    if (!team.official1Photo)
+      return (alert("Foto Official 1 wajib upload"), false);
+
+    if (!team.official2Photo)
+      return (alert("Foto Official 2 wajib upload"), false);
+
+    if (!team.official3Photo)
+      return (alert("Foto Official 3 wajib upload"), false);
 
     if (sanitizeText(team.official1).length < 3)
-      return alert("Official 1 wajib diisi"), false;
+      return (alert("Official 1 wajib diisi"), false);
 
     if (sanitizeText(team.official2).length < 3)
-      return alert("Official 2 wajib diisi"), false;
+      return (alert("Official 2 wajib diisi"), false);
 
     if (sanitizeText(team.official3).length < 3)
-      return alert("Official 3 wajib diisi"), false;
+      return (alert("Official 3 wajib diisi"), false);
 
     if (!/^08[0-9]{8,13}$/.test(team.phone.trim()))
-      return alert("Nomor Whatsapp harus valid"), false;
+      return (alert("Nomor Whatsapp harus valid"), false);
 
     if (sanitizeText(team.address).length < 8)
-      return alert("Alamat tim terlalu pendek"), false;
+      return (alert("Alamat tim terlalu pendek"), false);
 
     for (let i = 0; i < players.length; i++) {
       const p = players[i];
 
       if (sanitizeText(p.name).length < 3)
-        return alert(`Nama pemain ke-${i + 1} tidak valid`), false;
+        return (alert(`Nama pemain ke-${i + 1} tidak valid`), false);
 
       if (!/^\d{16}$/.test(p.nik))
-        return alert(`NIK pemain ke-${i + 1} harus 16 digit`), false;
+        return (alert(`NIK pemain ke-${i + 1} harus 16 digit`), false);
 
       if (sanitizeText(p.pob).length < 3)
-        return alert(`Tempat lahir pemain ke-${i + 1} tidak valid`), false;
+        return (alert(`Tempat lahir pemain ke-${i + 1} tidak valid`), false);
 
       if (!p.dob)
-        return alert(`Tanggal lahir pemain ke-${i + 1} wajib diisi`), false;
+        return (alert(`Tanggal lahir pemain ke-${i + 1} wajib diisi`), false);
 
       const age = calcAge(p.dob);
       if (age < 17 || age > 50)
-        return alert(`Usia pemain ke-${i + 1} harus 17 - 50 tahun`), false;
+        return (alert(`Usia pemain ke-${i + 1} harus 17 - 50 tahun`), false);
       if (!p.position)
-        return alert(`Posisi pemain ke-${i + 1} wajib diisi`), false;
+        return (alert(`Posisi pemain ke-${i + 1} wajib diisi`), false);
 
-      if (!p.ktp) return alert(`KTP pemain ke-${i + 1} wajib upload`), false;
-      if (!p.photo) return alert(`Foto pemain ke-${i + 1} wajib upload`), false;
+      if (!p.ktp) return (alert(`KTP pemain ke-${i + 1} wajib upload`), false);
+      if (!p.photo)
+        return (alert(`Foto pemain ke-${i + 1} wajib upload`), false);
     }
 
     const uniqueCheck = new Set();
@@ -215,16 +258,14 @@ export default function Register() {
       const p = players[i];
 
       const key =
-        sanitizeText(p.name).toLowerCase() +
-        p.pob.toLowerCase() +
-        p.dob;
+        sanitizeText(p.name).toLowerCase() + p.pob.toLowerCase() + p.dob;
 
       if (uniqueCheck.has(key)) {
-        return alert(`Pemain duplikat di form (index ${i + 1})`), false;
+        return (alert(`Pemain duplikat di form (index ${i + 1})`), false);
       }
 
       if (nikCheck.has(p.nik)) {
-        return alert(`NIK pemain duplikat pada pemain ke-${i + 1}`), false;
+        return (alert(`NIK pemain duplikat pada pemain ke-${i + 1}`), false);
       }
 
       uniqueCheck.add(key);
@@ -244,7 +285,7 @@ export default function Register() {
       {
         method: "POST",
         body: formData,
-      }
+      },
     );
 
     const data = await res.json();
@@ -254,10 +295,7 @@ export default function Register() {
       throw new Error("Upload gagal");
     }
 
-    return data.secure_url.replace(
-      "/upload/",
-      "/upload/f_auto,q_auto/"
-    );
+    return data.secure_url.replace("/upload/", "/upload/f_auto,q_auto/");
   };
 
   const handleSubmit = async (e) => {
@@ -282,7 +320,7 @@ export default function Register() {
         if (data.players) {
           data.players.forEach((p) => {
             existingPlayers.push(
-              p.name.toLowerCase() + p.pob.toLowerCase() + p.dob
+              p.name.toLowerCase() + p.pob.toLowerCase() + p.dob,
             );
 
             existingNiks.push(p.nik?.trim());
@@ -307,6 +345,15 @@ export default function Register() {
         }
       }
 
+      const managerPhotoUrl = await uploadFile(team.managerPhoto);
+
+      const managerKtpUrl = await uploadFile(team.managerKtp);
+
+      const official1PhotoUrl = await uploadFile(team.official1Photo);
+
+      const official2PhotoUrl = await uploadFile(team.official2Photo);
+
+      const official3PhotoUrl = await uploadFile(team.official3Photo);
 
       const cleanPlayers = [];
 
@@ -334,10 +381,14 @@ export default function Register() {
       await addDoc(collection(db, "teams"), {
         name: sanitizeText(team.name),
         manager: sanitizeText(team.manager),
+        managerPhoto: managerPhotoUrl,
+        managerKtp: managerKtpUrl,
         official1: sanitizeText(team.official1),
         official2: sanitizeText(team.official2),
         official3: sanitizeText(team.official3),
-
+        official1Photo: official1PhotoUrl,
+        official2Photo: official2PhotoUrl,
+        official3Photo: official3PhotoUrl,
         phone: team.phone.trim(),
         address: sanitizeText(team.address),
 
@@ -353,7 +404,6 @@ export default function Register() {
 
       alert("Tim berhasil didaftarkan ✅");
       navigate(`/edit/${editToken}`);
-
     } catch (error) {
       console.error(error);
       alert("Gagal menyimpan data ❌");
@@ -367,7 +417,6 @@ export default function Register() {
       <div className="max-w-5xl mx-auto bg-white rounded-xl overflow-hidden shadow-2xl border border-gray-200">
         <div className="bg-[#111111] text-white px-5 py-6 md:px-8 border-b-4 border-[#c8102e]">
           <div className="flex items-center justify-between gap-4">
-
             {/* LEFT CONTENT */}
             <div>
               <div className="flex items-center gap-2 text-[10px] sm:text-xs uppercase tracking-[3px] text-white/70">
@@ -391,23 +440,188 @@ export default function Register() {
                 className="w-12 sm:w-16 md:w-20 object-contain"
               />
             </div>
-
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-8">
-
           {/* DATA TIM */}
           <div>
             <h2 className="font-bold text-lg mb-4">Data Tim</h2>
             <div className="grid md:grid-cols-2 gap-3">
-              <input name="name" value={team.name} onChange={handleChange} placeholder="Nama Tim" className="border rounded-md px-4 h-12 text-sm" />
-              <input name="manager" value={team.manager} onChange={handleChange} placeholder="Manager / PIC" className="border rounded-md px-4 h-12 text-sm" />
-              <input name="phone" value={team.phone} onChange={handleChange} placeholder="No. Whatsapp Aktif" className="border rounded-md px-4 h-12 text-sm" />
-              <input name="address" value={team.address} onChange={handleChange} placeholder="Alamat Lengkap Tim" className="border rounded-md px-4 h-12 text-sm" />
-              <input name="official1" value={team.official1} onChange={handleChange} placeholder="Nama Official 1" className="border rounded-md px-4 h-12 text-sm" />
-              <input name="official2" value={team.official2} onChange={handleChange} placeholder="Nama Official 2" className="border rounded-md px-4 h-12 text-sm" />
-              <input name="official3" value={team.official3} onChange={handleChange} placeholder="Nama Official 3" className="border rounded-md px-4 h-12 text-sm" />
+              <input
+                name="name"
+                value={team.name}
+                onChange={handleChange}
+                placeholder="Nama Tim"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+              <input
+                name="manager"
+                value={team.manager}
+                onChange={handleChange}
+                placeholder="Manager / PIC"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* FOTO MANAGER */}
+                <div className="border rounded-xl p-4 bg-white">
+                  <p className="text-xs font-semibold text-gray-700">
+                    Upload Foto Manager
+                  </p>
+
+                  <p className="text-[11px] text-gray-500 mt-1">
+                    JPG / PNG • Maksimal 500KB
+                  </p>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleTeamFileChange("managerPhoto", e.target.files[0])
+                    }
+                    className="mt-3 block w-full text-sm text-gray-600
+                    file:mr-3 file:px-4 file:py-2
+                    file:border-0 file:rounded-md
+                    file:bg-[#c8102e] file:text-white"
+                  />
+                </div>
+
+                {/* KTP MANAGER */}
+                <div className="border rounded-xl p-4 bg-white">
+                  <p className="text-xs font-semibold text-gray-700">
+                    Upload KTP Manager
+                  </p>
+
+                  <p className="text-[11px] text-gray-500 mt-1">
+                    JPG / PNG • Maksimal 500KB
+                  </p>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleTeamFileChange("managerKtp", e.target.files[0])
+                    }
+                    className="mt-3 block w-full text-sm text-gray-600
+                  file:mr-3 file:px-4 file:py-2
+                  file:border-0 file:rounded-md
+                  file:bg-[#c8102e] file:text-white"
+                  />
+                </div>
+              </div>
+              <input
+                name="phone"
+                value={team.phone}
+                onChange={handleChange}
+                placeholder="No. Whatsapp Aktif"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+              <input
+                name="address"
+                value={team.address}
+                onChange={handleChange}
+                placeholder="Alamat Lengkap Tim"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+              <input
+                name="official1"
+                value={team.official1}
+                onChange={handleChange}
+                placeholder="Nama Official 1"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+              <div className="border rounded-xl p-4 bg-white">
+                <p className="text-xs font-semibold text-gray-700">
+                  Upload Foto Official 1
+                </p>
+
+                <p className="text-[11px] text-gray-500 mt-1">
+                  JPG / PNG / WEBP • Maksimal Ukuran File 500KB
+                </p>
+
+                <p className="text-[11px] text-red-500 mt-1">
+                  Gunakan foto portrait / close-up agar wajah terlihat jelas
+                </p>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    handleTeamFileChange("official1Photo", e.target.files[0])
+                  }
+                  className="mt-3 block w-full text-sm text-gray-600
+    file:mr-3 file:px-4 file:py-2
+    file:border-0 file:rounded-md 
+    file:bg-[#c8102e] file:text-white
+    hover:file:bg-[#a70d26]"
+                />
+              </div>
+              <input
+                name="official2"
+                value={team.official2}
+                onChange={handleChange}
+                placeholder="Nama Official 2"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+              <div className="border rounded-xl p-4 bg-white">
+                <p className="text-xs font-semibold text-gray-700">
+                  Upload Foto Official 2
+                </p>
+
+                <p className="text-[11px] text-gray-500 mt-1">
+                  JPG / PNG / WEBP • Maksimal Ukuran File 500KB
+                </p>
+
+                <p className="text-[11px] text-red-500 mt-1">
+                  Gunakan foto portrait / close-up agar wajah terlihat jelas
+                </p>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    handleTeamFileChange("official2Photo", e.target.files[0])
+                  }
+                  className="mt-3 block w-full text-sm text-gray-600
+    file:mr-3 file:px-4 file:py-2
+    file:border-0 file:rounded-md
+    file:bg-[#c8102e] file:text-white
+    hover:file:bg-[#a70d26]"
+                />
+              </div>
+              <input
+                name="official3"
+                value={team.official3}
+                onChange={handleChange}
+                placeholder="Nama Official 3"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+              <div className="border rounded-xl p-4 bg-white">
+                <p className="text-xs font-semibold text-gray-700">
+                  Upload Foto Official 3
+                </p>
+
+                <p className="text-[11px] text-gray-500 mt-1">
+                  JPG / PNG / WEBP • Maksimal Ukuran File 500KB
+                </p>
+
+                <p className="text-[11px] text-red-500 mt-1">
+                  Gunakan foto portrait / close-up agar wajah terlihat jelas
+                </p>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    handleTeamFileChange("official3Photo", e.target.files[0])
+                  }
+                  className="mt-3 block w-full text-sm text-gray-600
+    file:mr-3 file:px-4 file:py-2
+    file:border-0 file:rounded-md
+    file:bg-[#c8102e] file:text-white
+    hover:file:bg-[#a70d26]"
+                />
+              </div>
             </div>
           </div>
 
@@ -417,21 +631,28 @@ export default function Register() {
               <h2 className="font-bold text-lg flex items-center gap-2">
                 <Users size={18} /> Daftar Pemain
               </h2>
-
             </div>
 
             <div className="space-y-4">
               {players.map((p, i) => (
-                <div key={p.id} className="border rounded-lg p-3 bg-[#fafafa] space-y-3">
+                <div
+                  key={p.id}
+                  className="border rounded-lg p-3 bg-[#fafafa] space-y-3"
+                >
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-sm text-gray-500">
                       Pemain #{i + 1}
                     </span>
-
-
                   </div>
 
-                  <input value={p.name} onChange={(e) => handlePlayerChange(i, "name", e.target.value)} placeholder="Contoh: Risal Gerrad (sesuai KTP)" className="border rounded-md px-4 h-11 text-sm w-full" />
+                  <input
+                    value={p.name}
+                    onChange={(e) =>
+                      handlePlayerChange(i, "name", e.target.value)
+                    }
+                    placeholder="Contoh: Risal Gerrad (sesuai KTP)"
+                    className="border rounded-md px-4 h-11 text-sm w-full"
+                  />
                   <div>
                     <p className="text-[10px] text-gray-500 mb-1">NIK</p>
 
@@ -441,7 +662,7 @@ export default function Register() {
                         handlePlayerChange(
                           i,
                           "nik",
-                          e.target.value.replace(/\D/g, "")
+                          e.target.value.replace(/\D/g, ""),
                         )
                       }
                       placeholder="16 digit NIK"
@@ -452,22 +673,30 @@ export default function Register() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <p className="text-[10px] text-gray-500 mb-1">Tempat Lahir</p>
+                      <p className="text-[10px] text-gray-500 mb-1">
+                        Tempat Lahir
+                      </p>
                       <input
                         value={p.pob}
-                        onChange={(e) => handlePlayerChange(i, "pob", e.target.value)}
+                        onChange={(e) =>
+                          handlePlayerChange(i, "pob", e.target.value)
+                        }
                         placeholder="Contoh: Samarinda"
                         className="border rounded-md px-3 h-11 text-sm w-full"
                       />
                     </div>
 
                     <div>
-                      <p className="text-[10px] text-gray-500 mb-1">Tanggal Lahir</p>
+                      <p className="text-[10px] text-gray-500 mb-1">
+                        Tanggal Lahir
+                      </p>
                       <div className="relative">
                         <input
                           type="date"
                           value={p.dob}
-                          onChange={(e) => handlePlayerChange(i, "dob", e.target.value)}
+                          onChange={(e) =>
+                            handlePlayerChange(i, "dob", e.target.value)
+                          }
                           className="border rounded-md px-3 h-11 text-sm w-full appearance-none"
                         />
                       </div>
@@ -486,7 +715,9 @@ export default function Register() {
                     <p className="text-[10px] text-gray-500 mb-1">Posisi</p>
                     <select
                       value={p.position}
-                      onChange={(e) => handlePlayerChange(i, "position", e.target.value)}
+                      onChange={(e) =>
+                        handlePlayerChange(i, "position", e.target.value)
+                      }
                       className="border rounded-md px-3 h-11 text-sm w-full"
                     >
                       <option value="">Pilih Posisi</option>
@@ -497,7 +728,6 @@ export default function Register() {
                     </select>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-
                     {/* KTP */}
                     <div className="border rounded-xl p-4 bg-white">
                       <p className="text-xs font-semibold text-gray-700">
@@ -515,7 +745,9 @@ export default function Register() {
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => handleFileChange(i, "ktp", e.target.files[0])}
+                        onChange={(e) =>
+                          handleFileChange(i, "ktp", e.target.files[0])
+                        }
                         className="mt-3 block w-full text-sm text-gray-600
     file:mr-3 file:px-4 file:py-2
     file:border-0 file:rounded-md
@@ -535,13 +767,16 @@ export default function Register() {
                       </p>
 
                       <p className="text-[11px] text-red-500 mt-1">
-                        Gunakan foto portrait / close-up agar wajah terlihat jelas
+                        Gunakan foto portrait / close-up agar wajah terlihat
+                        jelas
                       </p>
 
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => handleFileChange(i, "photo", e.target.files[0])}
+                        onChange={(e) =>
+                          handleFileChange(i, "photo", e.target.files[0])
+                        }
                         className="mt-3 block w-full text-sm text-gray-600
     file:mr-3 file:px-4 file:py-2
     file:border-0 file:rounded-md
@@ -549,11 +784,9 @@ export default function Register() {
     hover:file:bg-[#a70d26]"
                       />
                     </div>
-
                   </div>
 
                   <div className="flex items-center gap-3 text-sm">
-
                     {/* ➕ TAMBAH */}
                     {i === players.length - 1 && (
                       <button
@@ -580,7 +813,6 @@ export default function Register() {
                       <Trash2 size={16} />
                       <span>Hapus</span>
                     </button>
-
                   </div>
                 </div>
               ))}
@@ -588,7 +820,10 @@ export default function Register() {
           </div>
 
           <div className="bg-[#fff8f8] border border-[#ffd6dc] rounded-lg p-4 text-sm text-gray-700 leading-6">
-            <p>• Pendaftaran peserta dibuka mulai 05 Mei 2026 dan ditutup pada 01 Juni 2026.</p>
+            <p>
+              • Pendaftaran peserta dibuka mulai 05 Mei 2026 dan ditutup pada 01
+              Juni 2026.
+            </p>
             <p>• Setelah submit akan dapat link edit privat.</p>
             <p>• Edit maksimal sampai 08 Juni 2026 (H-5).</p>
           </div>

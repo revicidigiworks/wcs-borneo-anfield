@@ -31,10 +31,20 @@ export default function EditTeam() {
 
   const [team, setTeam] = useState({
     name: "",
+
     manager: "",
+    managerPhoto: "",
+    managerKtp: "",
+
     official1: "",
+    official1Photo: "",
+
     official2: "",
+    official2Photo: "",
+
     official3: "",
+    official3Photo: "",
+
     phone: "",
     address: "",
   });
@@ -49,19 +59,19 @@ export default function EditTeam() {
     const options =
       type === "ktp"
         ? {
-          maxSizeMB: 0.3,
-          maxWidthOrHeight: 1800,
-          useWebWorker: true,
-          fileType: "image/jpeg",
-          initialQuality: 0.85,
-        }
+            maxSizeMB: 0.3,
+            maxWidthOrHeight: 1800,
+            useWebWorker: true,
+            fileType: "image/jpeg",
+            initialQuality: 0.85,
+          }
         : {
-          maxSizeMB: 0.12,
-          maxWidthOrHeight: 1200,
-          useWebWorker: true,
-          fileType: "image/webp",
-          initialQuality: 0.7,
-        };
+            maxSizeMB: 0.12,
+            maxWidthOrHeight: 1200,
+            useWebWorker: true,
+            fileType: "image/webp",
+            initialQuality: 0.7,
+          };
 
     try {
       const compressedFile = await imageCompression(file, options);
@@ -90,7 +100,7 @@ export default function EditTeam() {
       try {
         const q = query(
           collection(db, "teams"),
-          where("editToken", "==", token)
+          where("editToken", "==", token),
         );
 
         const snap = await getDocs(q);
@@ -107,10 +117,20 @@ export default function EditTeam() {
 
         setTeam({
           name: data.name || "",
+
           manager: data.manager || "",
+          managerPhoto: data.managerPhoto || "",
+          managerKtp: data.managerKtp || "",
+
           official1: data.official1 || "",
+          official1Photo: data.official1Photo || "",
+
           official2: data.official2 || "",
+          official2Photo: data.official2Photo || "",
+
           official3: data.official3 || "",
+          official3Photo: data.official3Photo || "",
+
           phone: data.phone || "",
           address: data.address || "",
         });
@@ -268,7 +288,7 @@ export default function EditTeam() {
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
 
       const data = await res.json();
@@ -281,10 +301,58 @@ export default function EditTeam() {
       const updated = [...players];
       updated[index][field] = data.secure_url.replace(
         "/upload/",
-        "/upload/f_auto,q_auto/"
+        "/upload/f_auto,q_auto/",
       );
 
       setPlayers(updated);
+
+      alert("Upload berhasil diganti ✅");
+    } catch (err) {
+      console.error(err);
+      alert("Upload error ❌");
+    }
+  };
+
+  const handleTeamFileChangeEdit = async (field, file) => {
+    if (!file) return;
+
+    const MAX_FILE_SIZE = 500 * 1024;
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert("Ukuran maksimal 500KB");
+      return;
+    }
+
+    try {
+      const type = field.toLowerCase().includes("ktp") ? "ktp" : "photo";
+
+      const compressedFile = await compressImage(file, type);
+
+      const formData = new FormData();
+
+      formData.append("file", compressedFile);
+
+      formData.append("upload_preset", "unsigned_upload");
+
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/da9y2lsrs/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      const data = await res.json();
+
+      if (!data.secure_url) {
+        alert("Upload gagal");
+        return;
+      }
+
+      setTeam((prev) => ({
+        ...prev,
+        [field]: data.secure_url.replace("/upload/", "/upload/f_auto,q_auto/"),
+      }));
 
       alert("Upload berhasil diganti ✅");
     } catch (err) {
@@ -321,8 +389,8 @@ export default function EditTeam() {
           data.players.forEach((p) => {
             existingPlayers.push(
               (p.name || "").toLowerCase() +
-              (p.pob || "").toLowerCase() +
-              (p.dob || "")
+                (p.pob || "").toLowerCase() +
+                (p.dob || ""),
             );
 
             existingNiks.push(p.nik?.trim());
@@ -395,15 +463,12 @@ export default function EditTeam() {
   return (
     <div className="min-h-screen bg-[#f5f5f5] px-3 py-4 md:py-10">
       <div className="max-w-5xl mx-auto bg-white rounded-xl overflow-hidden shadow-2xl border border-gray-200">
-
         {/* HEADER */}
         <div className="bg-[#111] text-white px-5 py-6 md:px-8 border-b-4 border-[#c8102e]">
           <div className="flex items-center gap-2 text-xs uppercase tracking-[3px] text-white/70">
             <ShieldAlert size={16} /> Secure Edit Access
           </div>
-          <h1 className="text-2xl md:text-4xl font-bold mt-2">
-            EDIT DATA TIM
-          </h1>
+          <h1 className="text-2xl md:text-4xl font-bold mt-2">EDIT DATA TIM</h1>
           <p className="text-white/70 text-sm mt-1">
             Pendaftaran ditutup {registrationCloseDate} • Revisi roster sampai{" "}
             {rosterEditCloseDate}
@@ -411,22 +476,273 @@ export default function EditTeam() {
         </div>
 
         <form onSubmit={handleUpdate} className="p-4 md:p-8 space-y-8">
-
           {/* DATA TIM */}
           <div>
             <h2 className="font-bold text-lg mb-4">Data Tim</h2>
             <div className="grid md:grid-cols-2 gap-3">
-              {Object.keys(team).map((key) => (
-                <input
-                  key={key}
-                  name={key}
-                  value={team[key]}
-                  onChange={handleChange}
-                  disabled={locked}
-                  placeholder={key}
-                  className="border rounded-md px-4 h-12 text-sm"
-                />
-              ))}
+              <input
+                name="name"
+                value={team.name}
+                onChange={handleChange}
+                disabled={locked}
+                placeholder="Nama Tim"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+
+              <input
+                name="manager"
+                value={team.manager}
+                onChange={handleChange}
+                disabled={locked}
+                placeholder="Nama Manager"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* FOTO MANAGER */}
+                <div className="border rounded-xl p-4 bg-[#fafafa]">
+                  <p className="text-xs font-semibold text-gray-700">
+                    Foto Manager
+                  </p>
+
+                  <p className="text-[11px] text-gray-500 mt-1">
+                    JPG / PNG • Maksimal 500KB
+                  </p>
+
+                  <p className="text-[11px] text-red-500 mt-1">
+                    Gunakan foto portrait / close-up agar wajah terlihat jelas
+                  </p>
+
+                  {team.managerPhoto && (
+                    <img
+                      src={team.managerPhoto}
+                      alt="Manager"
+                      className="w-[140px] h-24 object-cover rounded-md border mt-3"
+                    />
+                  )}
+
+                  {!locked && (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleTeamFileChangeEdit(
+                          "managerPhoto",
+                          e.target.files[0],
+                        )
+                      }
+                      className="mt-3 block w-full text-sm text-gray-600
+        file:mr-3 file:px-4 file:py-2
+        file:border-0 file:rounded-md
+        file:bg-[#c8102e] file:text-white
+        hover:file:bg-[#a70d26]"
+                    />
+                  )}
+                </div>
+
+                {/* KTP MANAGER */}
+                <div className="border rounded-xl p-4 bg-[#fafafa]">
+                  <p className="text-xs font-semibold text-gray-700">
+                    KTP Manager
+                  </p>
+
+                  <p className="text-[11px] text-gray-500 mt-1">
+                    JPG / PNG • Maksimal 500KB
+                  </p>
+
+                  <p className="text-[11px] text-red-500 mt-1">
+                    Pastikan tulisan pada KTP terlihat jelas
+                  </p>
+
+                  {team.managerKtp && (
+                    <img
+                      src={team.managerKtp}
+                      alt="KTP Manager"
+                      className="w-[140px] h-24 object-cover rounded-md border mt-3"
+                    />
+                  )}
+
+                  {!locked && (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleTeamFileChangeEdit(
+                          "managerKtp",
+                          e.target.files[0],
+                        )
+                      }
+                      className="mt-3 block w-full text-sm text-gray-600
+        file:mr-3 file:px-4 file:py-2
+        file:border-0 file:rounded-md
+        file:bg-[#c8102e] file:text-white
+        hover:file:bg-[#a70d26]"
+                    />
+                  )}
+                </div>
+              </div>
+
+              <input
+                name="official1"
+                value={team.official1}
+                onChange={handleChange}
+                disabled={locked}
+                placeholder="Official 1"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+              <div className="border rounded-xl p-4 bg-[#fafafa]">
+                <p className="text-xs font-semibold text-gray-700">
+                  Foto Official 1
+                </p>
+
+                <p className="text-[11px] text-gray-500 mt-1">
+                  JPG / PNG • Maksimal 500KB
+                </p>
+
+                <p className="text-[11px] text-red-500 mt-1">
+                  Gunakan foto portrait / close-up agar wajah terlihat jelas
+                </p>
+
+                {team.official1Photo && (
+                  <img
+                    src={team.official1Photo}
+                    alt="Official 1"
+                    className="w-[140px] h-24 object-cover rounded-md border mt-3"
+                  />
+                )}
+
+                {!locked && (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleTeamFileChangeEdit(
+                        "official1Photo",
+                        e.target.files[0],
+                      )
+                    }
+                    className="mt-3 block w-full text-sm text-gray-600
+      file:mr-3 file:px-4 file:py-2
+      file:border-0 file:rounded-md
+      file:bg-[#c8102e] file:text-white
+      hover:file:bg-[#a70d26]"
+                  />
+                )}
+              </div>
+
+              <input
+                name="official2"
+                value={team.official2}
+                onChange={handleChange}
+                disabled={locked}
+                placeholder="Official 2"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+
+              <div className="border rounded-xl p-4 bg-[#fafafa]">
+                <p className="text-xs font-semibold text-gray-700">
+                  Foto Official 2
+                </p>
+
+                <p className="text-[11px] text-gray-500 mt-1">
+                  JPG / PNG • Maksimal 500KB
+                </p>
+
+                <p className="text-[11px] text-red-500 mt-1">
+                  Gunakan foto portrait / close-up agar wajah terlihat jelas
+                </p>
+
+                {team.official2Photo && (
+                  <img
+                    src={team.official2Photo}
+                    alt="Official 2"
+                    className="w-[140px] h-24 object-cover rounded-md border mt-3"
+                  />
+                )}
+
+                {!locked && (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleTeamFileChangeEdit(
+                        "official2Photo",
+                        e.target.files[0],
+                      )
+                    }
+                    className="mt-3 block w-full text-sm text-gray-600
+      file:mr-3 file:px-4 file:py-2
+      file:border-0 file:rounded-md
+      file:bg-[#c8102e] file:text-white
+      hover:file:bg-[#a70d26]"
+                  />
+                )}
+              </div>
+
+              <input
+                name="official3"
+                value={team.official3}
+                onChange={handleChange}
+                disabled={locked}
+                placeholder="Official 3"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+              <div className="border rounded-xl p-4 bg-[#fafafa]">
+                <p className="text-xs font-semibold text-gray-700">
+                  Foto Official 3
+                </p>
+
+                <p className="text-[11px] text-gray-500 mt-1">
+                  JPG / PNG • Maksimal 500KB
+                </p>
+
+                <p className="text-[11px] text-red-500 mt-1">
+                  Gunakan foto portrait / close-up agar wajah terlihat jelas
+                </p>
+
+                {team.official3Photo && (
+                  <img
+                    src={team.official3Photo}
+                    alt="Official 3"
+                    className="w-[140px] h-24 object-cover rounded-md border mt-3"
+                  />
+                )}
+
+                {!locked && (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleTeamFileChangeEdit(
+                        "official3Photo",
+                        e.target.files[0],
+                      )
+                    }
+                    className="mt-3 block w-full text-sm text-gray-600
+      file:mr-3 file:px-4 file:py-2
+      file:border-0 file:rounded-md
+      file:bg-[#c8102e] file:text-white
+      hover:file:bg-[#a70d26]"
+                  />
+                )}
+              </div>
+
+              <input
+                name="phone"
+                value={team.phone}
+                onChange={handleChange}
+                disabled={locked}
+                placeholder="Nomor HP"
+                className="border rounded-md px-4 h-12 text-sm"
+              />
+
+              <input
+                name="address"
+                value={team.address}
+                onChange={handleChange}
+                disabled={locked}
+                placeholder="Alamat"
+                className="border rounded-md px-4 h-12 text-sm md:col-span-2"
+              />
             </div>
           </div>
 
@@ -453,8 +769,10 @@ export default function EditTeam() {
                 const open = activePlayer === i;
 
                 return (
-                  <div key={p.id} className="border rounded-lg bg-white overflow-hidden">
-
+                  <div
+                    key={p.id}
+                    className="border rounded-lg bg-white overflow-hidden"
+                  >
                     <button
                       type="button"
                       onClick={() => setActivePlayer(open ? null : i)}
@@ -469,14 +787,18 @@ export default function EditTeam() {
                         </div>
                       </div>
 
-                      <ChevronDown className={`transition ${open ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        className={`transition ${open ? "rotate-180" : ""}`}
+                      />
                     </button>
 
                     {open && (
                       <div className="p-4 space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           <div>
-                            <p className="text-[10px] text-gray-500 mb-1">Nama Lengkap</p>
+                            <p className="text-[10px] text-gray-500 mb-1">
+                              Nama Lengkap
+                            </p>
                             <input
                               value={p.name}
                               disabled={locked}
@@ -488,7 +810,9 @@ export default function EditTeam() {
                             />
                           </div>
                           <div>
-                            <p className="text-[10px] text-gray-500 mb-1">NIK</p>
+                            <p className="text-[10px] text-gray-500 mb-1">
+                              NIK
+                            </p>
 
                             <input
                               value={p.nik || ""}
@@ -499,35 +823,42 @@ export default function EditTeam() {
                                 handlePlayerChange(
                                   i,
                                   "nik",
-                                  e.target.value.replace(/\D/g, "")
+                                  e.target.value.replace(/\D/g, ""),
                                 )
                               }
                               className="border rounded-md px-3 h-10 text-xs w-full"
                             />
                           </div>
                           <div>
-                            <p className="text-[10px] text-gray-500 mb-1">Tempat Lahir</p>
+                            <p className="text-[10px] text-gray-500 mb-1">
+                              Tempat Lahir
+                            </p>
                             <input
                               value={p.pob}
                               disabled={locked}
                               placeholder="Contoh: Samarinda"
-                              onChange={(e) => handlePlayerChange(i, "pob", e.target.value)}
+                              onChange={(e) =>
+                                handlePlayerChange(i, "pob", e.target.value)
+                              }
                               className="border rounded-md px-3 h-10 text-xs w-full"
                             />
                           </div>
 
                           <div>
-                            <p className="text-[10px] text-gray-500 mb-1">Tanggal Lahir</p>
+                            <p className="text-[10px] text-gray-500 mb-1">
+                              Tanggal Lahir
+                            </p>
                             <input
                               type="date"
                               value={p.dob}
                               disabled={locked}
-                              onChange={(e) => handlePlayerChange(i, "dob", e.target.value)}
+                              onChange={(e) =>
+                                handlePlayerChange(i, "dob", e.target.value)
+                              }
                               className="border rounded-md px-3 h-10 text-xs w-full appearance-none"
                               placeholder="Tanggal Lahir"
                             />
                           </div>
-
                         </div>
 
                         <div>
@@ -540,11 +871,15 @@ export default function EditTeam() {
                           />
                         </div>
                         <div>
-                          <p className="text-[10px] text-gray-500 mb-1">Posisi</p>
+                          <p className="text-[10px] text-gray-500 mb-1">
+                            Posisi
+                          </p>
                           <select
                             value={p.position || ""}
                             disabled={locked}
-                            onChange={(e) => handlePlayerChange(i, "position", e.target.value)}
+                            onChange={(e) =>
+                              handlePlayerChange(i, "position", e.target.value)
+                            }
                             className="border rounded-md px-3 h-10 text-xs w-full"
                           >
                             <option value="">Pilih Posisi</option>
@@ -555,10 +890,11 @@ export default function EditTeam() {
                           </select>
                         </div>
                         <div className="flex gap-3 flex-wrap">
-
                           {p.ktp && (
                             <div>
-                              <p className="text-[10px] text-gray-500 mb-1">KTP</p>
+                              <p className="text-[10px] text-gray-500 mb-1">
+                                KTP
+                              </p>
                               <img
                                 src={p.ktp}
                                 alt="KTP"
@@ -569,7 +905,9 @@ export default function EditTeam() {
 
                           {p.photo && (
                             <div>
-                              <p className="text-[10px] text-gray-500 mb-1">Foto</p>
+                              <p className="text-[10px] text-gray-500 mb-1">
+                                Foto
+                              </p>
                               <img
                                 src={p.photo}
                                 alt="Foto Pemain"
@@ -581,7 +919,6 @@ export default function EditTeam() {
 
                         {!locked && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-
                             {/* KTP */}
                             <div className="border rounded-xl p-4 bg-[#fafafa]">
                               <p className="text-xs font-semibold text-gray-700">
@@ -600,7 +937,11 @@ export default function EditTeam() {
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
-                                  handleFileChangeEdit(i, "ktp", e.target.files[0])
+                                  handleFileChangeEdit(
+                                    i,
+                                    "ktp",
+                                    e.target.files[0],
+                                  )
                                 }
                                 className="mt-3 block w-full text-sm text-gray-600
     file:mr-3 file:px-4 file:py-2
@@ -609,7 +950,7 @@ export default function EditTeam() {
     hover:file:bg-[#a70d26]"
                               />
                             </div>
-                            
+
                             {/* FOTO PEMAIN */}
                             <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 bg-[#fafafa]">
                               <p className="text-xs font-semibold text-gray-700">
@@ -621,14 +962,19 @@ export default function EditTeam() {
                               </p>
 
                               <p className="text-[11px] text-red-500 mt-1">
-                                Gunakan foto portrait / close-up agar wajah terlihat jelas
+                                Gunakan foto portrait / close-up agar wajah
+                                terlihat jelas
                               </p>
 
                               <input
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
-                                  handleFileChangeEdit(i, "photo", e.target.files[0])
+                                  handleFileChangeEdit(
+                                    i,
+                                    "photo",
+                                    e.target.files[0],
+                                  )
                                 }
                                 className="mt-3 block w-full text-sm text-gray-600
     file:mr-3 file:px-4 file:py-2
@@ -637,7 +983,6 @@ export default function EditTeam() {
     hover:file:bg-[#a70d26]"
                               />
                             </div>
-
                           </div>
                         )}
 
@@ -680,11 +1025,23 @@ export default function EditTeam() {
               </button>
             </div>
 
-            <p>• Simpan link edit privat ini dengan baik untuk melakukan perubahan data tim.</p>
+            <p>
+              • Simpan link edit privat ini dengan baik untuk melakukan
+              perubahan data tim.
+            </p>
             <p>• Pendaftaran tim baru ditutup pada {registrationCloseDate}.</p>
-            <p>• Revisi roster pemain masih diperbolehkan sampai {rosterEditCloseDate} pukul 23:59 WITA.</p>
-            <p>• Setelah tanggal tersebut sistem otomatis mengunci seluruh data pemain (H-5 tournament).</p>
-            <p>• Panitia tidak bertanggung jawab apabila link edit hilang atau dibagikan ke pihak lain.</p>
+            <p>
+              • Revisi roster pemain masih diperbolehkan sampai{" "}
+              {rosterEditCloseDate} pukul 23:59 WITA.
+            </p>
+            <p>
+              • Setelah tanggal tersebut sistem otomatis mengunci seluruh data
+              pemain (H-5 tournament).
+            </p>
+            <p>
+              • Panitia tidak bertanggung jawab apabila link edit hilang atau
+              dibagikan ke pihak lain.
+            </p>
           </div>
 
           {/* BUTTON */}

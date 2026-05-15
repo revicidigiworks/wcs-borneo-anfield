@@ -8,7 +8,7 @@ import {
   updateDoc,
   query,
   orderBy,
-  serverTimestamp
+  serverTimestamp,
 } from "firebase/firestore";
 import { exportTeamsPDF } from "../../utils/exportPDF";
 import {
@@ -22,7 +22,7 @@ import {
   ChevronLeft,
   Download,
   LogOut,
-  FileText // Ikon baru untuk export individu
+  FileText, // Ikon baru untuk export individu
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -35,16 +35,13 @@ export default function Dashboard() {
   const fetchTeams = async () => {
     setLoading(true);
 
-    const q = query(
-      collection(db, "teams"),
-      orderBy("createdAt", "desc")
-    );
+    const q = query(collection(db, "teams"), orderBy("createdAt", "desc"));
 
     const snap = await getDocs(q);
 
     const data = snap.docs.map((d) => ({
       id: d.id,
-      ...d.data()
+      ...d.data(),
     }));
 
     setTeams(data);
@@ -54,10 +51,12 @@ export default function Dashboard() {
     return data;
   };
 
-  useEffect(() => { fetchTeams(); }, []);
+  useEffect(() => {
+    fetchTeams();
+  }, []);
 
   const filtered = teams.filter((t) =>
-    (t.name || "").toLowerCase().includes(search.toLowerCase())
+    (t.name || "").toLowerCase().includes(search.toLowerCase()),
   );
 
   const handleSelectTeam = (team) => {
@@ -65,7 +64,8 @@ export default function Dashboard() {
     if (window.innerWidth < 768) setView("detail");
   };
 
-  const updateField = (field, value) => setActive({ ...active, [field]: value });
+  const updateField = (field, value) =>
+    setActive({ ...active, [field]: value });
 
   const updatePlayer = (i, field, value) => {
     const updated = [...(active.players || [])];
@@ -82,7 +82,7 @@ export default function Dashboard() {
       dob: "",
       position: "",
       photo: "",
-      ktp: ""
+      ktp: "",
     };
     setActive({ ...active, players: [...(active.players || []), newPlayer] });
   };
@@ -102,10 +102,7 @@ export default function Dashboard() {
 
     const m = today.getMonth() - birth.getMonth();
 
-    if (
-      m < 0 ||
-      (m === 0 && today.getDate() < birth.getDate())
-    ) {
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
 
@@ -114,7 +111,6 @@ export default function Dashboard() {
 
   const handleSave = async () => {
     try {
-
       if (!confirm("Simpan perubahan data tim ini?")) return;
       if ((active.players || []).length < 1) {
         alert("Minimal harus ada 1 pemain");
@@ -125,7 +121,6 @@ export default function Dashboard() {
       const nikCheck = new Set();
 
       for (let i = 0; i < (active.players || []).length; i++) {
-
         const p = active.players[i];
 
         if (!p.photo) {
@@ -201,33 +196,25 @@ export default function Dashboard() {
       const existingNiks = [];
 
       snapshot.forEach((teamDoc) => {
-
         // skip tim sendiri
         if (teamDoc.id === active.id) return;
 
         const data = teamDoc.data();
 
         if (data.players) {
-
           data.players.forEach((p) => {
-
             existingPlayers.push(
               (p.name || "").toLowerCase() +
-              (p.pob || "").toLowerCase() +
-              (p.dob || "")
+                (p.pob || "").toLowerCase() +
+                (p.dob || ""),
             );
 
-            existingNiks.push(
-              (p.nik || "").trim()
-            );
-
+            existingNiks.push((p.nik || "").trim());
           });
-
         }
       });
 
       for (let i = 0; i < (active.players || []).length; i++) {
-
         const p = active.players[i];
 
         const key =
@@ -263,11 +250,16 @@ export default function Dashboard() {
       await updateDoc(doc(db, "teams", active.id), {
         name: active.name || "",
         manager: active.manager || "",
+        managerPhoto: active.managerPhoto || "",
+        managerKtp: active.managerKtp || "",
         phone: active.phone || "",
         address: active.address || "",
         official1: active.official1 || "",
+        official1Photo: active.official1Photo || "",
         official2: active.official2 || "",
+        official2Photo: active.official2Photo || "",
         official3: active.official3 || "",
+        official3Photo: active.official3Photo || "",
         players: cleanPlayers,
         isLocked: active.isLocked || false,
         updatedAt: serverTimestamp(),
@@ -277,12 +269,9 @@ export default function Dashboard() {
 
       const refreshedData = await fetchTeams();
 
-      const refreshedTeam = refreshedData.find(
-        (t) => t.id === active.id
-      );
+      const refreshedTeam = refreshedData.find((t) => t.id === active.id);
 
       setActive(refreshedTeam);
-
     } catch (err) {
       console.error(err);
       alert("Gagal memperbarui data.");
@@ -303,22 +292,27 @@ export default function Dashboard() {
     window.location.href = "/admin";
   };
 
-  if (loading) return (
-    <div className="min-h-screen flex flex-col items-center justify-center space-y-4 bg-white">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
-      <p className="text-gray-500 font-medium">Memuat Data...</p>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center space-y-4 bg-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+        <p className="text-gray-500 font-medium">Memuat Data...</p>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-gray-50 text-slate-900 flex flex-col md:flex-row">
-
       {/* SIDEBAR */}
-      <div className={`${view === 'detail' ? 'hidden' : 'flex'} md:flex md:w-80 lg:w-96 flex-col bg-white border-r border-gray-200 h-screen sticky top-0`}>
+      <div
+        className={`${view === "detail" ? "hidden" : "flex"} md:flex md:w-80 lg:w-96 flex-col bg-white border-r border-gray-200 h-screen sticky top-0`}
+      >
         <div className="p-5 border-b border-gray-100">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-xl font-bold tracking-tight">Admin Console</h1>
-            <button onClick={logout} className="p-2 text-gray-400 hover:text-red-600 transition-colors">
+            <button
+              onClick={logout}
+              className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+            >
               <LogOut size={20} />
             </button>
           </div>
@@ -342,7 +336,10 @@ export default function Dashboard() {
           </button>
 
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={16}
+            />
             <input
               placeholder="Cari nama tim..."
               value={search}
@@ -357,10 +354,11 @@ export default function Dashboard() {
             <div
               key={t.id}
               onClick={() => handleSelectTeam(t)}
-              className={`p-4 rounded-xl border transition-all cursor-pointer ${active?.id === t.id
-                ? "bg-red-50 border-red-200 ring-1 ring-red-200"
-                : "bg-white border-transparent hover:border-gray-200 shadow-sm"
-                }`}
+              className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                active?.id === t.id
+                  ? "bg-red-50 border-red-200 ring-1 ring-red-200"
+                  : "bg-white border-transparent hover:border-gray-200 shadow-sm"
+              }`}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -377,22 +375,27 @@ export default function Dashboard() {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className={`${view === 'list' ? 'hidden' : 'flex'} md:flex flex-1 flex-col h-screen overflow-y-auto bg-white md:bg-gray-50`}>
+      <div
+        className={`${view === "list" ? "hidden" : "flex"} md:flex flex-1 flex-col h-screen overflow-y-auto bg-white md:bg-gray-50`}
+      >
         {active ? (
           <div className="max-w-4xl w-full mx-auto pb-24 md:p-8">
-
             {/* MOBILE HEADER */}
             <div className="md:hidden flex items-center p-4 bg-white sticky top-0 z-10 border-b">
               <button onClick={() => setView("list")} className="p-2 -ml-2">
                 <ChevronLeft />
               </button>
-              <h2 className="flex-1 font-bold text-center truncate px-2">{active.name}</h2>
+              <h2 className="flex-1 font-bold text-center truncate px-2">
+                {active.name}
+              </h2>
               {/* Tombol Export Per Tim Mobile */}
               <button
-                onClick={() => exportTeamsPDF({
-                  ...active,
-                  players: active?.players || []
-                })}
+                onClick={() =>
+                  exportTeamsPDF({
+                    ...active,
+                    players: active?.players || [],
+                  })
+                }
                 className="p-2 text-blue-600 active:bg-blue-50 rounded-full"
               >
                 <FileText size={20} />
@@ -401,15 +404,13 @@ export default function Dashboard() {
               {/* DELETE */}
               <button
                 onClick={async () => {
-
                   const confirmDelete = window.confirm(
-                    `Yakin ingin menghapus tim "${active.name}" ?`
+                    `Yakin ingin menghapus tim "${active.name}" ?`,
                   );
 
                   if (!confirmDelete) return;
 
                   try {
-
                     await deleteDoc(doc(db, "teams", active.id));
 
                     alert("Tim berhasil dihapus ✅");
@@ -419,15 +420,11 @@ export default function Dashboard() {
                     setView("list");
 
                     fetchTeams();
-
                   } catch (err) {
-
                     console.error(err);
 
                     alert("Gagal menghapus tim ❌");
-
                   }
-
                 }}
                 className="p-2 text-red-600 active:bg-red-50 rounded-full"
               >
@@ -450,7 +447,7 @@ export default function Dashboard() {
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(
-                        `${window.location.origin}/edit/${active.editToken}`
+                        `${window.location.origin}/edit/${active.editToken}`,
                       );
                       alert("Link disalin");
                     }}
@@ -463,16 +460,22 @@ export default function Dashboard() {
               {/* DESKTOP HEADER */}
               <div className="hidden md:flex justify-between items-end border-b pb-6">
                 <div>
-                  <span className="text-red-600 font-bold text-xs uppercase tracking-[0.2em]">Team Profile</span>
-                  <h2 className="text-3xl font-black text-slate-800">{active.name}</h2>
+                  <span className="text-red-600 font-bold text-xs uppercase tracking-[0.2em]">
+                    Team Profile
+                  </span>
+                  <h2 className="text-3xl font-black text-slate-800">
+                    {active.name}
+                  </h2>
                 </div>
                 <div className="flex gap-2">
                   {/* Tombol Export Per Tim Desktop */}
                   <button
-                    onClick={() => exportTeamsPDF({
-                      ...active,
-                      players: active?.players || []
-                    })}
+                    onClick={() =>
+                      exportTeamsPDF({
+                        ...active,
+                        players: active?.players || [],
+                      })
+                    }
                     className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-100 transition-colors border border-blue-100"
                   >
                     <Download size={14} /> EXPORT TIM INI
@@ -486,11 +489,11 @@ export default function Dashboard() {
                 </div>
               </div>
 
-
               {/* FORM SECTION */}
               <section className="space-y-4">
                 <h3 className="font-bold text-lg flex items-center gap-2">
-                  <div className="w-1 h-6 bg-red-600 rounded-full"></div> Detail Informasi
+                  <div className="w-1 h-6 bg-red-600 rounded-full"></div> Detail
+                  Informasi
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
@@ -500,10 +503,12 @@ export default function Dashboard() {
                     "address",
                     "official1",
                     "official2",
-                    "official3"
+                    "official3",
                   ].map((field) => (
                     <div key={field} className="space-y-1">
-                      <label className="text-[10px] font-bold uppercase text-gray-400 ml-1">{field}</label>
+                      <label className="text-[10px] font-bold uppercase text-gray-400 ml-1">
+                        {field}
+                      </label>
                       <input
                         value={active[field] || ""}
                         onChange={(e) => updateField(field, e.target.value)}
@@ -515,11 +520,131 @@ export default function Dashboard() {
                 </div>
               </section>
 
+              {/* OFFICIAL DOCUMENT SECTION */}
+              <section className="space-y-4">
+                <h3 className="font-bold text-lg flex items-center gap-2">
+                  <div className="w-1 h-6 bg-red-600 rounded-full"></div>
+                  Dokumen Official Tim
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* MANAGER */}
+                  <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm space-y-3">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">
+                        Manager
+                      </p>
+
+                      <h4 className="font-bold text-sm">
+                        {active.manager || "-"}
+                      </h4>
+                    </div>
+
+                    <div className="flex gap-3 flex-wrap">
+                      {active.managerPhoto && (
+                        <img
+                          src={active.managerPhoto}
+                          alt="Manager"
+                          onClick={() =>
+                            window.open(active.managerPhoto, "_blank")
+                          }
+                          className="w-24 h-32 object-cover rounded-md border cursor-pointer"
+                        />
+                      )}
+
+                      {active.managerKtp && (
+                        <img
+                          src={active.managerKtp}
+                          alt="KTP Manager"
+                          onClick={() =>
+                            window.open(active.managerKtp, "_blank")
+                          }
+                          className="w-32 h-20 object-cover rounded-md border cursor-pointer"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* OFFICIAL 1 */}
+                  <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm space-y-3">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">
+                        Official 1
+                      </p>
+
+                      <h4 className="font-bold text-sm">
+                        {active.official1 || "-"}
+                      </h4>
+                    </div>
+
+                    {active.official1Photo && (
+                      <img
+                        src={active.official1Photo}
+                        alt="Official 1"
+                        onClick={() =>
+                          window.open(active.official1Photo, "_blank")
+                        }
+                        className="w-24 h-32 object-cover rounded-md border cursor-pointer"
+                      />
+                    )}
+                  </div>
+
+                  {/* OFFICIAL 2 */}
+                  <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm space-y-3">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">
+                        Official 2
+                      </p>
+
+                      <h4 className="font-bold text-sm">
+                        {active.official2 || "-"}
+                      </h4>
+                    </div>
+
+                    {active.official2Photo && (
+                      <img
+                        src={active.official2Photo}
+                        alt="Official 2"
+                        onClick={() =>
+                          window.open(active.official2Photo, "_blank")
+                        }
+                        className="w-24 h-32 object-cover rounded-md border cursor-pointer"
+                      />
+                    )}
+                  </div>
+
+                  {/* OFFICIAL 3 */}
+                  <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm space-y-3">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">
+                        Official 3
+                      </p>
+
+                      <h4 className="font-bold text-sm">
+                        {active.official3 || "-"}
+                      </h4>
+                    </div>
+
+                    {active.official3Photo && (
+                      <img
+                        src={active.official3Photo}
+                        alt="Official 3"
+                        onClick={() =>
+                          window.open(active.official3Photo, "_blank")
+                        }
+                        className="w-24 h-32 object-cover rounded-md border cursor-pointer"
+                      />
+                    )}
+                  </div>
+                </div>
+              </section>
+
               {/* PLAYER SECTION */}
               <section className="space-y-4">
                 <div className="flex justify-between items-center">
                   <h3 className="font-bold text-lg flex items-center gap-2">
-                    <div className="w-1 h-6 bg-red-600 rounded-full"></div> Daftar Pemain
+                    <div className="w-1 h-6 bg-red-600 rounded-full"></div>{" "}
+                    Daftar Pemain
                   </h3>
                   <button
                     onClick={addPlayer}
@@ -531,19 +656,28 @@ export default function Dashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {active.players?.map((p, i) => (
-                    <div key={p.id} className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm space-y-4 relative group">
+                    <div
+                      key={p.id}
+                      className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm space-y-4 relative group"
+                    >
                       <div className="flex justify-between items-center border-b border-gray-50 pb-2">
-                        <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded">PEMAIN #{i + 1}</span>
-                        <button onClick={() => removePlayer(i)} className="text-gray-300 hover:text-red-500">
+                        <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded">
+                          PEMAIN #{i + 1}
+                        </span>
+                        <button
+                          onClick={() => removePlayer(i)}
+                          className="text-gray-300 hover:text-red-500"
+                        >
                           <Trash2 size={16} />
                         </button>
                       </div>
                       <div className="space-y-3">
-
                         <input
                           placeholder="Nama Lengkap"
                           value={(p.name || "").toUpperCase()}
-                          onChange={(e) => updatePlayer(i, "name", e.target.value)}
+                          onChange={(e) =>
+                            updatePlayer(i, "name", e.target.value)
+                          }
                           className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-sm font-medium"
                         />
                         <input
@@ -554,7 +688,7 @@ export default function Dashboard() {
                             updatePlayer(
                               i,
                               "nik",
-                              e.target.value.replace(/\D/g, "")
+                              e.target.value.replace(/\D/g, ""),
                             )
                           }
                           className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-xs"
@@ -564,13 +698,17 @@ export default function Dashboard() {
                           <input
                             placeholder="Tempat Lahir"
                             value={(p.pob || "").toUpperCase()}
-                            onChange={(e) => updatePlayer(i, "pob", e.target.value)}
+                            onChange={(e) =>
+                              updatePlayer(i, "pob", e.target.value)
+                            }
                             className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-xs"
                           />
                           <input
                             type="date"
                             value={p.dob}
-                            onChange={(e) => updatePlayer(i, "dob", e.target.value)}
+                            onChange={(e) =>
+                              updatePlayer(i, "dob", e.target.value)
+                            }
                             className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-xs"
                           />
                         </div>
@@ -578,7 +716,9 @@ export default function Dashboard() {
                         {/* 🔥 POSISI */}
                         <select
                           value={p.position || ""}
-                          onChange={(e) => updatePlayer(i, "position", e.target.value)}
+                          onChange={(e) =>
+                            updatePlayer(i, "position", e.target.value)
+                          }
                           className="w-full border-b border-gray-100 focus:border-red-500 outline-none py-1 text-xs"
                         >
                           <option value="">Pilih Posisi</option>
@@ -589,7 +729,6 @@ export default function Dashboard() {
                         </select>
 
                         <div className="flex gap-3">
-
                           {p.photo && (
                             <img
                               src={p.photo}
@@ -607,7 +746,6 @@ export default function Dashboard() {
                               className="w-32 h-20 object-cover rounded-md border cursor-pointer"
                             />
                           )}
-
                         </div>
                       </div>
                     </div>
@@ -627,7 +765,7 @@ export default function Dashboard() {
                       console.log("UPDATE isLocked:", newStatus);
 
                       await updateDoc(doc(db, "teams", active.id), {
-                        isLocked: newStatus
+                        isLocked: newStatus,
                       });
 
                       setActive({ ...active, isLocked: newStatus });
@@ -635,13 +773,12 @@ export default function Dashboard() {
                       await fetchTeams();
 
                       alert("Status berhasil diubah ✅");
-
                     } catch (err) {
                       console.error("UPDATE ERROR:", err);
                       alert("Gagal update (cek console) ❌");
                     }
                   }}
-                  className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 ${active.isLocked ? 'bg-amber-100 text-amber-700 shadow-amber-100' : 'bg-slate-800 text-white shadow-slate-200'}`}
+                  className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 ${active.isLocked ? "bg-amber-100 text-amber-700 shadow-amber-100" : "bg-slate-800 text-white shadow-slate-200"}`}
                 >
                   {active.isLocked ? <Lock size={18} /> : <Unlock size={18} />}
                   {active.isLocked ? "Unlock Team" : "Lock Team"}
@@ -655,14 +792,15 @@ export default function Dashboard() {
                 </button>
               </div>
             </div>
-
           </div>
         ) : (
           <div className="hidden md:flex flex-col items-center justify-center h-full text-gray-400 space-y-4">
             <div className="p-6 bg-gray-100 rounded-full">
               <Users size={48} />
             </div>
-            <p className="font-medium">Pilih tim dari daftar untuk mengelola data</p>
+            <p className="font-medium">
+              Pilih tim dari daftar untuk mengelola data
+            </p>
           </div>
         )}
       </div>
