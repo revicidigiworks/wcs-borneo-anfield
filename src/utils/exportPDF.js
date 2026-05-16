@@ -446,6 +446,124 @@ const drawTeamInfo = (
 };
 
 /* =========================
+   OFFICIAL SECTION
+========================= */
+
+const drawOfficialSection = async (
+  doc,
+  team,
+  y
+) => {
+
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(11);
+
+  doc.setTextColor(
+    ...COLOR.DARK
+  );
+
+  doc.text(
+    "DOKUMEN OFFICIAL",
+    PAGE.M,
+    y
+  );
+
+  drawLine(doc, y + 4);
+
+  y += 10;
+
+  const officials = [
+    {
+      label: "MANAGER",
+      photo: team.managerPhoto,
+      ktp: team.managerKtp,
+    },
+    {
+      label: "OFFICIAL 1",
+      photo: team.official1Photo,
+    },
+    {
+      label: "OFFICIAL 2",
+      photo: team.official2Photo,
+    },
+    {
+      label: "OFFICIAL 3",
+      photo: team.official3Photo,
+    },
+  ];
+
+  for (let i = 0; i < officials.length; i++) {
+
+    const item = officials[i];
+
+    const column = i % 2 === 0 ? 10 : 108;
+
+    const row = Math.floor(i / 2);
+
+    const cardY = y + row * 42;
+
+    doc.setFont(
+      "helvetica",
+      "bold"
+    );
+
+    doc.setFontSize(9);
+
+    doc.text(
+      item.label,
+      column,
+      cardY
+    );
+
+    /* FOTO */
+    if (item.photo) {
+
+      const photo =
+        await toBase64PlayerPhoto(
+          item.photo
+        );
+
+      if (photo) {
+        doc.addImage(
+          photo,
+          "JPEG",
+          column,
+          cardY + 4,
+          20,
+          26
+        );
+      }
+    }
+
+    /* KTP */
+    if (item.ktp) {
+
+      const ktp =
+        await toBase64(
+          item.ktp
+        );
+
+      if (ktp) {
+        doc.addImage(
+          ktp,
+          "JPEG",
+          column + 25,
+          cardY + 8,
+          30,
+          18
+        );
+      }
+    }
+  }
+
+  return y + 85;
+};
+
+/* =========================
    PLAYER SECTION
 ========================= */
 
@@ -758,6 +876,12 @@ export const exportTeamsPDF =
         team,
         y
       );
+
+      y = await drawOfficialSection(
+  doc,
+  team,
+  y + 5
+);
 
       const players =
         team.players || [];
