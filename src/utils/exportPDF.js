@@ -375,7 +375,7 @@ const drawTeamInfo = (
   );
 
   doc.text(
-    "DOKUMEN OFFICIAL",
+    "INFORMASI TIM",
     PAGE.M,
     y
   );
@@ -384,99 +384,65 @@ const drawTeamInfo = (
 
   y += 12;
 
- const officials = [
-  {
-    name: team.manager,
-    role: "Manager",
-    photo: team.managerPhoto,
-  },
-  {
-    name: team.official1,
-    role: "Official 1",
-    photo: team.official1Photo,
-  },
-  {
-    name: team.official2,
-    role: "Official 2",
-    photo: team.official2Photo,
-  },
-  {
-    name: team.official3,
-    role: "Official 3",
-    photo: team.official3Photo,
-  },
-];
+  const left = [
+    ["NAMA TIM", (team.name || "").toUpperCase()],
+    ["MANAGER", (team.manager || "").toUpperCase()],
+    ["NO WHATSAPP", team.phone],
+  ];
 
-y += 2;
+  const right = [
+    ["OFFICIAL 1", (team.official1 || "").toUpperCase()],
+    ["OFFICIAL 2", (team.official2 || "").toUpperCase()],
+    ["OFFICIAL 3", (team.official3 || "").toUpperCase()],
+  ];
 
-const leftX = 10;
-const rightX = 108;
+  const drawColumn = (
+    data,
+    startX
+  ) => {
+    data.forEach((item, i) => {
+      const rowY = y + i * 7;
 
-for (let i = 0; i < officials.length; i++) {
-
-  const item = officials[i];
-
-  const column =
-    i % 2 === 0
-      ? leftX
-      : rightX;
-
-  const row = Math.floor(i / 2);
-
-  const cardY =
-    y + row * 36;
-
-  /* FOTO */
-  if (item.photo) {
-
-    const img =
-      await toBase64PlayerPhoto(
-        item.photo
+      doc.setFont(
+        "helvetica",
+        "bold"
       );
 
-    if (img) {
-      doc.addImage(
-        img,
-        "JPEG",
-        column,
-        cardY,
-        20,
-        26
+      doc.setFontSize(9);
+
+      doc.text(
+        item[0],
+        startX,
+        rowY
       );
-    }
-  }
 
-  /* TEXT */
-  const tx = column + 28;
+      doc.text(
+        ":",
+        startX + 35,
+        rowY
+      );
 
-  doc.setFont(
-    "helvetica",
-    "bold"
+      doc.setFont(
+        "helvetica",
+        "normal"
+      );
+
+      doc.text(
+        item[1] || "-",
+        startX + 39,
+        rowY
+      );
+    });
+  };
+
+  drawColumn(left, PAGE.M);
+
+  drawColumn(
+    right,
+    PAGE.W / 2 + 5
   );
 
-  doc.setFontSize(10);
-
-  doc.text(
-    (item.name || "-").toUpperCase(),
-    tx,
-    cardY + 8
-  );
-
-  doc.setFont(
-    "helvetica",
-    "normal"
-  );
-
-  doc.setFontSize(9);
-
-  doc.text(
-    `Posisi : ${item.role}`,
-    tx,
-    cardY + 16
-  );
-}
-
-return y + 78;
+  return y + 22;
 };
 
 /* =========================
@@ -491,7 +457,7 @@ const drawPlayersPage = async (
   await drawWatermark(doc);
 
   let y = isFirstPage
-    ? 178
+    ? 123
     : 62;
 
   doc.setFont(
