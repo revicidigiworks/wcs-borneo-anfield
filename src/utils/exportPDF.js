@@ -375,7 +375,7 @@ const drawTeamInfo = (
   );
 
   doc.text(
-    "INFORMASI TIM",
+    "DOKUMEN OFFICIAL",
     PAGE.M,
     y
   );
@@ -384,183 +384,99 @@ const drawTeamInfo = (
 
   y += 12;
 
-  const left = [
-    ["NAMA TIM", (team.name || "").toUpperCase()],
-    ["MANAGER", (team.manager || "").toUpperCase()],
-    ["NO WHATSAPP", team.phone],
-  ];
+ const officials = [
+  {
+    name: team.manager,
+    role: "Manager",
+    photo: team.managerPhoto,
+  },
+  {
+    name: team.official1,
+    role: "Official 1",
+    photo: team.official1Photo,
+  },
+  {
+    name: team.official2,
+    role: "Official 2",
+    photo: team.official2Photo,
+  },
+  {
+    name: team.official3,
+    role: "Official 3",
+    photo: team.official3Photo,
+  },
+];
 
-  const right = [
-    ["OFFICIAL 1", (team.official1 || "").toUpperCase()],
-    ["OFFICIAL 2", (team.official2 || "").toUpperCase()],
-    ["OFFICIAL 3", (team.official3 || "").toUpperCase()],
-  ];
+y += 2;
 
-  const drawColumn = (
-    data,
-    startX
-  ) => {
-    data.forEach((item, i) => {
-      const rowY = y + i * 7;
+const leftX = 10;
+const rightX = 108;
 
-      doc.setFont(
-        "helvetica",
-        "bold"
+for (let i = 0; i < officials.length; i++) {
+
+  const item = officials[i];
+
+  const column =
+    i % 2 === 0
+      ? leftX
+      : rightX;
+
+  const row = Math.floor(i / 2);
+
+  const cardY =
+    y + row * 36;
+
+  /* FOTO */
+  if (item.photo) {
+
+    const img =
+      await toBase64PlayerPhoto(
+        item.photo
       );
 
-      doc.setFontSize(9);
-
-      doc.text(
-        item[0],
-        startX,
-        rowY
+    if (img) {
+      doc.addImage(
+        img,
+        "JPEG",
+        column,
+        cardY,
+        20,
+        26
       );
+    }
+  }
 
-      doc.text(
-        ":",
-        startX + 35,
-        rowY
-      );
-
-      doc.setFont(
-        "helvetica",
-        "normal"
-      );
-
-      doc.text(
-        item[1] || "-",
-        startX + 39,
-        rowY
-      );
-    });
-  };
-
-  drawColumn(left, PAGE.M);
-
-  drawColumn(
-    right,
-    PAGE.W / 2 + 5
-  );
-
-  return y + 22;
-};
-
-/* =========================
-   OFFICIAL SECTION
-========================= */
-
-const drawOfficialSection = async (
-  doc,
-  team,
-  y
-) => {
+  /* TEXT */
+  const tx = column + 28;
 
   doc.setFont(
     "helvetica",
     "bold"
   );
 
-  doc.setFontSize(11);
-
-  doc.setTextColor(
-    ...COLOR.DARK
-  );
+  doc.setFontSize(10);
 
   doc.text(
-    "DOKUMEN OFFICIAL",
-    PAGE.M,
-    y
+    (item.name || "-").toUpperCase(),
+    tx,
+    cardY + 8
   );
 
-  drawLine(doc, y + 4);
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
 
-  y += 10;
+  doc.setFontSize(9);
 
-  const officials = [
-    {
-      label: "MANAGER",
-      photo: team.managerPhoto,
-      ktp: team.managerKtp,
-    },
-    {
-      label: "OFFICIAL 1",
-      photo: team.official1Photo,
-    },
-    {
-      label: "OFFICIAL 2",
-      photo: team.official2Photo,
-    },
-    {
-      label: "OFFICIAL 3",
-      photo: team.official3Photo,
-    },
-  ];
+  doc.text(
+    `Posisi : ${item.role}`,
+    tx,
+    cardY + 16
+  );
+}
 
-  for (let i = 0; i < officials.length; i++) {
-
-    const item = officials[i];
-
-    const column = i % 2 === 0 ? 10 : 108;
-
-    const row = Math.floor(i / 2);
-
-    const cardY = y + row * 42;
-
-    doc.setFont(
-      "helvetica",
-      "bold"
-    );
-
-    doc.setFontSize(9);
-
-    doc.text(
-      item.label,
-      column,
-      cardY
-    );
-
-    /* FOTO */
-    if (item.photo) {
-
-      const photo =
-        await toBase64PlayerPhoto(
-          item.photo
-        );
-
-      if (photo) {
-        doc.addImage(
-          photo,
-          "JPEG",
-          column,
-          cardY + 4,
-          20,
-          26
-        );
-      }
-    }
-
-    /* KTP */
-    if (item.ktp) {
-
-      const ktp =
-        await toBase64(
-          item.ktp
-        );
-
-      if (ktp) {
-        doc.addImage(
-          ktp,
-          "JPEG",
-          column + 25,
-          cardY + 8,
-          30,
-          18
-        );
-      }
-    }
-  }
-
-  return y + 85;
+return y + 78;
 };
 
 /* =========================
@@ -575,7 +491,7 @@ const drawPlayersPage = async (
   await drawWatermark(doc);
 
   let y = isFirstPage
-    ? 123
+    ? 178
     : 62;
 
   doc.setFont(
@@ -876,12 +792,6 @@ export const exportTeamsPDF =
         team,
         y
       );
-
-      y = await drawOfficialSection(
-  doc,
-  team,
-  y + 5
-);
 
       const players =
         team.players || [];
