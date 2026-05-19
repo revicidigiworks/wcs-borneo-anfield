@@ -588,7 +588,7 @@ export default function Register() {
                       value={team.official1}
                       onChange={handleChange}
                   
-                      placeholder="Official 1"
+                      placeholder="Nama Official 1"
                       className="border border-gray-300 rounded-md px-4 h-11 text-sm w-full"
                     />
 
@@ -610,7 +610,7 @@ export default function Register() {
                       value={team.official2}
                       onChange={handleChange}
                   
-                      placeholder="Official 2"
+                      placeholder="Nama Official 2"
                       className="border border-gray-300 rounded-md px-4 h-11 text-sm w-full"
                     />
 
@@ -648,7 +648,7 @@ export default function Register() {
                     value={team.official3}
                     onChange={handleChange}
                 
-                    placeholder="Official 3"
+                    placeholder="Nama Official 3"
                     className="border border-gray-300 rounded-md px-4 h-11 text-sm w-full"
                   />
 
