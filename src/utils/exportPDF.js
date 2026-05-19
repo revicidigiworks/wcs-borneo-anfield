@@ -258,7 +258,7 @@ const drawTeamInfo = (doc, team, y) => {
 
   /* LOGO TEAM */
   if (team.logo) {
-    doc.addImage(team.logo, "PNG", PAGE.M, y - 1, 26, 26);
+    doc.addImage(team.logo, "PNG", PAGE.M, y - 2, 32, 32);
   }
 
   const left = [
@@ -295,11 +295,11 @@ const drawTeamInfo = (doc, team, y) => {
 
   drawColumn(right, PAGE.W / 2 + 15);
 
-  return y + 22;
+  return y + 28;
 };
 
 /* =========================
-   OFFICIAL PHOTO SECTION
+   OFFICIAL PHOTO
 ========================= */
 
 const drawOfficialPhotos = async (doc, team, y) => {
@@ -322,7 +322,8 @@ const drawOfficialPhotos = async (doc, team, y) => {
     },
   ];
 
-  const startX = 38;
+  const startX = 35;
+
   const gap = 38;
 
   for (let i = 0; i < officials.length; i++) {
@@ -330,26 +331,33 @@ const drawOfficialPhotos = async (doc, team, y) => {
 
     const x = startX + i * gap;
 
+    /* TITLE */
+
+    doc.setFillColor(...COLOR.RED);
+
+    doc.rect(x, y, 24, 5, "F");
+
     doc.setFont("helvetica", "bold");
 
-    doc.setFontSize(9);
+    doc.setFontSize(7);
 
-    doc.setTextColor(...COLOR.DARK);
+    doc.setTextColor(255);
 
-    doc.text(item.label, x + 10, y, {
+    doc.text(item.label, x + 12, y + 3.5, {
       align: "center",
     });
 
     /* PHOTO BOX */
+
     doc.setDrawColor(220);
 
-    doc.roundedRect(x, y + 5, 24, 30, 1.5, 1.5);
+    doc.roundedRect(x, y + 7, 24, 30, 1.5, 1.5);
 
     if (item.photo) {
       const img = await toBase64PlayerPhoto(item.photo);
 
       if (img) {
-        doc.addImage(img, "JPEG", x + 1, y + 6, 22, 28);
+        doc.addImage(img, "JPEG", x + 1, y + 8, 22, 28);
       }
     } else {
       doc.setFont("helvetica", "normal");
@@ -358,7 +366,7 @@ const drawOfficialPhotos = async (doc, team, y) => {
 
       doc.setTextColor(160);
 
-      doc.text("BELUM\nDIISI", x + 12, y + 20, {
+      doc.text("BELUM\nDIISI", x + 12, y + 22, {
         align: "center",
       });
     }
@@ -374,7 +382,7 @@ const drawOfficialPhotos = async (doc, team, y) => {
 const drawPlayersPage = async (doc, players, isFirstPage = false) => {
   await drawWatermark(doc);
 
-  let y = isFirstPage ? 175 : 62;
+  let y = isFirstPage ? 170 : 62;
 
   doc.setFont("helvetica", "bold");
 
@@ -542,9 +550,9 @@ export const exportTeamsPDF = async (teams) => {
 
     y = drawInfoBar(doc, team, y + 8);
 
-
     y = drawTeamInfo(doc, team, y);
-    y = await drawOfficialPhotos(doc, team, y + 8);
+
+    y = await drawOfficialPhotos(doc, team, y + 2);
 
     const players = team.players || [];
 
