@@ -41,6 +41,8 @@ export default function Register() {
     official3: "",
     official3Photo: null,
 
+    logo: null,
+
     phone: "",
     address: "",
   });
@@ -172,7 +174,7 @@ export default function Register() {
         pob: "",
         dob: "",
         age: "",
-        position: "", // 🔥 WAJIB
+        position: "",
         ktp: null,
         photo: null,
       },
@@ -193,6 +195,8 @@ export default function Register() {
 
     if (sanitizeText(team.name).length < 3)
       return (alert("Nama tim minimal 3 karakter"), false);
+
+    if (!team.logo) return (alert("Logo tim wajib upload"), false);
 
     if (sanitizeText(team.manager).length < 3)
       return (alert("Nama Manager / PIC wajib diisi"), false);
@@ -345,6 +349,8 @@ export default function Register() {
         }
       }
 
+      const logoUrl = await uploadFile(team.logo);
+
       const managerPhotoUrl = await uploadFile(team.managerPhoto);
 
       const managerKtpUrl = await uploadFile(team.managerKtp);
@@ -380,6 +386,7 @@ export default function Register() {
 
       await addDoc(collection(db, "teams"), {
         name: sanitizeText(team.name),
+        logo: logoUrl,
         manager: sanitizeText(team.manager),
         managerPhoto: managerPhotoUrl,
         managerKtp: managerKtpUrl,
@@ -447,180 +454,249 @@ export default function Register() {
           {/* DATA TIM */}
           <div>
             <h2 className="font-bold text-lg mb-4">Data Tim</h2>
-            <div className="grid md:grid-cols-2 gap-3">
-              <input
-                name="name"
-                value={team.name}
-                onChange={handleChange}
-                placeholder="Nama Tim"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-              <input
-                name="manager"
-                value={team.manager}
-                onChange={handleChange}
-                placeholder="Manager / PIC"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* FOTO MANAGER */}
+            <div className="space-y-4">
+              {/* IDENTITAS TIM */}
+              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-sm text-gray-500">
+                    Identitas Tim
+                  </span>
+                </div>
+
+                <input
+                  name="name"
+                  value={team.name}
+                  onChange={handleChange}
+                  placeholder="Nama Tim"
+                  className="border rounded-md px-4 h-11 text-sm w-full"
+                />
+
+                <input
+                  name="phone"
+                  value={team.phone}
+                  onChange={handleChange}
+                  placeholder="No. Whatsapp Aktif"
+                  className="border rounded-md px-4 h-11 text-sm w-full"
+                />
+
+                <input
+                  name="address"
+                  value={team.address}
+                  onChange={handleChange}
+                  placeholder="Alamat Lengkap Tim"
+                  className="border rounded-md px-4 h-11 text-sm w-full"
+                />
+
                 <div className="border rounded-xl p-4 bg-white">
                   <p className="text-xs font-semibold text-gray-700">
-                    Upload Foto Manager
+                    Upload Logo Tim
                   </p>
 
                   <p className="text-[11px] text-gray-500 mt-1">
-                    JPG / PNG • Maksimal 500KB
+                    PNG transparan disarankan • Maksimal 500KB
                   </p>
 
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) =>
-                      handleTeamFileChange("managerPhoto", e.target.files[0])
+                      handleTeamFileChange("logo", e.target.files[0])
                     }
                     className="mt-3 block w-full text-sm text-gray-600
-                    file:mr-3 file:px-4 file:py-2
-                    file:border-0 file:rounded-md
-                    file:bg-[#c8102e] file:text-white"
+        file:mr-3 file:px-4 file:py-2
+        file:border-0 file:rounded-md
+        file:bg-[#c8102e] file:text-white"
                   />
                 </div>
+              </div>
 
-                {/* KTP MANAGER */}
+              {/* MANAGER */}
+              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-sm text-gray-500">
+                    Manager / PIC
+                  </span>
+                </div>
+
+                <input
+                  name="manager"
+                  value={team.manager}
+                  onChange={handleChange}
+                  placeholder="Nama Manager / PIC"
+                  className="border rounded-md px-4 h-11 text-sm w-full"
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="border rounded-xl p-4 bg-white">
+                    <p className="text-xs font-semibold text-gray-700">
+                      Upload Foto Manager
+                    </p>
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleTeamFileChange("managerPhoto", e.target.files[0])
+                      }
+                      className="mt-3 block w-full text-sm text-gray-600
+          file:mr-3 file:px-4 file:py-2
+          file:border-0 file:rounded-md
+          file:bg-[#c8102e] file:text-white"
+                    />
+                  </div>
+
+                  <div className="border rounded-xl p-4 bg-white">
+                    <p className="text-xs font-semibold text-gray-700">
+                      Upload KTP Manager
+                    </p>
+                    <p className="text-[11px] text-gray-500 mt-1">
+                      JPG / PNG • Maksimal 500KB
+                    </p>
+
+                    <p className="text-[11px] text-red-500 mt-1">
+                      Gunakan foto portrait / close-up agar wajah terlihat jelas
+                    </p>
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleTeamFileChange("managerKtp", e.target.files[0])
+                      }
+                      className="mt-3 block w-full text-sm text-gray-600
+          file:mr-3 file:px-4 file:py-2
+          file:border-0 file:rounded-md
+          file:bg-[#c8102e] file:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* OFFICIAL 1 */}
+              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-sm text-gray-500">
+                    Official 1
+                  </span>
+                </div>
+
+                <input
+                  name="official1"
+                  value={team.official1}
+                  onChange={handleChange}
+                  placeholder="Nama Official 1"
+                  className="border rounded-md px-4 h-11 text-sm w-full"
+                />
+
                 <div className="border rounded-xl p-4 bg-white">
                   <p className="text-xs font-semibold text-gray-700">
-                    Upload KTP Manager
+                    Upload Foto Official 1
                   </p>
-
                   <p className="text-[11px] text-gray-500 mt-1">
                     JPG / PNG • Maksimal 500KB
+                  </p>
+
+                  <p className="text-[11px] text-red-500 mt-1">
+                    Gunakan foto portrait / close-up agar wajah terlihat jelas
                   </p>
 
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) =>
-                      handleTeamFileChange("managerKtp", e.target.files[0])
+                      handleTeamFileChange("official1Photo", e.target.files[0])
                     }
                     className="mt-3 block w-full text-sm text-gray-600
-                  file:mr-3 file:px-4 file:py-2
-                  file:border-0 file:rounded-md
-                  file:bg-[#c8102e] file:text-white"
+        file:mr-3 file:px-4 file:py-2
+        file:border-0 file:rounded-md
+        file:bg-[#c8102e] file:text-white"
                   />
                 </div>
               </div>
-              <input
-                name="phone"
-                value={team.phone}
-                onChange={handleChange}
-                placeholder="No. Whatsapp Aktif"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-              <input
-                name="address"
-                value={team.address}
-                onChange={handleChange}
-                placeholder="Alamat Lengkap Tim"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-              <input
-                name="official1"
-                value={team.official1}
-                onChange={handleChange}
-                placeholder="Nama Official 1"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-              <div className="border rounded-xl p-4 bg-white">
-                <p className="text-xs font-semibold text-gray-700">
-                  Upload Foto Official 1
-                </p>
 
-                <p className="text-[11px] text-gray-500 mt-1">
-                  JPG / PNG / WEBP • Maksimal Ukuran File 500KB
-                </p>
-
-                <p className="text-[11px] text-red-500 mt-1">
-                  Gunakan foto portrait / close-up agar wajah terlihat jelas
-                </p>
+              {/* OFFICIAL 2 */}
+              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-sm text-gray-500">
+                    Official 2
+                  </span>
+                </div>
 
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleTeamFileChange("official1Photo", e.target.files[0])
-                  }
-                  className="mt-3 block w-full text-sm text-gray-600
-    file:mr-3 file:px-4 file:py-2
-    file:border-0 file:rounded-md 
-    file:bg-[#c8102e] file:text-white
-    hover:file:bg-[#a70d26]"
+                  name="official2"
+                  value={team.official2}
+                  onChange={handleChange}
+                  placeholder="Nama Official 2"
+                  className="border rounded-md px-4 h-11 text-sm w-full"
                 />
+
+                <div className="border rounded-xl p-4 bg-white">
+                  <p className="text-xs font-semibold text-gray-700">
+                    Upload Foto Official 2
+                  </p>
+                  <p className="text-[11px] text-gray-500 mt-1">
+                    JPG / PNG • Maksimal 500KB
+                  </p>
+
+                  <p className="text-[11px] text-red-500 mt-1">
+                    Gunakan foto portrait / close-up agar wajah terlihat jelas
+                  </p>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleTeamFileChange("official2Photo", e.target.files[0])
+                    }
+                    className="mt-3 block w-full text-sm text-gray-600
+        file:mr-3 file:px-4 file:py-2
+        file:border-0 file:rounded-md
+        file:bg-[#c8102e] file:text-white"
+                  />
+                </div>
               </div>
-              <input
-                name="official2"
-                value={team.official2}
-                onChange={handleChange}
-                placeholder="Nama Official 2"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-              <div className="border rounded-xl p-4 bg-white">
-                <p className="text-xs font-semibold text-gray-700">
-                  Upload Foto Official 2
-                </p>
 
-                <p className="text-[11px] text-gray-500 mt-1">
-                  JPG / PNG / WEBP • Maksimal Ukuran File 500KB
-                </p>
-
-                <p className="text-[11px] text-red-500 mt-1">
-                  Gunakan foto portrait / close-up agar wajah terlihat jelas
-                </p>
+              {/* OFFICIAL 3 */}
+              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-sm text-gray-500">
+                    Official 3
+                  </span>
+                </div>
 
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleTeamFileChange("official2Photo", e.target.files[0])
-                  }
-                  className="mt-3 block w-full text-sm text-gray-600
-    file:mr-3 file:px-4 file:py-2
-    file:border-0 file:rounded-md
-    file:bg-[#c8102e] file:text-white
-    hover:file:bg-[#a70d26]"
+                  name="official3"
+                  value={team.official3}
+                  onChange={handleChange}
+                  placeholder="Nama Official 3"
+                  className="border rounded-md px-4 h-11 text-sm w-full"
                 />
-              </div>
-              <input
-                name="official3"
-                value={team.official3}
-                onChange={handleChange}
-                placeholder="Nama Official 3"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-              <div className="border rounded-xl p-4 bg-white">
-                <p className="text-xs font-semibold text-gray-700">
-                  Upload Foto Official 3
-                </p>
 
-                <p className="text-[11px] text-gray-500 mt-1">
-                  JPG / PNG / WEBP • Maksimal Ukuran File 500KB
-                </p>
+                <div className="border rounded-xl p-4 bg-white">
+                  <p className="text-xs font-semibold text-gray-700">
+                    Upload Foto Official 3
+                  </p>
 
-                <p className="text-[11px] text-red-500 mt-1">
-                  Gunakan foto portrait / close-up agar wajah terlihat jelas
-                </p>
+                  <p className="text-[11px] text-gray-500 mt-1">
+                    JPG / PNG • Maksimal 500KB
+                  </p>
 
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleTeamFileChange("official3Photo", e.target.files[0])
-                  }
-                  className="mt-3 block w-full text-sm text-gray-600
-    file:mr-3 file:px-4 file:py-2
-    file:border-0 file:rounded-md
-    file:bg-[#c8102e] file:text-white
-    hover:file:bg-[#a70d26]"
-                />
+                  <p className="text-[11px] text-red-500 mt-1">
+                    Gunakan foto portrait / close-up agar wajah terlihat jelas
+                  </p>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleTeamFileChange("official3Photo", e.target.files[0])
+                    }
+                    className="mt-3 block w-full text-sm text-gray-600
+        file:mr-3 file:px-4 file:py-2
+        file:border-0 file:rounded-md
+        file:bg-[#c8102e] file:text-white"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -637,7 +713,7 @@ export default function Register() {
               {players.map((p, i) => (
                 <div
                   key={p.id}
-                  className="border rounded-lg p-3 bg-[#fafafa] space-y-3"
+                  className="border rounded-lg p-4 bg-[#fafafa] space-y-3"
                 >
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-sm text-gray-500">

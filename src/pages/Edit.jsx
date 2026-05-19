@@ -32,6 +32,8 @@ export default function EditTeam() {
   const [team, setTeam] = useState({
     name: "",
 
+    logo: "",
+
     manager: "",
     managerPhoto: "",
     managerKtp: "",
@@ -117,7 +119,7 @@ export default function EditTeam() {
 
         setTeam({
           name: data.name || "",
-
+          logo: data.logo || "",
           manager: data.manager || "",
           managerPhoto: data.managerPhoto || "",
           managerKtp: data.managerKtp || "",
@@ -433,6 +435,7 @@ export default function EditTeam() {
       await updateDoc(doc(db, "teams", docId), {
         ...team,
         name: sanitizeText(team.name),
+        logo: team.logo,
         manager: sanitizeText(team.manager),
         official1: sanitizeText(team.official1),
         official2: sanitizeText(team.official2),
@@ -479,29 +482,201 @@ export default function EditTeam() {
           {/* DATA TIM */}
           <div>
             <h2 className="font-bold text-lg mb-4">Data Tim</h2>
-            <div className="grid md:grid-cols-2 gap-3">
-              <input
-                name="name"
-                value={team.name}
-                onChange={handleChange}
-                disabled={locked}
-                placeholder="Nama Tim"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
 
-              <input
-                name="manager"
-                value={team.manager}
-                onChange={handleChange}
-                disabled={locked}
-                placeholder="Nama Manager"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* FOTO MANAGER */}
-                <div className="border rounded-xl p-4 bg-[#fafafa]">
+            <div className="space-y-4">
+              {/* IDENTITAS TIM */}
+              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-sm text-gray-500">
+                    Identitas Tim
+                  </span>
+                </div>
+
+                <input
+                  name="name"
+                  value={team.name}
+                  onChange={handleChange}
+                  disabled={locked}
+                  placeholder="Nama Tim"
+                  className="border border-gray-300 rounded-md px-4 h-12 text-sm w-full"
+                />
+
+                <div className="border rounded-xl p-4 bg-white">
                   <p className="text-xs font-semibold text-gray-700">
-                    Foto Manager
+                    Logo Tim
+                  </p>
+
+                  <p className="text-[11px] text-gray-500 mt-1">
+                    PNG transparan disarankan • Maksimal 500KB
+                  </p>
+
+                  {team.logo && (
+                    <img
+                      src={team.logo}
+                      alt="Logo Tim"
+                      className="w-24 h-24 object-contain rounded-lg border bg-white p-2 mt-3"
+                    />
+                  )}
+
+                  {!locked && (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleTeamFileChangeEdit("logo", e.target.files[0])
+                      }
+                      className="mt-3 block w-full text-sm text-gray-600
+            file:mr-3 file:px-4 file:py-2
+            file:border-0 file:rounded-md
+            file:bg-[#c8102e] file:text-white
+            hover:file:bg-[#a70d26]"
+                    />
+                  )}
+                </div>
+
+                <input
+                  name="phone"
+                  value={team.phone}
+                  onChange={handleChange}
+                  disabled={locked}
+                  placeholder="Nomor HP"
+                  className="border border-gray-300 rounded-md px-4 h-12 text-sm w-full"
+                />
+
+                <input
+                  name="address"
+                  value={team.address}
+                  onChange={handleChange}
+                  disabled={locked}
+                  placeholder="Alamat"
+                  className="border border-gray-300 rounded-md px-4 h-12 text-sm w-full"
+                />
+              </div>
+
+              {/* MANAGER */}
+              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-sm text-gray-500">
+                    Manager / PIC
+                  </span>
+                </div>
+
+                <input
+                  name="manager"
+                  value={team.manager}
+                  onChange={handleChange}
+                  disabled={locked}
+                  placeholder="Nama Manager"
+                  className="border border-gray-300 rounded-md px-4 h-12 text-sm w-full"
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {/* FOTO MANAGER */}
+                  <div className="border rounded-xl p-4 bg-white">
+                    <p className="text-xs font-semibold text-gray-700">
+                      Foto Manager
+                    </p>
+
+                    <p className="text-[11px] text-gray-500 mt-1">
+                      JPG / PNG • Maksimal 500KB
+                    </p>
+
+                    <p className="text-[11px] text-red-500 mt-1">
+                      Gunakan foto portrait / close-up agar wajah terlihat jelas
+                    </p>
+
+                    {team.managerPhoto && (
+                      <div className="mt-3">a
+                        <img
+                          src={team.managerPhoto}
+                          alt="Manager"
+                          className="w-[140px] h-24 object-cover rounded-md border"
+                        />
+                      </div>
+                    )}
+
+                    {!locked && (
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          handleTeamFileChangeEdit(
+                            "managerPhoto",
+                            e.target.files[0],
+                          )
+                        }
+                        className="mt-3 block w-full text-sm text-gray-600
+              file:mr-3 file:px-4 file:py-2
+              file:border-0 file:rounded-md
+              file:bg-[#c8102e] file:text-white
+              hover:file:bg-[#a70d26]"
+                      />
+                    )}
+                  </div>
+
+                  {/* KTP MANAGER */}
+                  <div className="border rounded-xl p-4 bg-white">
+                    <p className="text-xs font-semibold text-gray-700">
+                      KTP Manager
+                    </p>
+
+                    <p className="text-[11px] text-gray-500 mt-1">
+                      JPG / PNG • Maksimal 500KB
+                    </p>
+
+                    <p className="text-[11px] text-red-500 mt-1">
+                      Pastikan tulisan pada KTP terlihat jelas
+                    </p>
+
+                    {team.managerKtp && (
+                      <img
+                        src={team.managerKtp}
+                        alt="KTP Manager"
+                        className="w-[140px] h-24 object-cover rounded-md border mt-3"
+                      />
+                    )}
+
+                    {!locked && (
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          handleTeamFileChangeEdit(
+                            "managerKtp",
+                            e.target.files[0],
+                          )
+                        }
+                        className="mt-3 block w-full text-sm text-gray-600
+              file:mr-3 file:px-4 file:py-2
+              file:border-0 file:rounded-md
+              file:bg-[#c8102e] file:text-white
+              hover:file:bg-[#a70d26]"
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* OFFICIAL 1 */}
+              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-sm text-gray-500">
+                    Official 1
+                  </span>
+                </div>
+
+                <input
+                  name="official1"
+                  value={team.official1}
+                  onChange={handleChange}
+                  disabled={locked}
+                  placeholder="Official 1"
+                  className="border border-gray-300 rounded-md px-4 h-12 text-sm w-full"
+                />
+
+                <div className="border rounded-xl p-4 bg-white">
+                  <p className="text-xs font-semibold text-gray-700">
+                    Foto Official 1
                   </p>
 
                   <p className="text-[11px] text-gray-500 mt-1">
@@ -512,10 +687,10 @@ export default function EditTeam() {
                     Gunakan foto portrait / close-up agar wajah terlihat jelas
                   </p>
 
-                  {team.managerPhoto && (
+                  {team.official1Photo && (
                     <img
-                      src={team.managerPhoto}
-                      alt="Manager"
+                      src={team.official1Photo}
+                      alt="Official 1"
                       className="w-[140px] h-24 object-cover rounded-md border mt-3"
                     />
                   )}
@@ -526,23 +701,40 @@ export default function EditTeam() {
                       accept="image/*"
                       onChange={(e) =>
                         handleTeamFileChangeEdit(
-                          "managerPhoto",
+                          "official1Photo",
                           e.target.files[0],
                         )
                       }
                       className="mt-3 block w-full text-sm text-gray-600
-        file:mr-3 file:px-4 file:py-2
-        file:border-0 file:rounded-md
-        file:bg-[#c8102e] file:text-white
-        hover:file:bg-[#a70d26]"
+            file:mr-3 file:px-4 file:py-2
+            file:border-0 file:rounded-md
+            file:bg-[#c8102e] file:text-white
+            hover:file:bg-[#a70d26]"
                     />
                   )}
                 </div>
+              </div>
 
-                {/* KTP MANAGER */}
-                <div className="border rounded-xl p-4 bg-[#fafafa]">
+              {/* OFFICIAL 2 */}
+              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-sm text-gray-500">
+                    Official 2
+                  </span>
+                </div>
+
+                <input
+                  name="official2"
+                  value={team.official2}
+                  onChange={handleChange}
+                  disabled={locked}
+                  placeholder="Official 2"
+                  className="border border-gray-300 rounded-md px-4 h-12 text-sm w-full"
+                />
+
+                <div className="border rounded-xl p-4 bg-white">
                   <p className="text-xs font-semibold text-gray-700">
-                    KTP Manager
+                    Foto Official 2
                   </p>
 
                   <p className="text-[11px] text-gray-500 mt-1">
@@ -550,13 +742,13 @@ export default function EditTeam() {
                   </p>
 
                   <p className="text-[11px] text-red-500 mt-1">
-                    Pastikan tulisan pada KTP terlihat jelas
+                    Gunakan foto portrait / close-up agar wajah terlihat jelas
                   </p>
 
-                  {team.managerKtp && (
+                  {team.official2Photo && (
                     <img
-                      src={team.managerKtp}
-                      alt="KTP Manager"
+                      src={team.official2Photo}
+                      alt="Official 2"
                       className="w-[140px] h-24 object-cover rounded-md border mt-3"
                     />
                   )}
@@ -567,182 +759,77 @@ export default function EditTeam() {
                       accept="image/*"
                       onChange={(e) =>
                         handleTeamFileChangeEdit(
-                          "managerKtp",
+                          "official2Photo",
                           e.target.files[0],
                         )
                       }
                       className="mt-3 block w-full text-sm text-gray-600
-        file:mr-3 file:px-4 file:py-2
-        file:border-0 file:rounded-md
-        file:bg-[#c8102e] file:text-white
-        hover:file:bg-[#a70d26]"
+            file:mr-3 file:px-4 file:py-2
+            file:border-0 file:rounded-md
+            file:bg-[#c8102e] file:text-white
+            hover:file:bg-[#a70d26]"
                     />
                   )}
                 </div>
               </div>
 
-              <input
-                name="official1"
-                value={team.official1}
-                onChange={handleChange}
-                disabled={locked}
-                placeholder="Official 1"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-              <div className="border rounded-xl p-4 bg-[#fafafa]">
-                <p className="text-xs font-semibold text-gray-700">
-                  Foto Official 1
-                </p>
+              {/* OFFICIAL 3 */}
+              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-sm text-gray-500">
+                    Official 3
+                  </span>
+                </div>
 
-                <p className="text-[11px] text-gray-500 mt-1">
-                  JPG / PNG • Maksimal 500KB
-                </p>
+                <input
+                  name="official3"
+                  value={team.official3}
+                  onChange={handleChange}
+                  disabled={locked}
+                  placeholder="Official 3"
+                  className="border border-gray-300 rounded-md px-4 h-12 text-sm w-full"
+                />
 
-                <p className="text-[11px] text-red-500 mt-1">
-                  Gunakan foto portrait / close-up agar wajah terlihat jelas
-                </p>
+                <div className="border rounded-xl p-4 bg-white">
+                  <p className="text-xs font-semibold text-gray-700">
+                    Foto Official 3
+                  </p>
 
-                {team.official1Photo && (
-                  <img
-                    src={team.official1Photo}
-                    alt="Official 1"
-                    className="w-[140px] h-24 object-cover rounded-md border mt-3"
-                  />
-                )}
+                  <p className="text-[11px] text-gray-500 mt-1">
+                    JPG / PNG • Maksimal 500KB
+                  </p>
 
-                {!locked && (
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleTeamFileChangeEdit(
-                        "official1Photo",
-                        e.target.files[0],
-                      )
-                    }
-                    className="mt-3 block w-full text-sm text-gray-600
-      file:mr-3 file:px-4 file:py-2
-      file:border-0 file:rounded-md
-      file:bg-[#c8102e] file:text-white
-      hover:file:bg-[#a70d26]"
-                  />
-                )}
+                  <p className="text-[11px] text-red-500 mt-1">
+                    Gunakan foto portrait / close-up agar wajah terlihat jelas
+                  </p>
+
+                  {team.official3Photo && (
+                    <img
+                      src={team.official3Photo}
+                      alt="Official 3"
+                      className="w-[140px] h-24 object-cover rounded-md border mt-3"
+                    />
+                  )}
+
+                  {!locked && (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleTeamFileChangeEdit(
+                          "official3Photo",
+                          e.target.files[0],
+                        )
+                      }
+                      className="mt-3 block w-full text-sm text-gray-600
+            file:mr-3 file:px-4 file:py-2
+            file:border-0 file:rounded-md
+            file:bg-[#c8102e] file:text-white
+            hover:file:bg-[#a70d26]"
+                    />
+                  )}
+                </div>
               </div>
-
-              <input
-                name="official2"
-                value={team.official2}
-                onChange={handleChange}
-                disabled={locked}
-                placeholder="Official 2"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-
-              <div className="border rounded-xl p-4 bg-[#fafafa]">
-                <p className="text-xs font-semibold text-gray-700">
-                  Foto Official 2
-                </p>
-
-                <p className="text-[11px] text-gray-500 mt-1">
-                  JPG / PNG • Maksimal 500KB
-                </p>
-
-                <p className="text-[11px] text-red-500 mt-1">
-                  Gunakan foto portrait / close-up agar wajah terlihat jelas
-                </p>
-
-                {team.official2Photo && (
-                  <img
-                    src={team.official2Photo}
-                    alt="Official 2"
-                    className="w-[140px] h-24 object-cover rounded-md border mt-3"
-                  />
-                )}
-
-                {!locked && (
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleTeamFileChangeEdit(
-                        "official2Photo",
-                        e.target.files[0],
-                      )
-                    }
-                    className="mt-3 block w-full text-sm text-gray-600
-      file:mr-3 file:px-4 file:py-2
-      file:border-0 file:rounded-md
-      file:bg-[#c8102e] file:text-white
-      hover:file:bg-[#a70d26]"
-                  />
-                )}
-              </div>
-
-              <input
-                name="official3"
-                value={team.official3}
-                onChange={handleChange}
-                disabled={locked}
-                placeholder="Official 3"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-              <div className="border rounded-xl p-4 bg-[#fafafa]">
-                <p className="text-xs font-semibold text-gray-700">
-                  Foto Official 3
-                </p>
-
-                <p className="text-[11px] text-gray-500 mt-1">
-                  JPG / PNG • Maksimal 500KB
-                </p>
-
-                <p className="text-[11px] text-red-500 mt-1">
-                  Gunakan foto portrait / close-up agar wajah terlihat jelas
-                </p>
-
-                {team.official3Photo && (
-                  <img
-                    src={team.official3Photo}
-                    alt="Official 3"
-                    className="w-[140px] h-24 object-cover rounded-md border mt-3"
-                  />
-                )}
-
-                {!locked && (
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleTeamFileChangeEdit(
-                        "official3Photo",
-                        e.target.files[0],
-                      )
-                    }
-                    className="mt-3 block w-full text-sm text-gray-600
-      file:mr-3 file:px-4 file:py-2
-      file:border-0 file:rounded-md
-      file:bg-[#c8102e] file:text-white
-      hover:file:bg-[#a70d26]"
-                  />
-                )}
-              </div>
-
-              <input
-                name="phone"
-                value={team.phone}
-                onChange={handleChange}
-                disabled={locked}
-                placeholder="Nomor HP"
-                className="border rounded-md px-4 h-12 text-sm"
-              />
-
-              <input
-                name="address"
-                value={team.address}
-                onChange={handleChange}
-                disabled={locked}
-                placeholder="Alamat"
-                className="border rounded-md px-4 h-12 text-sm md:col-span-2"
-              />
             </div>
           </div>
 
