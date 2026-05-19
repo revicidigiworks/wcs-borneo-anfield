@@ -572,130 +572,125 @@ export default function Register() {
                 </div>
               </div>
 
-              {/* OFFICIAL 1 */}
-              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
+              {/* OFFICIAL */}
+              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="font-semibold text-sm text-gray-500">
-                    Official 1
+                    Official Team
                   </span>
                 </div>
 
-                <input
-                  name="official1"
-                  value={team.official1}
-                  onChange={handleChange}
-                  placeholder="Nama Official 1"
-                  className="border rounded-md px-4 h-11 text-sm w-full"
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* OFFICIAL 1 */}
+                  <div className="border rounded-xl p-4 bg-white space-y-3">
+                    <input
+                      name="official1"
+                      value={team.official1}
+                      onChange={handleChange}
+                      disabled={locked}
+                      placeholder="Official 1"
+                      className="border border-gray-300 rounded-md px-4 h-11 text-sm w-full"
+                    />
 
-                <div className="border rounded-xl p-4 bg-white">
-                  <p className="text-xs font-semibold text-gray-700">
-                    Upload Foto Official 1
-                  </p>
-                  <p className="text-[11px] text-gray-500 mt-1">
-                    JPG / PNG • Maksimal 500KB
-                  </p>
+                    {team.official1Photo && (
+                      <img
+                        src={team.official1Photo}
+                        alt="Official 1"
+                        className="w-[140px] h-24 object-cover rounded-md border"
+                      />
+                    )}
 
-                  <p className="text-[11px] text-red-500 mt-1">
-                    Gunakan foto portrait / close-up agar wajah terlihat jelas
-                  </p>
+                    {!locked && (
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          handleTeamFileChangeEdit(
+                            "official1Photo",
+                            e.target.files[0],
+                          )
+                        }
+                        className="block w-full text-sm text-gray-600
+          file:mr-3 file:px-4 file:py-2
+          file:border-0 file:rounded-md
+          file:bg-[#c8102e] file:text-white"
+                      />
+                    )}
+                  </div>
 
+                  {/* OFFICIAL 2 */}
+                  <div className="border rounded-xl p-4 bg-white space-y-3">
+                    <input
+                      name="official2"
+                      value={team.official2}
+                      onChange={handleChange}
+                      disabled={locked}
+                      placeholder="Official 2"
+                      className="border border-gray-300 rounded-md px-4 h-11 text-sm w-full"
+                    />
+
+                    {team.official2Photo && (
+                      <img
+                        src={team.official2Photo}
+                        alt="Official 2"
+                        className="w-[140px] h-24 object-cover rounded-md border"
+                      />
+                    )}
+
+                    {!locked && (
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          handleTeamFileChangeEdit(
+                            "official2Photo",
+                            e.target.files[0],
+                          )
+                        }
+                        className="block w-full text-sm text-gray-600
+          file:mr-3 file:px-4 file:py-2
+          file:border-0 file:rounded-md
+          file:bg-[#c8102e] file:text-white"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {/* OFFICIAL 3 */}
+                <div className="border rounded-xl p-4 bg-white space-y-3">
                   <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleTeamFileChange("official1Photo", e.target.files[0])
-                    }
-                    className="mt-3 block w-full text-sm text-gray-600
+                    name="official3"
+                    value={team.official3}
+                    onChange={handleChange}
+                    disabled={locked}
+                    placeholder="Official 3"
+                    className="border border-gray-300 rounded-md px-4 h-11 text-sm w-full"
+                  />
+
+                  {team.official3Photo && (
+                    <img
+                      src={team.official3Photo}
+                      alt="Official 3"
+                      className="w-[140px] h-24 object-cover rounded-md border"
+                    />
+                  )}
+
+                  {!locked && (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleTeamFileChangeEdit(
+                          "official3Photo",
+                          e.target.files[0],
+                        )
+                      }
+                      className="block w-full text-sm text-gray-600
         file:mr-3 file:px-4 file:py-2
         file:border-0 file:rounded-md
         file:bg-[#c8102e] file:text-white"
-                  />
-                </div>
-              </div>
-
-              {/* OFFICIAL 2 */}
-              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold text-sm text-gray-500">
-                    Official 2
-                  </span>
-                </div>
-
-                <input
-                  name="official2"
-                  value={team.official2}
-                  onChange={handleChange}
-                  placeholder="Nama Official 2"
-                  className="border rounded-md px-4 h-11 text-sm w-full"
-                />
-
-                <div className="border rounded-xl p-4 bg-white">
-                  <p className="text-xs font-semibold text-gray-700">
-                    Upload Foto Official 2
-                  </p>
-                  <p className="text-[11px] text-gray-500 mt-1">
-                    JPG / PNG • Maksimal 500KB
-                  </p>
-
-                  <p className="text-[11px] text-red-500 mt-1">
-                    Gunakan foto portrait / close-up agar wajah terlihat jelas
-                  </p>
-
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleTeamFileChange("official2Photo", e.target.files[0])
-                    }
-                    className="mt-3 block w-full text-sm text-gray-600
-        file:mr-3 file:px-4 file:py-2
-        file:border-0 file:rounded-md
-        file:bg-[#c8102e] file:text-white"
-                  />
-                </div>
-              </div>
-
-              {/* OFFICIAL 3 */}
-              <div className="border rounded-lg p-4 bg-[#fafafa] space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold text-sm text-gray-500">
-                    Official 3
-                  </span>
-                </div>
-
-                <input
-                  name="official3"
-                  value={team.official3}
-                  onChange={handleChange}
-                  placeholder="Nama Official 3"
-                  className="border rounded-md px-4 h-11 text-sm w-full"
-                />
-
-                <div className="border rounded-xl p-4 bg-white">
-                  <p className="text-xs font-semibold text-gray-700">
-                    Upload Foto Official 3
-                  </p>
-
-                  <p className="text-[11px] text-gray-500 mt-1">
-                    JPG / PNG • Maksimal 500KB
-                  </p>
-
-                  <p className="text-[11px] text-red-500 mt-1">
-                    Gunakan foto portrait / close-up agar wajah terlihat jelas
-                  </p>
-
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleTeamFileChange("official3Photo", e.target.files[0])
-                    }
-                    className="mt-3 block w-full text-sm text-gray-600
-        file:mr-3 file:px-4 file:py-2
-        file:border-0 file:rounded-md
-        file:bg-[#c8102e] file:text-white"
-                  />
+                    />
+                  )}
                 </div>
               </div>
             </div>
