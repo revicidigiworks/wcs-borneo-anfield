@@ -587,20 +587,40 @@ export default function Register() {
                       name="official1"
                       value={team.official1}
                       onChange={handleChange}
-                  
                       placeholder="Nama Official 1"
                       className="border border-gray-300 rounded-md px-4 h-11 text-sm w-full"
                     />
 
+                    <p className="text-[11px] text-gray-500">
+                      JPG / PNG • Maksimal Ukuran File 500KB
+                    </p>
+
+                    <p className="text-[11px] text-red-500">
+                      Gunakan foto portrait / close-up agar wajah terlihat jelas
+                    </p>
+
                     {team.official1Photo && (
                       <img
-                        src={team.official1Photo}
+                        src={URL.createObjectURL(team.official1Photo)}
                         alt="Official 1"
                         className="w-[140px] h-24 object-cover rounded-md border"
                       />
                     )}
 
-
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleTeamFileChange(
+                          "official1Photo",
+                          e.target.files[0],
+                        )
+                      }
+                      className="block w-full text-sm text-gray-600
+        file:mr-3 file:px-4 file:py-2
+        file:border-0 file:rounded-md
+        file:bg-[#c8102e] file:text-white"
+                    />
                   </div>
 
                   {/* OFFICIAL 2 */}
@@ -609,35 +629,40 @@ export default function Register() {
                       name="official2"
                       value={team.official2}
                       onChange={handleChange}
-                  
                       placeholder="Nama Official 2"
                       className="border border-gray-300 rounded-md px-4 h-11 text-sm w-full"
                     />
 
+                    <p className="text-[11px] text-gray-500">
+                      JPG / PNG • Maksimal Ukuran File 500KB
+                    </p>
+
+                    <p className="text-[11px] text-red-500">
+                      Gunakan foto portrait / close-up agar wajah terlihat jelas
+                    </p>
+
                     {team.official2Photo && (
                       <img
-                        src={team.official2Photo}
+                        src={URL.createObjectURL(team.official2Photo)}
                         alt="Official 2"
                         className="w-[140px] h-24 object-cover rounded-md border"
                       />
                     )}
 
-                    {/* {!locked && (
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) =>
-                          handleTeamFileChangeEdit(
-                            "official2Photo",
-                            e.target.files[0],
-                          )
-                        }
-                        className="block w-full text-sm text-gray-600
-          file:mr-3 file:px-4 file:py-2
-          file:border-0 file:rounded-md
-          file:bg-[#c8102e] file:text-white"
-                      />
-                    )} */}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleTeamFileChange(
+                          "official2Photo",
+                          e.target.files[0],
+                        )
+                      }
+                      className="block w-full text-sm text-gray-600
+        file:mr-3 file:px-4 file:py-2
+        file:border-0 file:rounded-md
+        file:bg-[#c8102e] file:text-white"
+                    />
                   </div>
                 </div>
 
@@ -647,35 +672,37 @@ export default function Register() {
                     name="official3"
                     value={team.official3}
                     onChange={handleChange}
-                
                     placeholder="Nama Official 3"
                     className="border border-gray-300 rounded-md px-4 h-11 text-sm w-full"
                   />
 
+                  <p className="text-[11px] text-gray-500">
+                    JPG / PNG • Maksimal Ukuran File 500KB
+                  </p>
+
+                  <p className="text-[11px] text-red-500">
+                    Gunakan foto portrait / close-up agar wajah terlihat jelas
+                  </p>
+
                   {team.official3Photo && (
                     <img
-                      src={team.official3Photo}
+                      src={URL.createObjectURL(team.official3Photo)}
                       alt="Official 3"
                       className="w-[140px] h-24 object-cover rounded-md border"
                     />
                   )}
 
-                  {/* {!locked && (
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        handleTeamFileChangeEdit(
-                          "official3Photo",
-                          e.target.files[0],
-                        )
-                      }
-                      className="block w-full text-sm text-gray-600
-        file:mr-3 file:px-4 file:py-2
-        file:border-0 file:rounded-md
-        file:bg-[#c8102e] file:text-white"
-                    />
-                  )} */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleTeamFileChange("official3Photo", e.target.files[0])
+                    }
+                    className="block w-full text-sm text-gray-600
+      file:mr-3 file:px-4 file:py-2
+      file:border-0 file:rounded-md
+      file:bg-[#c8102e] file:text-white"
+                  />
                 </div>
               </div>
             </div>
