@@ -293,9 +293,9 @@ const drawTeamInfo = (doc, team, y) => {
     });
   };
 
-  drawColumn(left, PAGE.M + 34, PAGE.M + 64, PAGE.M + 69);
+  drawColumn(left, PAGE.M + 30, PAGE.M + 56, PAGE.M + 61);
 
-  drawColumn(right, 110, 138, 143);
+  drawColumn(right, 116, 142, 147);
 
   return y + 30;
 };
