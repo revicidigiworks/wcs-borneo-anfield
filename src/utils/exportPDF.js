@@ -382,7 +382,7 @@ const drawOfficialPhotos = async (doc, team, y) => {
 const drawPlayersPage = async (doc, players, isFirstPage = false) => {
   await drawWatermark(doc);
 
-  let y = isFirstPage ? 123 : 62;
+  let y = isFirstPage ? 180 : 62;
 
   doc.setFont("helvetica", "bold");
 
