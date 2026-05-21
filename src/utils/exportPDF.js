@@ -258,7 +258,7 @@ const drawTeamInfo = (doc, team, y) => {
 
   /* LOGO TEAM */
   if (team.logo) {
-    doc.addImage(team.logo, "PNG", PAGE.M, y - 2, 22, 22);
+    doc.addImage(team.logo, "PNG", PAGE.M, y - 1.5, 22, 22);
   }
 
   const left = [
