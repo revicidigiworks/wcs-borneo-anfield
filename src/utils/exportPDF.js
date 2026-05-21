@@ -371,7 +371,7 @@ const drawOfficialPhotos = async (doc, team, y) => {
       });
     }
   }
-
+  doc.setTextColor(...COLOR.DARK);
   return y + 45;
 };
 
@@ -556,26 +556,21 @@ export const exportTeamsPDF = async (teams) => {
 
     const players = team.players || [];
 
-    const chunkSize = 8;
+    /* PAGE 1 = 6 PLAYER */
+    const firstChunk = players.slice(0, 6);
 
-    const chunks = [];
+    /* PAGE 2+ = 10 PLAYER */
+    const nextChunks = [];
 
-    for (let i = 0; i < players.length; i += chunkSize) {
-      chunks.push(players.slice(i, i + chunkSize));
+    for (let i = 6; i < players.length; i += 10) {
+      nextChunks.push(players.slice(i, i + 10));
     }
 
-    for (let c = 0; c < chunks.length; c++) {
-      /* PAGE 2+ */
-      if (c > 0) {
-        doc.addPage();
+    /* PAGE 1 */
+    await drawPlayersPage(doc, firstChunk, true);
 
-        await drawHeader(doc, false);
-      }
-
-      await drawPlayersPage(doc, chunks[c], c === 0);
-    }
-
-    await drawSignature(doc);
+    /* PAGE 2+ */
+    for (let c = 0; c < nextChunks.length; c++) await drawSignature(doc);
   }
 
   await drawFooter(doc);
