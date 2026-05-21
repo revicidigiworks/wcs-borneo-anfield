@@ -273,7 +273,7 @@ const drawTeamInfo = (doc, team, y) => {
     ["OFFICIAL 3", (team.official3 || "").toUpperCase()],
   ];
 
-  const drawColumn = (data, startX) => {
+  const drawColumn = (data, startX, colonX, valueX) => {
     data.forEach((item, i) => {
       const rowY = y + i * 7;
 
@@ -283,17 +283,19 @@ const drawTeamInfo = (doc, team, y) => {
 
       doc.text(item[0], startX, rowY);
 
-      doc.text(":", startX + 35, rowY);
+      doc.text(":", colonX, rowY);
 
       doc.setFont("helvetica", "normal");
 
-      doc.text(item[1] || "-", startX + 39, rowY);
+      doc.text(item[1] || "-", valueX, rowY, {
+        maxWidth: 42,
+      });
     });
   };
 
-  drawColumn(left, PAGE.M + 38);
+  drawColumn(left, PAGE.M + 34, PAGE.M + 64, PAGE.M + 69);
 
-  drawColumn(right, PAGE.W / 2 + 10);
+  drawColumn(right, 110, 138, 143);
 
   return y + 30;
 };
@@ -577,6 +579,8 @@ export const exportTeamsPDF = async (teams) => {
 
       await drawPlayersPage(doc, nextChunks[c], false);
     }
+
+    await drawSignature(doc);
   }
 
   await drawFooter(doc);
