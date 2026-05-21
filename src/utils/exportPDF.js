@@ -570,7 +570,13 @@ export const exportTeamsPDF = async (teams) => {
     await drawPlayersPage(doc, firstChunk, true);
 
     /* PAGE 2+ */
-    for (let c = 0; c < nextChunks.length; c++) await drawSignature(doc);
+    for (let c = 0; c < nextChunks.length; c++) {
+      doc.addPage();
+
+      await drawHeader(doc, false);
+
+      await drawPlayersPage(doc, nextChunks[c], false);
+    }
   }
 
   await drawFooter(doc);
