@@ -67,18 +67,18 @@ export default function Register() {
     const options =
       type === "ktp"
         ? {
-            maxSizeMB: 0.3,
+            maxSizeMB: 0.4,
             maxWidthOrHeight: 1800,
             useWebWorker: true,
             fileType: "image/jpeg",
-            initialQuality: 0.85,
+            initialQuality: 0.9,
           }
         : {
-            maxSizeMB: 0.12,
-            maxWidthOrHeight: 1200,
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1600,
             useWebWorker: true,
             fileType: "image/webp",
-            initialQuality: 0.7,
+            initialQuality: 0.92,
           };
 
     try {
@@ -110,7 +110,7 @@ export default function Register() {
     if (!file) return;
 
     if (file.size > MAX_FILE_SIZE) {
-      alert("Ukuran file maksimal 500KB");
+      alert("Ukuran file maksimal 1MB");
       return;
     }
 
@@ -140,13 +140,13 @@ export default function Register() {
     setPlayers(updated);
   };
 
-  const MAX_FILE_SIZE = 500 * 1024;
+  const MAX_FILE_SIZE = 1 * 1024 * 1024;
 
   const handleFileChange = async (index, field, file) => {
     if (!file) return;
 
     if (file.size > MAX_FILE_SIZE) {
-      alert("Ukuran file maksimal 500KB");
+      alert("Ukuran file maksimal 1MB");
       return;
     }
 
@@ -493,7 +493,7 @@ export default function Register() {
                   </p>
 
                   <p className="text-[11px] text-gray-500 mt-1">
-                    PNG transparan disarankan • Maksimal 500KB
+                    PNG transparan disarankan • Maksimal 1MB
                   </p>
 
                   <input
@@ -531,6 +531,9 @@ export default function Register() {
                     <p className="text-xs font-semibold text-gray-700">
                       Upload Foto Manager
                     </p>
+                    <p className="text-[11px] text-gray-500 mt-1">
+                      JPG / PNG • Maksimal Ukuran File 1MB
+                    </p>
 
                     <input
                       type="file"
@@ -550,7 +553,7 @@ export default function Register() {
                       Upload KTP Manager
                     </p>
                     <p className="text-[11px] text-gray-500 mt-1">
-                      JPG / PNG • Maksimal 500KB
+                      JPG / PNG • Maksimal 1MB
                     </p>
 
                     <p className="text-[11px] text-red-500 mt-1">
@@ -592,7 +595,7 @@ export default function Register() {
                     />
 
                     <p className="text-[11px] text-gray-500">
-                      JPG / PNG • Maksimal Ukuran File 500KB
+                      JPG / PNG • Maksimal Ukuran File 1MB
                     </p>
 
                     <p className="text-[11px] text-red-500">
@@ -634,7 +637,7 @@ export default function Register() {
                     />
 
                     <p className="text-[11px] text-gray-500">
-                      JPG / PNG • Maksimal Ukuran File 500KB
+                      JPG / PNG • Maksimal Ukuran File 1MB
                     </p>
 
                     <p className="text-[11px] text-red-500">
@@ -677,7 +680,7 @@ export default function Register() {
                   />
 
                   <p className="text-[11px] text-gray-500">
-                    JPG / PNG • Maksimal Ukuran File 500KB
+                    JPG / PNG • Maksimal Ukuran File 1MB
                   </p>
 
                   <p className="text-[11px] text-red-500">
@@ -818,7 +821,7 @@ export default function Register() {
                       </p>
 
                       <p className="text-[11px] text-gray-500 mt-1">
-                        JPG / PNG • Maksimal Ukuran File 500KB
+                        JPG / PNG • Maksimal Ukuran File 1MB
                       </p>
 
                       <p className="text-[11px] text-red-500 mt-1">
@@ -846,7 +849,7 @@ export default function Register() {
                       </p>
 
                       <p className="text-[11px] text-gray-500 mt-1">
-                        JPG / PNG / WEBP • Maksimal Ukuran File 500KB
+                        JPG / PNG / WEBP • Maksimal Ukuran File 1MB
                       </p>
 
                       <p className="text-[11px] text-red-500 mt-1">

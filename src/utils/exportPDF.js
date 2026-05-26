@@ -53,7 +53,7 @@ const toBase64 = async (url) => {
         const canvas = document.createElement("canvas");
 
         /* RESIZE */
-        const maxWidth = 1200;
+        const maxWidth = 1400;
 
         let width = img.width;
         let height = img.height;
@@ -76,7 +76,7 @@ const toBase64 = async (url) => {
         ctx.drawImage(img, 0, 0, width, height);
 
         /* JPEG COMPRESS */
-        resolve(canvas.toDataURL("image/jpeg", 0.65));
+        resolve(canvas.toDataURL("image/jpeg", 0.92));
       };
 
       img.src = url;
@@ -113,8 +113,8 @@ const toBase64PlayerPhoto = async (url) => {
         const sx = (width - cropWidth) / 2;
         const sy = (height - cropHeight) / 2;
 
-        canvas.width = 500;
-        canvas.height = 650;
+        canvas.width = 1000;
+        canvas.height = 1300;
 
         const ctx = canvas.getContext("2d");
 
@@ -124,7 +124,7 @@ const toBase64PlayerPhoto = async (url) => {
 
         ctx.drawImage(img, sx, sy, cropWidth, cropHeight, 0, 0, 500, 650);
 
-        resolve(canvas.toDataURL("image/jpeg", 0.7));
+        resolve(canvas.toDataURL("image/jpeg", 0.95));
       };
 
       img.src = url;

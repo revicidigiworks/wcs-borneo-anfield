@@ -61,18 +61,18 @@ export default function EditTeam() {
     const options =
       type === "ktp"
         ? {
-            maxSizeMB: 0.3,
+            maxSizeMB: 0.4,
             maxWidthOrHeight: 1800,
             useWebWorker: true,
             fileType: "image/jpeg",
-            initialQuality: 0.85,
+            initialQuality: 0.9,
           }
         : {
-            maxSizeMB: 0.12,
-            maxWidthOrHeight: 1200,
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1600,
             useWebWorker: true,
             fileType: "image/webp",
-            initialQuality: 0.7,
+            initialQuality: 0.92,
           };
 
     try {
@@ -272,10 +272,10 @@ export default function EditTeam() {
   const handleFileChangeEdit = async (index, field, file) => {
     if (!file) return;
 
-    const MAX_FILE_SIZE = 500 * 1024;
+    const MAX_FILE_SIZE = 1 * 1024 * 1024;
 
     if (file.size > MAX_FILE_SIZE) {
-      alert("Ukuran maksimal 500KB");
+      alert("Ukuran maksimal 1MB");
       return;
     }
 
@@ -318,10 +318,10 @@ export default function EditTeam() {
   const handleTeamFileChangeEdit = async (field, file) => {
     if (!file) return;
 
-    const MAX_FILE_SIZE = 500 * 1024;
+    const MAX_FILE_SIZE = 1 * 1024 * 1024;
 
     if (file.size > MAX_FILE_SIZE) {
-      alert("Ukuran maksimal 500KB");
+      alert("Ukuran maksimal 1MB");
       return;
     }
 
@@ -507,7 +507,7 @@ export default function EditTeam() {
                   </p>
 
                   <p className="text-[11px] text-gray-500 mt-1">
-                    PNG transparan disarankan • Maksimal 500KB
+                    PNG transparan disarankan • Maksimal 1MB
                   </p>
 
                   {team.logo && (
@@ -578,7 +578,7 @@ export default function EditTeam() {
                     </p>
 
                     <p className="text-[11px] text-gray-500 mt-1">
-                      JPG / PNG • Maksimal 500KB
+                      JPG / PNG • Maksimal 1MB
                     </p>
 
                     <p className="text-[11px] text-red-500 mt-1">
@@ -621,7 +621,7 @@ export default function EditTeam() {
                     </p>
 
                     <p className="text-[11px] text-gray-500 mt-1">
-                      JPG / PNG • Maksimal 500KB
+                      JPG / PNG • Maksimal 1MB
                     </p>
 
                     <p className="text-[11px] text-red-500 mt-1">
@@ -686,7 +686,7 @@ export default function EditTeam() {
                     )}
 
                     <p className="text-[11px] text-gray-500">
-                      JPG / PNG • Maksimal 500KB
+                      JPG / PNG • Maksimal 1MB
                     </p>
 
                     {!locked && (
@@ -727,7 +727,7 @@ export default function EditTeam() {
                     )}
 
                     <p className="text-[11px] text-gray-500">
-                      JPG / PNG • Maksimal 500KB
+                      JPG / PNG • Maksimal 1MB
                     </p>
 
                     {!locked && (
@@ -768,7 +768,7 @@ export default function EditTeam() {
                     )}
 
                     <p className="text-[11px] text-gray-500">
-                      JPG / PNG • Maksimal 500KB
+                      JPG / PNG • Maksimal 1MB
                     </p>
 
                     {!locked && (
@@ -973,7 +973,7 @@ export default function EditTeam() {
                               </p>
 
                               <p className="text-[11px] text-gray-500 mt-1">
-                                JPG / PNG • Maksimal 500KB
+                                JPG / PNG • Maksimal 1MB
                               </p>
 
                               <p className="text-[11px] text-red-500 mt-1">
@@ -1005,7 +1005,7 @@ export default function EditTeam() {
                               </p>
 
                               <p className="text-[11px] text-gray-500 mt-1">
-                                JPG / PNG • Maksimal 500KB
+                                JPG / PNG • Maksimal 1MB
                               </p>
 
                               <p className="text-[11px] text-red-500 mt-1">
