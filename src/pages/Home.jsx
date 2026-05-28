@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-
+import { useState } from "react";
+import { X } from "lucide-react";
 // IMPORT LOGO
 import logoWCS from "../assets/img/logo-wcs.webp";
 import logoBAS from "../assets/img/logo-bas.webp";
@@ -9,10 +10,16 @@ import logoCafe from "../assets/img/logo-cafe.webp";
 import logoWarkop from "../assets/img/logo-warkop.webp";
 import logoPickleball from "../assets/img/logo-pickleballhouse.webp";
 import logoCoda from "../assets/img/logo-coda.webp";
+import regulasi1 from "../assets/img/regulasi-1.webp";
+import regulasi2 from "../assets/img/regulasi-2.webp";
+import regulasi3 from "../assets/img/regulasi-3.webp";
 
 export default function Home() {
   const navigate = useNavigate();
 
+  const [showRegulation, setShowRegulation] = useState(false);
+  const [currentRegulation, setCurrentRegulation] = useState(0);
+  const regulations = [regulasi1, regulasi2, regulasi3];
   const sponsors = [
     logoSalon,
     logoTravel,
@@ -24,19 +31,15 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white text-slate-900 font-sans">
-
       {/* Pattern Background */}
       <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:24px_24px]"></div>
 
       {/* ================= HERO ================= */}
       <section className="relative z-10 max-w-7xl mx-auto px-5 md:px-10 pt-10 md:pt-20 pb-16 md:pb-24">
-
         {/* ================= DESKTOP ================= */}
         <div className="hidden lg:grid grid-cols-[1.1fr_0.9fr] gap-20 items-center">
-
           {/* LEFT */}
           <div>
-
             {/* Badge */}
             <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-slate-200 bg-white mb-8">
               <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
@@ -50,9 +53,7 @@ export default function Home() {
             <h1 className="text-[6rem] leading-[0.85] font-black tracking-[-0.06em] uppercase text-slate-950">
               WORLD CUP
               <br />
-              <span className="text-red-600">
-                SERIES 2026
-              </span>
+              <span className="text-red-600">SERIES 2026</span>
             </h1>
 
             {/* Venue */}
@@ -62,12 +63,18 @@ export default function Home() {
 
             {/* Description */}
             <p className="mt-8 max-w-xl text-base leading-8 text-slate-600">
-              Open Tournament Mini Soccer. Siapkan strategi terbaik, kumpulkan tim andalanmu, dan buktikan siapa yang layak menjadi juara.
+              Open Tournament Mini Soccer. Siapkan strategi terbaik, kumpulkan
+              tim andalanmu, dan buktikan siapa yang layak menjadi juara.
             </p>
 
             {/* CTA */}
-            <div className="flex items-center gap-8 mt-10">
-
+            <div className="flex items-center gap-4 mt-10">
+              <button
+                onClick={() => setShowRegulation(true)}
+                className="px-8 py-5 rounded-full border-2 border-slate-300 bg-white hover:bg-slate-100 text-slate-900 font-black tracking-[0.2em] uppercase transition-all duration-300"
+              >
+                Baca Regulasi
+              </button>
               <button
                 onClick={() => navigate("/register")}
                 className="group relative overflow-hidden px-10 py-5 rounded-full bg-red-600 hover:bg-red-700 text-white font-black tracking-[0.2em] uppercase shadow-[0_20px_40px_-10px_rgba(220,38,38,0.35)] transition-all duration-300 hover:scale-[1.03] active:scale-95"
@@ -93,7 +100,6 @@ export default function Home() {
 
             {/* Info Minimalis */}
             <div className="flex items-center gap-10 mt-16">
-
               <div>
                 <p className="text-[10px] tracking-[0.25em] uppercase text-slate-400 font-bold mb-2">
                   Registrasi
@@ -123,19 +129,15 @@ export default function Home() {
                   Slot
                 </p>
 
-                <h3 className="text-lg font-black text-red-600">
-                  32 TIM
-                </h3>
+                <h3 className="text-lg font-black text-red-600">32 TIM</h3>
               </div>
             </div>
           </div>
 
           {/* RIGHT */}
           <div className="relative flex justify-center">
-
             {/* Main Logo */}
             <div className="relative group">
-
               <img
                 src={logoWCS}
                 alt="World Cup Series"
@@ -150,7 +152,6 @@ export default function Home() {
 
         {/* ================= MOBILE ================= */}
         <div className="lg:hidden">
-
           {/* Badge */}
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 bg-white">
@@ -165,7 +166,6 @@ export default function Home() {
           {/* Logo */}
           <div className="relative flex justify-center mt-10">
             <div className="relative group">
-
               <img
                 src={logoWCS}
                 alt="World Cup Series"
@@ -179,13 +179,10 @@ export default function Home() {
 
           {/* Heading */}
           <div className="text-center mt-10">
-
             <h1 className="text-[3.3rem] sm:text-[4.8rem] leading-[0.9] font-black tracking-[-0.06em] uppercase text-slate-950">
               WORLD CUP
               <br />
-              <span className="text-red-600">
-                SERIES 2026
-              </span>
+              <span className="text-red-600">SERIES 2026</span>
             </h1>
 
             <p className="mt-4 text-xs sm:text-sm font-bold tracking-[0.3em] uppercase text-yellow-600">
@@ -193,13 +190,13 @@ export default function Home() {
             </p>
 
             <p className="mt-6 text-sm leading-7 text-slate-600 max-w-md mx-auto">
-              Open Tournament Mini Soccer. Siapkan strategi, kumpulkan tim terbaik, dan buktikan siapa yang layak menjadi juara.
+              Open Tournament Mini Soccer. Siapkan strategi, kumpulkan tim
+              terbaik, dan buktikan siapa yang layak menjadi juara.
             </p>
           </div>
 
           {/* Info Minimalis */}
           <div className="flex items-center justify-center gap-5 mt-10 text-center">
-
             <div>
               <p className="text-[9px] tracking-[0.2em] uppercase text-slate-400 font-bold mb-2">
                 Registrasi
@@ -229,14 +226,18 @@ export default function Home() {
                 Slot
               </p>
 
-              <h3 className="text-[11px] font-black text-red-600">
-                32 TIM
-              </h3>
+              <h3 className="text-[11px] font-black text-red-600">32 TIM</h3>
             </div>
           </div>
 
           {/* CTA */}
-          <div className="mt-12">
+          <div className="mt-12 space-y-4">
+            <button
+              onClick={() => setShowRegulation(true)}
+              className="w-full rounded-full border-2 border-slate-300 bg-white hover:bg-slate-100 text-slate-900 font-black tracking-[0.2em] uppercase py-5 transition-all duration-300 active:scale-95"
+            >
+              Baca Regulasi
+            </button>
             <button
               onClick={() => navigate("/register")}
               className="w-full rounded-full bg-red-600 hover:bg-red-700 text-white font-black tracking-[0.2em] uppercase py-5 shadow-[0_20px_40px_-10px_rgba(220,38,38,0.35)] transition-all duration-300 active:scale-95"
@@ -261,50 +262,107 @@ export default function Home() {
       </section>
 
       {/* ================= SPONSOR ================= */}
-<section className="relative z-10 mt-6">
+      <section className="relative z-10 mt-6">
+        <p className="text-center text-[10px] tracking-[0.4em] uppercase text-slate-400 mb-6">
+          Supported by
+        </p>
 
-  <p className="text-center text-[10px] tracking-[0.4em] uppercase text-slate-400 mb-6">
-    Supported by
-  </p>
+        {/* Box Hitam */}
+        <div className="relative overflow-hidden bg-black py-8 md:py-10 border-y border-white/5">
+          {/* Fade Pinggir */}
+          <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-r from-black via-transparent to-black"></div>
 
-  {/* Box Hitam */}
-  <div className="relative overflow-hidden bg-black py-8 md:py-10 border-y border-white/5">
+          {/* Glow Tipis */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent"></div>
 
-    {/* Fade Pinggir */}
-    <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-r from-black via-transparent to-black"></div>
-
-    {/* Glow Tipis */}
-    <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent"></div>
-
-    {/* Marquee */}
-    <div className="flex w-max animate-marquee items-center gap-14 md:gap-24 px-10">
-      {[...sponsors, ...sponsors].map((logo, index) => (
-        <img
-          key={index}
-          src={logo}
-          alt="Sponsor"
-          className="h-10 sm:h-12 md:h-14 w-auto object-contain"
-        />
-      ))}
-    </div>
-  </div>
-</section>
-{/* ================= FOOTER ================= */}
-<footer className="relative z-10 text-center py-24 md:py-32 px-5">
-
-  <div className="flex flex-col items-center gap-7 md:gap-9">
-
-    <p className="text-xl sm:text-2xl md:text-4xl f text-yellow-600 uppercase tracking-[-0.03em] text-slate-900 leading-none">
-      #KEEPING THE GAME BEAUTIFUL
-    </p>
-    <p className="text-xl sm:text-2xl md:text-4xl  text-yellow-600 uppercase tracking-[-0.03em] text-slate-900 leading-none">
-      #DEMI HOBI BUKAN GENGSI
-    </p>
-
-  </div>
-</footer>
+          {/* Marquee */}
+          <div className="flex w-max animate-marquee items-center gap-14 md:gap-24 px-10">
+            {[...sponsors, ...sponsors].map((logo, index) => (
+              <img
+                key={index}
+                src={logo}
+                alt="Sponsor"
+                className="h-10 sm:h-12 md:h-14 w-auto object-contain"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+      {/* ================= FOOTER ================= */}
+      <footer className="relative z-10 text-center py-24 md:py-32 px-5">
+        <div className="flex flex-col items-center gap-7 md:gap-9">
+          <p className="text-xl sm:text-2xl md:text-4xl f text-yellow-600 uppercase tracking-[-0.03em] text-slate-900 leading-none">
+            #KEEPING THE GAME BEAUTIFUL
+          </p>
+          <p className="text-xl sm:text-2xl md:text-4xl  text-yellow-600 uppercase tracking-[-0.03em] text-slate-900 leading-none">
+            #DEMI HOBI BUKAN GENGSI
+          </p>
+        </div>
+      </footer>
 
       {/* ================= STYLE ================= */}
+      {showRegulation && (
+        <div className="fixed inset-0 z-[999] bg-black flex items-center justify-center">
+          {/* CLOSE */}
+          <button
+            onClick={() => setShowRegulation(false)}
+            className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-black/60 backdrop-blur flex items-center justify-center text-white"
+          >
+            <X size={24} />
+          </button>
+
+          {/* PREV */}
+          <button
+            onClick={() =>
+              setCurrentRegulation((prev) =>
+                prev === 0 ? regulations.length - 1 : prev - 1,
+              )
+            }
+            className="absolute left-3 md:left-6 z-20 w-11 h-11 rounded-full bg-black/60 backdrop-blur flex items-center justify-center text-white text-2xl"
+          >
+            ‹
+          </button>
+
+          {/* NEXT */}
+          <button
+            onClick={() =>
+              setCurrentRegulation((prev) =>
+                prev === regulations.length - 1 ? 0 : prev + 1,
+              )
+            }
+            className="absolute right-3 md:right-6 z-20 w-11 h-11 rounded-full bg-black/60 backdrop-blur flex items-center justify-center text-white text-2xl"
+          >
+            ›
+          </button>
+
+          {/* IMAGE */}
+          <div className="w-full h-full flex items-center justify-center p-4 md:p-10">
+            <img
+              src={regulations[currentRegulation]}
+              alt="Regulasi"
+              className="
+          max-h-full
+          max-w-full
+          object-contain
+          rounded-2xl
+          shadow-2xl
+        "
+            />
+          </div>
+
+          {/* INDICATOR */}
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+            {regulations.map((_, i) => (
+              <div
+                key={i}
+                className={`w-2.5 h-2.5 rounded-full ${
+                  currentRegulation === i ? "bg-white" : "bg-white/30"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
       <style jsx>{`
         @keyframes marquee {
           0% {
@@ -328,7 +386,7 @@ export default function Home() {
           background: linear-gradient(
             120deg,
             transparent,
-            rgba(255,255,255,0.45),
+            rgba(255, 255, 255, 0.45),
             transparent
           );
           transform: skewX(-20deg);
@@ -340,7 +398,8 @@ export default function Home() {
           0% {
             left: -120%;
           }
-          40%, 100% {
+          40%,
+          100% {
             left: 160%;
           }
         }
