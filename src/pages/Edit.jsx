@@ -225,8 +225,8 @@ export default function EditTeam() {
 
       const age = calcAge(p.dob);
 
-      if (age < 17) {
-        alert(`Usia pemain ke-${i + 1} minimal 17 tahun`);
+      if (age < 16) {
+        alert(`Usia pemain ke-${i + 1} minimal 16 tahun`);
         return false;
       }
 
