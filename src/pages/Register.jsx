@@ -17,7 +17,7 @@ export default function Register() {
   const navigate = useNavigate();
 
   const registrationOpen = new Date("2026-05-04T00:00:00");
-  const registrationClose = new Date("2026-06-01T23:59:59");
+  const registrationClose = new Date("2026-06-05T23:59:59");
   const editLockDate = new Date("2026-06-08T23:59:59");
 
   const now = new Date();
@@ -191,7 +191,7 @@ export default function Register() {
       return (alert("Pendaftaran belum dibuka"), false);
 
     if (registrationClosed)
-      return (alert("Pendaftaran telah ditutup pada 01 Juni 2026"), false);
+      return (alert("Pendaftaran telah ditutup pada 05 Juni 2026"), false);
 
     if (sanitizeText(team.name).length < 3)
       return (alert("Nama tim minimal 3 karakter"), false);
@@ -435,7 +435,7 @@ export default function Register() {
               </h1>
 
               <p className="text-white/70 text-xs sm:text-sm mt-1">
-                Pendaftaran dibuka 05 Mei 2026 • Ditutup 01 Juni 2026
+                Pendaftaran dibuka 05 Mei 2026 • Ditutup 05 Juni 2026
               </p>
             </div>
 
@@ -907,8 +907,7 @@ export default function Register() {
 
           <div className="bg-[#fff8f8] border border-[#ffd6dc] rounded-lg p-4 text-sm text-gray-700 leading-6">
             <p>
-              • Pendaftaran peserta dibuka mulai 05 Mei 2026 dan ditutup pada 01
-              Juni 2026.
+              • Pendaftaran peserta dibuka mulai 05 Mei 2026 dan ditutup pada 05 Juni 2026.
             </p>
             <p>• Setelah submit akan dapat link edit privat.</p>
             <p>• Edit maksimal sampai 08 Juni 2026 (H-5).</p>

@@ -53,7 +53,7 @@ export default function EditTeam() {
 
   const [players, setPlayers] = useState([]);
 
-  const registrationCloseDate = "01 Juni 2026";
+  const registrationCloseDate = "05 Juni 2026";
   const rosterEditCloseDate = "08 Juni 2026";
   const hardLockDate = new Date("2026-06-08T23:59:59");
 
@@ -237,6 +237,16 @@ export default function EditTeam() {
 
       if (!p.position) {
         alert(`Posisi pemain ke-${i + 1} wajib diisi`);
+        return false;
+      }
+
+      if (!p.ktp) {
+        alert(`KTP pemain ke-${i + 1} wajib upload`);
+        return false;
+      } 
+
+      if (!p.photo) {
+        alert(`Foto pemain ke-${i + 1} wajib upload`);
         return false;
       }
     }
