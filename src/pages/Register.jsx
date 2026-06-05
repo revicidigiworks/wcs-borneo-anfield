@@ -17,7 +17,7 @@ export default function Register() {
   const navigate = useNavigate();
 
   const registrationOpen = new Date("2026-05-04T00:00:00");
-  const registrationClose = new Date("2026-06-05T23:59:59");
+  const registrationClose = new Date("2026-06-06T23:59:59");
   const editLockDate = new Date("2026-06-08T23:59:59");
 
   const now = new Date();
@@ -191,7 +191,7 @@ export default function Register() {
       return (alert("Pendaftaran belum dibuka"), false);
 
     if (registrationClosed)
-      return (alert("Pendaftaran telah ditutup pada 05 Juni 2026"), false);
+      return (alert("Perpanjangan Pendaftaran telah ditutup pada 06 Juni 2026"), false);
 
     if (sanitizeText(team.name).length < 3)
       return (alert("Nama tim minimal 3 karakter"), false);

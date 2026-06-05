@@ -53,7 +53,7 @@ export default function EditTeam() {
 
   const [players, setPlayers] = useState([]);
 
-  const registrationCloseDate = "05 Juni 2026";
+  const registrationCloseDate = "06 Juni 2026";
   const rosterEditCloseDate = "08 Juni 2026";
   const hardLockDate = new Date("2026-06-08T23:59:59");
 
