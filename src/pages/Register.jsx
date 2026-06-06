@@ -245,7 +245,7 @@ export default function Register() {
         return (alert(`Tanggal lahir pemain ke-${i + 1} wajib diisi`), false);
 
       const age = calcAge(p.dob);
-      if (age < 15 || age > 50)
+      if (age < 16 || age > 50)
         return (alert(`Usia pemain ke-${i + 1} harus 16 - 50 tahun`), false);
       if (!p.position)
         return (alert(`Posisi pemain ke-${i + 1} wajib diisi`), false);
