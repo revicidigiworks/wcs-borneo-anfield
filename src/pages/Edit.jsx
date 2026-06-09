@@ -55,7 +55,7 @@ export default function EditTeam() {
 
   const registrationCloseDate = "06 Juni 2026";
   const rosterEditCloseDate = "08 Juni 2026";
-  const hardLockDate = new Date("2026-06-09T23:59:59");
+  const hardLockDate = new Date("2026-06-10T23:59:59");
 
   const compressImage = async (file, type) => {
     const options =
