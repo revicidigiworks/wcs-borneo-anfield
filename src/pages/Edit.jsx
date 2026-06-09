@@ -142,14 +142,14 @@ export default function EditTeam() {
         const now = new Date();
         const expiry = data.editExpiry?.toDate();
 
-        // if (data.isLocked || (expiry && now > expiry) || now > hardLockDate) {
-        //   setLocked(true);
-        //   alert("Batas edit sudah habis");
-        // }
-         if (locked) {
-      alert("Batas edit sudah habis");
-      return;
-    }
+        if (data.isLocked || (expiry && now > expiry) || now > hardLockDate) {
+          setLocked(true);
+          alert("Batas edit sudah habis");
+        }
+    //      if (locked) {
+    //   alert("Batas edit sudah habis");
+    //   return;
+    // }
       } catch (err) {
         console.error(err);
         alert("Gagal memuat data ❌");
@@ -229,7 +229,7 @@ export default function EditTeam() {
 
       const age = calcAge(p.dob);
 
-      if (age < 15) {
+      if (age < 16) {
         alert(`Usia pemain ke-${i + 1} minimal 16 tahun`);
         return false;
       }
